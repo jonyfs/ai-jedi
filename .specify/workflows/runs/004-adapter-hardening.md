@@ -121,3 +121,15 @@ talked himself out of a finding a tool then caught — an argument for running t
 
 Result: **64 passed, 0 failed, 0 skipped**. Zero shellcheck findings. FR-005 byte-identity still intact
 at cksum `2195510091 25097`.
+
+### PR #8 — lint triage, round 1
+
+Verified: zero shellcheck findings, 64 passed / 0 failed / 0 skipped, two inline suppressions each with
+an adjacent justification, zero global rule disablings (FR-007), FR-005 cksum unchanged, live config
+untouched and reporting current.
+
+**Verdict: approve — 0 findings.** Shepherd skipped: a clean review leaves it nothing to resolve, and
+invoking it would produce an empty diff for step 3 to re-review. Rounds used: 1 of 3.
+
+Check gate: no workflows configured, no checks reported, `required_status_checks` null — the
+absent-checks case. Merge proceeded on review approval, and the absence is recorded here.
