@@ -162,14 +162,26 @@ coverage of untested tools.
 Run `/speckit-analyze` and confirm it reports convergence across `spec.md`, `plan.md`, and
 `tasks.md` before any edit to `instructions.md` is made.
 
-## Step 8 — Post-implementation review chain (Principle VI)
+## Step 8 — Autonomous review-to-merge loop (Principle VI, SC-016)
 
-After the revision lands, the chain runs automatically:
+The chain runs automatically when the pull request is opened — no one asks for it:
 
-1. `/pr-reviewer` — against the pull request, since the repository now has a remote.
-2. `/pr-shepherd` — only after the review closes; resolves comments, conflicts, and checks.
+1. `/pr-reviewer` against the pull request.
+2. `/pr-shepherd` only after the review closes; resolves comments, conflicts, and checks, fixing
+   only what review raised.
+3. `/pr-reviewer` again, against the shepherd's own diff. Those edits are code no reviewer has seen.
+4. Repeat until a review closes clean, then automerge lands the change on `main`.
 
 CRITICAL findings freeze the change until resolved.
+
+Verify the bounds hold (SC-016):
+
+- The loop halts and reports at the round limit rather than iterating indefinitely.
+- The shepherd's diff contains nothing beyond the findings it was resolving.
+- Branch protection on `main` is unchanged after the loop — required pull requests, required
+  conversation resolution, and `enforce_admins` all still set.
+- An unconverged change is left open with its state recorded, not merged.
+- Every round appears in `.specify/workflows/runs/001-instructions-quality-revision.md`.
 
 ## Definition of done
 

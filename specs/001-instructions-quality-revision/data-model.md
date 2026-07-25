@@ -157,6 +157,14 @@ New entries extend the register; they do not replace anything above.
 | D84 | README explains benefits in operator terms, never restating directive text | n/a — README obligation | FR-022, Principle XII |
 | D85 | No README benefit claim without a backing directive; no implied tool coverage that was not exercised | n/a — README obligation | FR-022, Principle XII |
 | D86 | README states the current instruction version and links into sections rather than duplicating them | n/a — README obligation | FR-022, Principle XII |
+| D87 | Review chain triggers automatically on pull request creation, and at end-of-unit when no request exists | 8 | FR-023, Principle VI |
+| D88 | Chain loops: review, fix, re-review the fixer's own diff, until a review closes clean | 8 | FR-023, Principle VI |
+| D89 | The fixer's own diff MUST be re-reviewed — merging it on the previous review's strength defeats the chain | 8 | FR-023, Principle VI |
+| D90 | Loop halts and reports after a stated maximum number of rounds | 8 | FR-023, Principle VI |
+| D91 | Fixer addresses only what review raised; scope expansion is prohibited because that work would be unreviewed | 8 | FR-023, Principle VI |
+| D92 | Branch protection MUST NOT be weakened to complete the loop; blocked merge halts and reports | 8 | FR-023, Principle VI |
+| D93 | Unconverged change leaves the request open with state recorded; never merged | 8 | FR-023, Principle VI |
+| D94 | Every round's verdict, findings, actions, and merge outcome recorded in the run log so an interrupted loop resumes | 8 | FR-023, Principle VI |
 
 ## State transitions
 

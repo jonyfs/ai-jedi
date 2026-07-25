@@ -180,19 +180,23 @@ an adapter projection). Omit this phase entirely for features that touch neither
 
 ---
 
-## Phase N+2: Mandatory Post-Implementation Review (Constitution Principle VI)
+## Phase N+2: Autonomous Review-to-Merge Loop (Constitution Principle VI)
 
-**Purpose**: Implementation is complete only when review has closed and the change is
-mergeable. This phase MUST run automatically at the end of the implementation unit — the
-operator does not have to ask for it.
+**Purpose**: Implementation is complete only when the change has MERGED. This phase MUST run
+automatically — on pull request creation, or at the end of the implementation unit when no pull
+request exists yet. The operator does not have to ask for it.
 
 - [ ] TXXX Run `/pr-reviewer` and record the severity-ranked verdict in `.specify/workflows/runs/`
 - [ ] TXXX Resolve every CRITICAL finding; CRITICAL findings freeze the branch
-- [ ] TXXX Run `/pr-shepherd` ONLY after the review has closed — resolve comments, conflicts, and failing checks, then arm automerge
+- [ ] TXXX Run `/pr-shepherd` ONLY after the review has closed — resolve comments, conflicts, and failing checks, fixing only what review raised
+- [ ] TXXX Re-run `/pr-reviewer` against the shepherd's own diff — its edits are code no reviewer has seen and MUST NOT merge on the strength of the previous review
+- [ ] TXXX Loop review-shepherd-re-review until a review closes clean, then arm automerge so the change lands on `main` through the pull request
+- [ ] TXXX Halt and report if the round limit is reached, if scope would have to expand beyond the findings, or if branch protection blocks the merge — leave the pull request open rather than merging an unconverged change
 
-**Ordering constraint**: running the shepherd before the review closes is prohibited. When no
-pull request exists, `/pr-reviewer` runs against the local diff and the shepherd step is
-recorded as pending in the run log.
+**Ordering constraint**: running the shepherd before the review closes is prohibited. The
+shepherd's own diff must be re-reviewed before merge. Branch protection MUST NOT be weakened to
+complete the loop. When no pull request exists, `/pr-reviewer` runs against the local diff and the
+shepherd step is recorded as pending in the run log.
 
 ---
 

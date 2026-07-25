@@ -216,6 +216,11 @@ was written.
   the current instruction version, MUST link into the instruction sections rather than duplicating
   them, MUST NOT claim a benefit no directive backs, and MUST NOT imply coverage of tools the set has
   not been exercised against.
+- **FR-023**: The file MUST state that the review chain triggers automatically on pull request
+  creation and loops — review, fix, re-review the fixer's own changes — until the change merges,
+  and MUST state its autonomy bounds: a round limit, no scope expansion beyond the findings, no
+  weakening of branch protection, and halting with the request left open rather than merging an
+  unconverged change.
 
 ### Key Entities
 
@@ -263,6 +268,10 @@ was written.
 - **SC-015**: Every capability in the shipped instruction set is represented in the README, every
   README benefit claim traces to a directive, and the README's stated version matches the title —
   zero unbacked claims, zero missing capabilities, zero version mismatch.
+- **SC-016**: A pull request opened without the operator asking for review receives one
+  automatically, and the loop either merges the change or halts with the request left open and its
+  state recorded — never merging a change whose review did not close, and never weakening branch
+  protection to do so.
 
 ## Assumptions
 
