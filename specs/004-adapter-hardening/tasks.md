@@ -84,14 +84,14 @@ live in the operator's global config, so an accidental write there is worse than
 
 **Round limit: 3** — constitutional default.
 
-- [ ] T017 Open a pull request from `004-adapter-hardening` to `main` covering `.specify/adapters/claude-code/` and the feature artifacts, declaring the Principle XI single-PR exception
-- [ ] T018 Run the reviewer and record the severity-ranked verdict with its round number in `.specify/workflows/runs/004-adapter-hardening.md`
-- [ ] T019 If findings exist, run the shepherd only after the review closes, fixing ONLY what review raised in `.specify/adapters/claude-code/`. If the review closed with no findings, SKIP the shepherd entirely
-- [ ] T020 If the shepherd ran, re-review its own diff and record the round in `.specify/workflows/runs/004-adapter-hardening.md`
-- [ ] T021 Repeat T019–T020 until a review closes clean or round 3 is reached, recording each round in `.specify/workflows/runs/004-adapter-hardening.md`
-- [ ] T022 Evaluate the check gate and record the OBSERVED state in `.specify/workflows/runs/004-adapter-hardening.md`
-- [ ] T023 Complete the merge into `main` without requesting confirmation per the standing authorization, recording the outcome in `.specify/workflows/runs/004-adapter-hardening.md`
-- [ ] T024 AFTER the merge, confirm the platform removed the remote ref, delete the LOCAL branch `004-adapter-hardening`, confirm no worktree remains, verify branch protection on `main` is byte-identical to before the loop, and record all of it in `.specify/workflows/runs/004-adapter-hardening.md`
+- [X] T017 Open a pull request from `004-adapter-hardening` to `main` covering `.specify/adapters/claude-code/` and the feature artifacts, declaring the Principle XI single-PR exception
+- [X] T018 Run the reviewer and record the severity-ranked verdict with its round number in `.specify/workflows/runs/004-adapter-hardening.md`
+- [X] T019 If findings exist, run the shepherd only after the review closes, fixing ONLY what review raised in `.specify/adapters/claude-code/`. If the review closed with no findings, SKIP the shepherd entirely
+- [X] T020 If the shepherd ran, re-review its own diff and record the round in `.specify/workflows/runs/004-adapter-hardening.md`
+- [X] T021 Repeat T019–T020 until a review closes clean or round 3 is reached, recording each round in `.specify/workflows/runs/004-adapter-hardening.md`
+- [X] T022 Evaluate the check gate and record the OBSERVED state in `.specify/workflows/runs/004-adapter-hardening.md`
+- [X] T023 Complete the merge into `main` without requesting confirmation per the standing authorization, recording the outcome in `.specify/workflows/runs/004-adapter-hardening.md`
+- [X] T024 AFTER the merge, confirm the platform removed the remote ref, delete the LOCAL branch `004-adapter-hardening`, confirm no worktree remains, verify branch protection on `main` is byte-identical to before the loop, and record all of it in `.specify/workflows/runs/004-adapter-hardening.md`
 
 ---
 

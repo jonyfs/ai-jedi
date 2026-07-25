@@ -30,6 +30,18 @@ chose to reach the same outcome through the adapter mechanism instead.
 protocol and intensity levels are already `instructions.md` sections 5 and 6, so they reach every target
 as a consequence of projecting the source.
 
+## Open tasks that remain open, and why
+
+Six tasks across features 001 and 003 are genuinely unfinished. Every other task in every shipped
+feature is now marked, after an audit found 44 completed tasks still showing as open — the repository was
+recording finished work as pending, which makes the task lists useless as a signal.
+
+| Task | Feature | Why it cannot be closed here |
+|---|---|---|
+| T018, T035, T038, T039 | 001 | Behavioral probes needing fresh sessions of Codex, Copilot or OpenCode loading the instruction set as their global config. Blocked until feature 005 projects to them. |
+| T036 | 001 | Depends on T035's probe output; nothing to act on until it runs. |
+| T043 | 003 | Cross-tool confirmation that a fresh session applies a v0.1.0-only rule. Cannot be self-administered by the session that ran the projection, which still holds the instructions it loaded at start. |
+
 ## Deferred with reasons
 
 ### Adapter hardening — from the PR #5 review

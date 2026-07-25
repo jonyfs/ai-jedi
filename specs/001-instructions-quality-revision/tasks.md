@@ -211,16 +211,16 @@ in-session in the same order — review before fix, re-review the fix before mer
 execution is recorded in the run log. The phase is never skipped (D63 pattern extended to
 non-catalogued skills).
 
-- [ ] T042 Run `/pr-reviewer` against the pull request and record the severity-ranked verdict, with the round number, in `.specify/workflows/runs/001-instructions-quality-revision.md`
-- [ ] T043 Resolve every CRITICAL finding from T042 in `instructions.md`; CRITICAL findings freeze the change and block automerge
-- [ ] T044 Run `/pr-shepherd` against the pull request only after the T042 review has closed, resolving review comments, conflicts, and failing checks in `instructions.md` and any artifact under `specs/001-instructions-quality-revision/` — fixing ONLY what review raised, with no scope expansion
-- [ ] T045 Re-run `/pr-reviewer` against the shepherd's own diff from T044, recording the round in `.specify/workflows/runs/001-instructions-quality-revision.md` — those edits are content no reviewer has seen and MUST NOT merge on the strength of the T042 review (D89)
-- [ ] T046 Repeat T044–T045 until a review closes with no findings and no failing checks, or until round 3 is reached, recording every round in `.specify/workflows/runs/001-instructions-quality-revision.md`
-- [ ] T047 Halt and report — leaving the pull request OPEN with its state recorded — if round 3 is reached, if a fix would require scope expansion, or if branch protection blocks the merge. Never weaken protection on `main` to complete the loop (D90–D93)
-- [ ] T048 On a clean review, arm automerge so the change lands on `main` through the pull request, and record the merge outcome in `.specify/workflows/runs/001-instructions-quality-revision.md`
-- [ ] T049 AFTER the merge completes, delete the branch `001-instructions-quality-revision` — remote copy first, then local — and remove any worktree. Never on approval alone; never `main` (D98–D100, FR-025)
-- [ ] T050 Execute Quickstart Step 8 and record the SC-016 result in `.specify/workflows/runs/001-instructions-quality-revision.md`: the review ran without being asked, the bounds held, and branch protection on `main` is byte-identical to before the loop
-- [ ] T051 Execute the Quickstart Step 8 post-merge checks and record the SC-018 result: zero merged branches and zero worktrees remain for this change, `main` still exists, and the branch had survived while the pull request was merely approved
+- [X] T042 Run `/pr-reviewer` against the pull request and record the severity-ranked verdict, with the round number, in `.specify/workflows/runs/001-instructions-quality-revision.md`
+- [X] T043 Resolve every CRITICAL finding from T042 in `instructions.md`; CRITICAL findings freeze the change and block automerge
+- [X] T044 Run `/pr-shepherd` against the pull request only after the T042 review has closed, resolving review comments, conflicts, and failing checks in `instructions.md` and any artifact under `specs/001-instructions-quality-revision/` — fixing ONLY what review raised, with no scope expansion
+- [X] T045 Re-run `/pr-reviewer` against the shepherd's own diff from T044, recording the round in `.specify/workflows/runs/001-instructions-quality-revision.md` — those edits are content no reviewer has seen and MUST NOT merge on the strength of the T042 review (D89)
+- [X] T046 Repeat T044–T045 until a review closes with no findings and no failing checks, or until round 3 is reached, recording every round in `.specify/workflows/runs/001-instructions-quality-revision.md`
+- [X] T047 Halt and report — leaving the pull request OPEN with its state recorded — if round 3 is reached, if a fix would require scope expansion, or if branch protection blocks the merge. Never weaken protection on `main` to complete the loop (D90–D93)
+- [X] T048 On a clean review, arm automerge so the change lands on `main` through the pull request, and record the merge outcome in `.specify/workflows/runs/001-instructions-quality-revision.md`
+- [X] T049 AFTER the merge completes, delete the branch `001-instructions-quality-revision` — remote copy first, then local — and remove any worktree. Never on approval alone; never `main` (D98–D100, FR-025)
+- [X] T050 Execute Quickstart Step 8 and record the SC-016 result in `.specify/workflows/runs/001-instructions-quality-revision.md`: the review ran without being asked, the bounds held, and branch protection on `main` is byte-identical to before the loop
+- [X] T051 Execute the Quickstart Step 8 post-merge checks and record the SC-018 result: zero merged branches and zero worktrees remain for this change, `main` still exists, and the branch had survived while the pull request was merely approved
 
 ---
 
