@@ -5,7 +5,7 @@ Tags: [#plan #instructions #portability]
 
 # Implementation Plan: Instructions Quality Revision
 
-**Branch**: none (repository is not yet under version control) | **Date**: 2026-07-24 | **Spec**: [[spec]] — `specs/001-instructions-quality-revision/spec.md`
+**Branch**: `001-instructions-quality-revision` | **Date**: 2026-07-24 | **Spec**: [[spec]] — `specs/001-instructions-quality-revision/spec.md`
 
 **Input**: Feature specification from `specs/001-instructions-quality-revision/spec.md`
 
@@ -45,8 +45,9 @@ reading unrelated sections
 machine-local absolute paths (FR-012); English only (Principle III); token additions must remove
 ambiguity, not restate (FR-011)
 
-**Scale/Scope**: One file, 82 lines today, 41 directives, 11 sections. Adapters and projections
-explicitly out of scope.
+**Scale/Scope**: One file, 82 lines today carrying 41 directives across 11 sections. The revision
+ships those 41 plus 62 added obligations across sections 2–14. Adapters and projections explicitly
+out of scope.
 
 ## Constitution Check
 
@@ -59,12 +60,14 @@ explicitly out of scope.
 | III. Language Duality | All persisted artifacts in English | PASS — spec, plan, and revised file are English |
 | IV. Token Density with Auto-Clarity | Compression preserved; clarity exceptions explicit | PASS — FR-003 precedence ladder strengthens the existing switch |
 | V. Spec-Driven Change | specify → clarify → plan → tasks → implement → converge | PASS — spec exists; this is the plan step; `/speckit-analyze` runs before implementation |
-| VI. Automated Post-Implementation Review | Review chain runs after the implementation unit | PASS — quickstart records the chain; no git remote yet, so the local-diff degradation applies and the shepherd step is logged pending |
-| Authoring constraints | Frontmatter, wiki links, ≤800 lines, no secrets | PASS — FR-007 and FR-012 |
-
+| VI. Automated Post-Implementation Review | Autonomous review-to-merge loop, round limit, post-merge branch cleanup | PASS — a remote exists and `main` is protected, so the loop runs against the pull request; the local-diff degradation does NOT apply. Round limit: constitutional default of 3, not overridden. Phase 8 of `tasks.md` executes it |
 | VII. Versioned Instruction Surface | Title carries MAJOR.MINOR.PATCH; bump declared before implementation | PASS — see the bump declaration below |
 | VIII. Executable Agent Provisioning | Provisioning section present; invocation syntax derived; catalog agrees with manifests | PASS — sections 12–14 of the target order |
 | IX. Delimited Managed Region | Marker pair present; projections target global config only | PASS — source carries the pair and is exempt from the global-path rule |
+| X. Capability-Tiered Agent Materialization | Tier vocabulary only; mapping tool-scoped; agents materialized idempotently | PASS — FR-018 and FR-019; tasks T032i–T032l |
+| XI. Isolated Parallel Execution | Per-unit worktree isolation; dependency-order merge; PR-per-story | PASS — see the Parallel Execution Plan below, which declares zero parallel implementation units because the single-file deliverable makes them contend |
+| XII. Operator-Facing README | README exists, covers every capability, claims are directive-backed | PASS — FR-022; tasks T041d–T041f. Currently ABSENT, which is the standing violation this feature closes |
+| Authoring constraints | Frontmatter accurate not just present, wiki links, ≤800 lines, no secrets | PASS — FR-007, FR-012, FR-024 |
 
 **Instruction Version Bump**
 
@@ -116,6 +119,7 @@ specs/001-instructions-quality-revision/
 
 ```text
 instructions.md          # THE deliverable — revised in place
+README.md                # Mandated deliverable (FR-022, Principle XII) — currently absent
 CLAUDE.md                # Managed SPECKIT region only; plan pointer
 .specify/
 ├── memory/constitution.md   # Read-only input (governs the revision)
@@ -124,7 +128,8 @@ specs/001-instructions-quality-revision/   # This feature's artifacts
 ```
 
 **Structure Decision**: No source tree. The repository is an instruction control plane: the
-single deliverable is the root `instructions.md`, with `specs/` holding lifecycle artifacts and
+deliverables are the root `instructions.md` and its operator-facing `README.md`, with `specs/`
+holding lifecycle artifacts and
 `CLAUDE.md` carrying only a managed pointer region. No `src/` or `tests/` directory is created —
 verification is document-level and lives in `quickstart.md`.
 

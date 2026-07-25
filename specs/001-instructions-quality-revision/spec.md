@@ -106,8 +106,6 @@ returns the right rule without reading unrelated sections.
 
 ---
 
----
-
 ### User Story 5 - The instruction set can update itself in installed tools (Priority: P2)
 
 The operator says "update my AI Jedi instructions" and any agent — in any installed tool — can
@@ -218,7 +216,7 @@ was written.
   not been exercised against.
 - **FR-023**: The file MUST state that the review chain triggers automatically on pull request
   creation and loops — review, fix, re-review the fixer's own changes — until the change merges,
-  and MUST state its autonomy bounds: a round limit, no scope expansion beyond the findings, no
+  and MUST state its autonomy bounds: a round limit of 3, no scope expansion beyond the findings, no
   weakening of branch protection, and halting with the request left open rather than merging an
   unconverged change.
 - **FR-024**: The file's own `Summary:` MUST describe the directives it actually carries and its
@@ -247,9 +245,9 @@ was written.
 - **SC-002**: Zero retired vendor identifiers remain in the file.
 - **SC-003**: Every constitutional principle imposing runtime behavior is represented by at
   least one directive in the file.
-- **SC-004**: In a first-session test against each installed tool, the tool applies compression,
-  lifecycle routing, and frontmatter rules without being reminded, in at least 3 of 3 tools
-  tested.
+- **SC-004**: In a first-session test, every tool actually exercised applies compression, lifecycle
+  routing, and frontmatter rules without being reminded — 100% of tools tested, with at least 3
+  tools exercised out of the 4 assumed installed.
 - **SC-005**: For each of at least 5 sampled situations, a tool asked "which rule applies"
   names the correct section on the first attempt.
 - **SC-006**: The file stays within the stated file-length ceiling and opens with compliant

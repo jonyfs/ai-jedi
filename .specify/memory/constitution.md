@@ -1,8 +1,15 @@
 <!--
 Sync Impact Report
-- Version change: 1.10.0 → 1.11.0
+- Version change: 1.11.0 → 1.12.0
 - Ratification date unchanged: 2026-07-24
 - Modified principles:
+  - Principle VI. Automated Post-Implementation Review — the review-shepherd round
+    limit now has a concrete default of 3, overridable per feature in plan.md.
+    Previously the principle required "a stated maximum" without stating one,
+    which made the bound unenforceable and SC-016 unverifiable. Bump is MINOR:
+    a number was added where none existed, so guidance is materially expanded
+    rather than merely clarified.
+- Superseded report for v1.11.0 — modified principles:
   - Principle VI. Automated Post-Implementation Review — gains step 5: after the
     MERGE completes, the pull request's branch is deleted (remote then local) and
     its worktree removed. Explicitly NOT triggered by approval — a branch deleted
@@ -121,6 +128,8 @@ Sync Impact Report
   fallback no longer applies to work pushed to that remote.
 
 Prior version history
+- 1.11.0 (2026-07-25): frontmatter fidelity and post-merge branch cleanup folded
+  into existing sections.
 - 1.10.0 (2026-07-25): Principle VI became an autonomous review-to-merge loop with
   shepherd-diff re-review and explicit autonomy bounds.
 - 1.9.0 (2026-07-25): added Principle XII. Operator-Facing README.
@@ -238,9 +247,11 @@ consent to run it.
 
 **Autonomy bounds.** Autonomous merge is a real delegation, so it is bounded rather than open-ended:
 
-- The loop MUST halt and report after a stated maximum number of review-shepherd rounds. Convergence
-  is expected in a few rounds; a loop that keeps finding new problems is a signal the change is wrong,
-  not a signal to keep iterating.
+- The loop MUST halt and report after a maximum number of review-shepherd rounds. **The default limit
+  is 3.** A feature MAY set a different limit in its `plan.md`; absent an explicit choice, 3 applies.
+  Convergence is expected in one or two rounds; reaching the third is a signal the change is wrong,
+  not a signal to keep iterating. A limit that is merely "stated somewhere" is not a limit — the
+  number MUST be resolvable before the loop starts.
 - The shepherd MUST fix only what review raised. Expanding scope — adding features, refactoring
   beyond the findings, or "improving" untouched code — is prohibited, because that work would itself
   be unreviewed.
@@ -657,4 +668,4 @@ Compliance review: every pull request MUST verify adherence to Principles I–XI
 that violates a principle MUST be justified in the plan's Complexity Tracking section or
 removed. Runtime development guidance lives in `instructions.md`.
 
-**Version**: 1.11.0 | **Ratified**: 2026-07-24 | **Last Amended**: 2026-07-25
+**Version**: 1.12.0 | **Ratified**: 2026-07-24 | **Last Amended**: 2026-07-25

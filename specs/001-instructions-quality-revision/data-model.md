@@ -1,5 +1,5 @@
 ---
-Summary: Directive register of all 41 rules present in the pre-revision instructions.md, with destination sections, plus the entity definitions used by the revision.
+Summary: Directive register covering the 41 pre-revision rules plus the 62 added by this feature, each mapped to a destination section, with the entity definitions used by the revision.
 Tags: [#data-model #directive-register #instructions]
 ---
 
@@ -15,7 +15,7 @@ One enforceable rule. The atomic unit that FR-001 protects.
 
 | Field | Meaning | Validation |
 |---|---|---|
-| `id` | Stable register key (`D01`…`D41`) | Unique; never reused after retirement |
+| `id` | Stable register key (`D01`…`D100`) | Unique; never reused after retirement |
 | `trigger` | Condition that activates the rule | Non-empty after revision (FR-002) |
 | `obligation` | Required behavior | MUST / MUST NOT / SHOULD; non-empty |
 | `exception` | Termination or suspension condition | May be `none`, but never blank/undefined |
@@ -103,8 +103,10 @@ refer to the Target Section Order in [[plan]].
 | D40 | Context management: sub-agents receive isolated context to prevent context rot | Guardrails | 11 | 3 |
 | D41 | Resilience: persist orchestration logs and state under `.specify/workflows/runs/` | Guardrails | 11 | 3 |
 
-**Count**: 41 directives (D09 counted as four distinct obligations). SC-001 requires all 41 to be
-locatable in the revised file.
+**Pre-revision count**: 41 directives, `D01`–`D41` with `D09` counted as four distinct obligations.
+SC-001 requires all 41 to be locatable in the revised file. The register table below the added-
+directives heading extends past this point — `D42` onward are NEW obligations, not part of the
+preservation baseline, and are verified for presence rather than for preservation.
 
 ## Directives added by this revision
 
@@ -119,10 +121,10 @@ New entries extend the register; they do not replace anything above.
 | D46 | CRITICAL review findings freeze the branch; automerge MUST NOT be armed | 8 | FR-005, Principle VI |
 | D47 | Silence is consent to run the review chain; skipping requires an explicit per-change opt-out | 8 | FR-005, Principle VI |
 | D48 | Vendor values live only in the tool-scoped block and MUST be re-verified before use | 12 | FR-004 |
-| D49 | Degradation: no sub-agents → sequential single-agent execution of the same phases | 13 | FR-006 |
-| D50 | Degradation: no slash commands → follow the phase obligations manually in order | 13 | FR-006 |
-| D51 | Degradation: no git remote → review the local diff, log the shepherd step as pending | 13 | FR-006, Principle VI |
-| D52 | Degradation: no run-log directory → report state inline, declare resumption unrecoverable | 13 | FR-006 |
+| D49 | Degradation: no sub-agents → sequential single-agent execution of the same phases | 14 | FR-006 |
+| D50 | Degradation: no slash commands → follow the phase obligations manually in order | 14 | FR-006 |
+| D51 | Degradation: no git remote → review the local diff, log the shepherd step as pending | 14 | FR-006, Principle VI |
+| D52 | Degradation: no run-log directory → report state inline, declare resumption unrecoverable | 14 | FR-006 |
 | D53 | Conversational language mirrors the operator; every persisted artifact is English | 2 | Principle III |
 | D54 | Never emit secrets, operator-identifying data, or machine-local absolute paths | 3 | FR-012, authoring constraints |
 | D55 | Title carries an explicit MAJOR.MINOR.PATCH version; first versioned release is 0.0.1 and the `V4` marker is retired | 1 + 2 | FR-013, Principle VII |
