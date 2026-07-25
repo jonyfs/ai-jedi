@@ -1,6 +1,6 @@
 <!--
 Sync Impact Report
-- Version change: 1.17.0 → 1.18.0
+- Version change: 1.17.0 → 1.18.1
 - Ratification date unchanged: 2026-07-24
 - Last amended: 2026-07-25
 - Modified principles:
@@ -14,6 +14,12 @@ Sync Impact Report
     "THIS repository" — correct inside this file, meaningless once propagated into the machine-wide
     surface the same report requires it to reach. Replaced with a lookup against the working tree's
     own constitution, so the rule keeps its meaning when it moves.
+  - VI, again, at v1.18.1 (PATCH): the lookup said the constitution "records the grant", which is
+    prose an agent must interpret rather than a test it can run. Round 1 of feature 006's review
+    raised it: an unfamiliar constitution gives no procedure, so the agent judges. Replaced with the
+    literal marker line `AI-JEDI:MERGE-AUTHORIZED`, which this file now carries. PATCH because the
+    grant is unchanged — only its form became checkable. Adding the marker elsewhere is explicitly
+    reserved to the operator; an agent writing it would be granting itself the authorization.
 - Structural change: the 214-line header comment was split. Only the CURRENT amendment's report
   stays here; superseded reports and the version list moved to
   `.specify/memory/constitution-history.md`. The file's own File Architecture rule mandates
@@ -148,10 +154,28 @@ the first loops run. Nothing in that grant extended it to repositories the opera
 months.
 
 **Identifying an authorized repository.** The grant MUST be recoverable from the working tree, never
-from where the reading agent happens to be. A repository is authorized when its own
-`.specify/memory/constitution.md` records the grant — that is, when a constitution is present AND its
-Principle VI carries this authorization. Absent that file, or present without the grant, the
-repository is unauthorized and the loop halts at the merge.
+from where the reading agent happens to be, and MUST be testable mechanically rather than read as
+prose. A repository is authorized when its own `.specify/memory/constitution.md` contains this exact
+line:
+
+```text
+AI-JEDI:MERGE-AUTHORIZED
+```
+
+Absent the file, or present without that line, the repository is unauthorized and the loop halts at
+the merge.
+
+Prose is not a protocol. "The constitution records the grant" was the first phrasing here and it left
+an agent facing an unfamiliar constitution with no procedure — it would read several hundred lines and
+judge, which Principle IV's ladder exists to avoid. A constitution mentioning autonomous merge in
+passing would read as a grant; a real grant reworded by a later amendment would read as its absence.
+Both failures are silent and one of them merges.
+
+The marker is a deliberate opt-in the operator types once per repository, so the check and the consent
+are the same act. It MUST NOT be added by an agent on its own initiative in any repository — doing so
+would be an agent granting itself the authorization, which is the failure this entire clause prevents.
+
+**This repository is authorized:** AI-JEDI:MERGE-AUTHORIZED
 
 This is stated as a lookup rather than as "this repository" deliberately. The deictic form resolves
 correctly inside this file, which lives in the granting repository, and resolves to nothing once the
@@ -661,4 +685,4 @@ Compliance review: every pull request MUST verify adherence to Principles I–XI
 that violates a principle MUST be justified in the plan's Complexity Tracking section or
 removed. Runtime development guidance lives in `instructions.md`.
 
-**Version**: 1.18.0 | **Ratified**: 2026-07-24 | **Last Amended**: 2026-07-25
+**Version**: 1.18.1 | **Ratified**: 2026-07-24 | **Last Amended**: 2026-07-25

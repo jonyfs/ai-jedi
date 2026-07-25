@@ -48,35 +48,26 @@ tool at all. It was classified as blocked without being read. Run and passed —
 secrets, every governance area represented, four collision pairs resolved by the ladder alone.
 | T043 | 003 | Cross-tool confirmation that a fresh session applies a v0.1.0-only rule. Cannot be self-administered by the session that ran the projection, which still holds the instructions it loaded at start. |
 
-## Decided, not started — continued
+## Shipped since being recorded here
 
-### Propagate the merge-authorization scope into instructions.md section 8
+### Propagate the merge-authorization scope into instructions.md — DONE, feature 006
 
-Constitution v1.18.0 bounded the standing merge authorization to this repository. Section 8 of
-`instructions.md` still carries the unscoped version, and section 8 is what every tool on the machine
-actually loads — so until this propagates, the amendment governs nothing outside this file.
+Constitution v1.18.0 bounded the standing merge authorization; feature 006 carried it into
+`instructions.md` section 8 and bumped the surface to `v0.2.0`. Until that propagation the amendment
+was inert: agents read the projection, never the constitution.
 
-**Why it is not done in the amendment**: Principle V routes instruction-content changes through
-specify → clarify → plan → tasks → implement → converge. Editing section 8 ad hoc from a
-`/speckit-constitution` run would violate the principle the amendment exists to strengthen.
+Shipped alongside it, all four grounded in the same assessment: section 11's Orchestrator trigger now
+requires a SpecKit installation rather than a bare `tasks.md`; section 6's unmeasured `~65%` figure is
+marked unmeasured; section 14 gained a degradation row for an absent `.specify/integration.json`; and
+section 9's wiki links are annotated as resolving only in the source repository.
 
-**Scope when it runs**: section 8's "Standing merge authorization" block gains the repository-scope
-clause and the halt-and-report behaviour outside this repository. Candidate companions, all found in
-the same assessment and all cheap once a spec is open:
+**Retracted from that assessment, recorded so it is not re-raised**: a claim that section 11's catalog
+omits installed skills. Counted afterwards — `.claude/skills/` holds exactly the 11 `speckit-*` skills
+the catalog names. The 26 `specjedi-*` cited were a declaration in the PARENT directory's `CLAUDE.md`,
+a sibling project, not an installation here.
 
-- Section 11's Orchestrator Mode trigger fires on any `tasks.md` anywhere. Verified: no constitutional
-  principle asks for that breadth — it is an instructions.md invention.
-- Section 6 states `~65% token reduction` as fact. Never measured. Same class as the `tier_map`
-  identifiers corrected in feature 005.
-- Section 12 derives invocation syntax from `.specify/integration.json`; section 14's degradation
-  table has no row for that file being absent, which is the normal case outside a SpecKit repository.
-- `[[README]]` and `[[constitution]]` in section 9 resolve to nothing once projected into a global
-  config.
-
-**Retracted from the same assessment, recorded so it is not re-raised**: a claim that section 11's
-catalog omits installed skills. Counted afterwards — `.claude/skills/` holds exactly the 11
-`speckit-*` skills the catalog names. The 26 `specjedi-*` skills cited were a declaration in the
-PARENT directory's `CLAUDE.md`, a sibling project, not an installation here.
+**Also withdrawn**: the complaint that the instruction surface is too large. 25 KB against 155 KB
+already loaded from `~/.claude/rules/` — it is 14% of the per-session load, not the problem.
 
 ## Deferred with reasons
 

@@ -5,7 +5,7 @@ Tags: [#readme #onboarding #instructions #operator-guide #adapter #projection]
 
 # AI Jedi
 
-**Instruction version: `0.1.0`**
+**Instruction version: `0.2.1`**
 
 One file — [`instructions.md`](instructions.md) — configures every AI coding tool on your machine.
 Write a rule once; every tool that loads the file behaves the same way.
@@ -175,7 +175,10 @@ somewhere the tool never reads — a claim of coverage that does not exist.
 
 Honest current state rather than an aspirational one:
 
-- Instruction set: `0.1.0`. First release was `0.0.1`.
+- Instruction set: `0.2.1`. First release was `0.0.1`. `0.2.0` bounded the standing merge
+  authorization to repositories whose own constitution records the grant — before it, the authorization
+  was machine-wide, which nobody had decided. `0.2.1` made that test a literal marker line the operator
+  writes once per repository, instead of prose an agent had to interpret.
 - Constitution: 12 principles, v1.17.0.
 - Adapters: five, sharing one script. 14 test groups run against every target: 72 assertions for
   Claude Code and OpenCode, 65 plus one honest SKIP for Gemini, Copilot and Codex — those three
