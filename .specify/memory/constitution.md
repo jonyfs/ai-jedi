@@ -1,14 +1,50 @@
 <!--
 Sync Impact Report
-- Version change: 1.8.0 → 1.9.0
+- Version change: 1.11.0 → 1.12.0
 - Ratification date unchanged: 2026-07-24
-- Modified principles: none renamed or redefined
-- Added sections:
-  - Principle XII. Operator-Facing README
+- Modified principles:
+  - Principle VI. Automated Post-Implementation Review — the review-shepherd round
+    limit now has a concrete default of 3, overridable per feature in plan.md.
+    Previously the principle required "a stated maximum" without stating one,
+    which made the bound unenforceable and SC-016 unverifiable. Bump is MINOR:
+    a number was added where none existed, so guidance is materially expanded
+    rather than merely clarified.
+- Superseded report for v1.11.0 — modified principles:
+  - Principle VI. Automated Post-Implementation Review — gains step 5: after the
+    MERGE completes, the pull request's branch is deleted (remote then local) and
+    its worktree removed. Explicitly NOT triggered by approval — a branch deleted
+    between approval and merge closes the request without landing anything, since
+    the branch is what the merge consumes. `main` and operator-designated
+    long-lived branches are never deleted by this step.
+  - Principle XI. Isolated Parallel Execution — worktree cleanup now also covers
+    deleting the merged branch itself.
+  - Tool Adapter & Authoring Constraints — frontmatter must be ACCURATE, not merely
+    present. `Summary:` must describe what the file currently contains and `Tags:`
+    must reflect its actual subject matter, both re-evaluated in the same change
+    set as any content change. For `instructions.md`, `Summary:` must agree with
+    the directives carried and `Tags:` must cover every capability area present.
+  - Structural note: both requests were folded into existing sections rather than
+    ratified as Principles XIII and XIV. The constitution is already at ~620 lines
+    against a self-imposed 200–400 typical range, and these rules belong to
+    sections that already exist. Principle inflation would worsen the atomicity
+    tension without adding governance.
+- Added sections: none
 - Removed sections: none
-- IMMEDIATE VIOLATION: no `README.md` exists at the repository root, and the
-  repository is public. Principle XII is violated as of ratification. This is
-  recorded rather than hidden; the remedy is task-tracked in feature 001.
+- Superseded report for v1.10.0 — Principle VI. Automated Post-Implementation
+  Review — scope materially expanded
+    (not renamed). Trigger becomes pull-request creation as well as end-of-unit.
+    The chain becomes an autonomous LOOP that drives the change to merge on `main`
+    rather than stopping at "arming automerge". Adds the requirement that the
+    shepherd's own diff be re-reviewed before merge, and adds explicit autonomy
+    bounds: round limit, no scope expansion, no weakening branch protection, halt
+    rather than merge an unconverged change. Bump is MINOR: the chain's ordering
+    and freezing rules are unchanged, so nothing previously compliant becomes
+    non-compliant.
+- Added sections: none
+- Removed sections: none
+- Standing violation carried from v1.9.0: no `README.md` exists at the repository
+  root and the repository is public. Principle XII remains violated; remedy is
+  task-tracked as T041d…T041f in feature 001.
 - Templates requiring updates:
   - ✅ .specify/templates/spec-template.md (no constitution-mandated section added)
   - ✅ .specify/templates/tasks-template.md — Phase N+1 renamed to "Instruction
@@ -62,7 +98,10 @@ Sync Impact Report
     (exists), `~/.config/github-copilot/` (exists),
     `~/.cursor/` (exists), `~/.codex/AGENTS.md` (absent — adapter must create
     or report unconfigured, never fall back to project-local).
-  - ✅ specs/001-instructions-quality-revision/ — reconciled against Principle XII
+  - ✅ specs/001-instructions-quality-revision/ — reconciled against the expanded
+    Principle VI: spec.md gained FR-023 and SC-016; data-model.md gained D87…D94;
+    tasks.md gained T032q/T032r; quickstart.md Step 8 rewritten as the autonomous
+    loop with its bounds. Reconciled against Principle XII
     as well: spec.md gained FR-022 and SC-015; data-model.md gained D84…D86;
     tasks.md gained T041d…T041f creating and auditing the README; quickstart.md
     gained Step 6C. Earlier reconciliation against Principles X
@@ -79,12 +118,21 @@ Sync Impact Report
     tasks.md gained Phase 5B (US5) plus the catalog-migration and
     finding-resolution tasks; quickstart.md gained Step 6B.
 - Deferred TODOs: none
+- Operational note: `delete_branch_on_merge` is now enabled on the GitHub
+  repository, so the remote branch is removed by the platform at merge time.
+  Principle VI step 5 still governs the LOCAL branch and the worktree, which the
+  platform setting does not touch.
 - Operational note: repository now has a GitHub remote
   (github.com/jonyfs/ai-jedi) with `main` protected behind pull requests.
   Principle VI's PR-scoped automation is therefore live; its local-diff
   fallback no longer applies to work pushed to that remote.
 
 Prior version history
+- 1.11.0 (2026-07-25): frontmatter fidelity and post-merge branch cleanup folded
+  into existing sections.
+- 1.10.0 (2026-07-25): Principle VI became an autonomous review-to-merge loop with
+  shepherd-diff re-review and explicit autonomy bounds.
+- 1.9.0 (2026-07-25): added Principle XII. Operator-Facing README.
 - 1.8.0 (2026-07-25): Principle VII baseline corrected — first instruction release
   is 0.0.1; the `V4` generation marker retired.
 - 1.7.0 (2026-07-25): added Principle XI. Isolated Parallel Execution.
@@ -164,25 +212,66 @@ here silently changes every future session.
 
 ### VI. Automated Post-Implementation Review
 
-Implementation is not complete when code is written; it is complete when review has closed
-and the change is mergeable. As soon as an implementation unit lands, the review chain MUST
-run automatically, without the operator asking for it:
+Implementation is not complete when code is written; it is complete when the change has merged.
+The review chain MUST run automatically, without the operator asking for it, and MUST drive the
+change to merge autonomously.
 
-1. `/pr-reviewer` MUST run first and produce a severity-ranked, evidence-based verdict.
-2. `/pr-shepherd` MUST run only after the review closes, and MUST resolve review comments,
-   merge conflicts, and failing checks before arming automerge or handing off.
+**Trigger**: opening a pull request. The chain also triggers at the end of an implementation unit
+when no pull request exists yet. Both entry points are automatic.
 
-Running the shepherd before the review has closed is prohibited — it would shepherd an
-unreviewed change. CRITICAL findings from `/pr-reviewer` freeze the branch: `/pr-shepherd`
-MUST NOT arm automerge until they are resolved. The operator MAY skip the chain only by
-saying so explicitly for that specific change; silence is consent to run it.
+**The loop**, repeated until the change merges or the chain halts:
 
-When no GitHub pull request exists (no remote, or work still local), the chain degrades
-rather than being skipped: `/pr-reviewer` runs against the local diff, and the shepherd step
-is deferred and recorded as pending in the run log under `.specify/workflows/runs/`.
+1. `/pr-reviewer` produces a severity-ranked, evidence-based verdict.
+2. If findings exist, `/pr-shepherd` runs — only after the review closes — and resolves review
+   comments, merge conflicts, and failing checks.
+3. **The shepherd's own diff MUST be re-reviewed.** Its edits are code no reviewer has seen; merging
+   them on the strength of the previous review would defeat the chain. Return to step 1.
+4. When a review closes with no findings and no failing checks, the shepherd arms automerge and the
+   change lands on `main` through the pull request.
+5. **After the merge completes**, the pull request's branch MUST be deleted — remote first, then any
+   local copy — and its worktree removed per Principle XI.
 
-Rationale: An automation that must be remembered is an automation that gets skipped exactly
-on the rushed changes that most needed it.
+Branch deletion is triggered by the MERGE, never by the approval. Approval is not integration: a
+branch deleted between approval and merge closes the pull request without landing anything, because
+the branch is what the merge consumes. An approved-but-unmerged branch MUST survive.
+
+- Deletion MUST NOT run while the pull request is open, whatever its review state.
+- A branch that failed to merge MUST be preserved along with its pull request, so the work is
+  recoverable.
+- `main`, and any long-lived branch the operator designates, MUST NEVER be deleted by this step.
+
+Running the shepherd before the review has closed is prohibited — it would shepherd an unreviewed
+change. CRITICAL findings freeze the branch: automerge MUST NOT be armed until they are resolved.
+The operator MAY skip the chain only by saying so explicitly for that specific change; silence is
+consent to run it.
+
+**Autonomy bounds.** Autonomous merge is a real delegation, so it is bounded rather than open-ended:
+
+- The loop MUST halt and report after a maximum number of review-shepherd rounds. **The default limit
+  is 3.** A feature MAY set a different limit in its `plan.md`; absent an explicit choice, 3 applies.
+  Convergence is expected in one or two rounds; reaching the third is a signal the change is wrong,
+  not a signal to keep iterating. A limit that is merely "stated somewhere" is not a limit — the
+  number MUST be resolvable before the loop starts.
+- The shepherd MUST fix only what review raised. Expanding scope — adding features, refactoring
+  beyond the findings, or "improving" untouched code — is prohibited, because that work would itself
+  be unreviewed.
+- Branch protection MUST NOT be weakened to let a merge through. Removing required reviews, disabling
+  required conversation resolution, or force-pushing to `main` to complete the loop is prohibited
+  without explicit per-instance operator consent. If protection blocks the merge, the chain halts and
+  reports; it does not route around the guardrail.
+- If the chain cannot converge, it MUST leave the pull request open with its state recorded, never
+  merge something whose review did not close.
+- Every round — verdict, findings, shepherd actions, and merge outcome — MUST be recorded in the run
+  log under `.specify/workflows/runs/`, so an interrupted loop resumes without re-reviewing what
+  already passed.
+
+When no pull request exists (no remote, or work still local), the chain degrades rather than being
+skipped: `/pr-reviewer` runs against the local diff, and the shepherd step is deferred and recorded
+as pending in the run log.
+
+Rationale: An automation that must be remembered is an automation that gets skipped exactly on the
+rushed changes that most needed it. And an autonomous loop without bounds converts a review gate
+into a merge rubber stamp — the bounds are what keep the delegation honest.
 
 ### VII. Versioned Instruction Surface
 
@@ -410,6 +499,9 @@ Parallelism rules:
   finishes first does not thereby earn the right to land first.
 - A worktree MUST be removed once its branch has merged, or immediately if it produced no change.
   Abandoned worktrees are state that outlives its run log and MUST NOT accumulate.
+- The branch itself MUST be deleted after its merge completes, per Principle VI step 5 — remote copy
+  first, then any local copy. Merged branches that linger make the branch list a poor signal of what
+  work is actually open.
 - Orchestration state — which unit, which worktree, which branch, which status — MUST be recorded in
   the run log under `.specify/workflows/runs/` so an interrupted parallel run resumes without
   re-dispatching completed units.
@@ -496,6 +588,16 @@ than having no README at all.
   vendor model identifier into shared content, or that collapses a tier downward, is defective.
 - Every persisted Markdown artifact MUST open with frontmatter carrying `Summary:` (one
   sentence) and `Tags:`.
+- Frontmatter MUST be accurate, not merely present. `Summary:` MUST describe what the file actually
+  contains as of this revision, and `Tags:` MUST reflect its actual subject matter. Both MUST be
+  re-evaluated in the same change set as any content change, and corrected when the content moved on.
+  Stale frontmatter is worse than absent frontmatter: an agent that reads `Summary:` to decide
+  whether to load the file will skip a file that no longer matches its own description.
+- For `instructions.md` specifically, `Summary:` MUST agree with the directives the file actually
+  carries, and `Tags:` MUST cover every capability area present in it. A capability added without a
+  corresponding tag is undiscoverable to any agent that filters by tag.
+- Frontmatter MUST NOT contradict the title version (Principle VII) and MUST NOT claim scope the
+  file does not have.
 - Files MUST stay atomic and focused: 200–400 lines typical, 800 lines maximum. Split rather
   than grow.
 - Cross-file dependencies MUST be expressed as `[[Wiki Links]]`.
@@ -509,8 +611,10 @@ than having no README at all.
 - Code review MUST audit the diff against the task plan and report findings by severity.
   CRITICAL findings freeze the branch until resolved.
 - The Principle VI review chain (`/pr-reviewer` then `/pr-shepherd`) MUST be triggered
-  automatically at the end of every implementation unit. Its outcome — verdict, findings,
-  and shepherd state — MUST be recorded in the run log.
+  automatically when a pull request is opened, and at the end of every implementation unit when no
+  pull request exists yet. It loops — review, shepherd, re-review the shepherd's own diff — until the
+  change merges or the loop's round limit is reached. Every round's verdict, findings, shepherd
+  actions, and merge outcome MUST be recorded in the run log.
 - Orchestration state and logs MUST be persisted under `.specify/workflows/runs/` so an
   interrupted run can resume. For parallel runs this MUST include the unit, worktree, branch, and
   status of each dispatched agent (Principle XI).
@@ -536,6 +640,11 @@ than having no README at all.
 - Any change set that edits instruction content MUST update `README.md` in the same change set, or
   record the reviewed no-change decision (Principle XII). Review MUST verify that every README
   benefit claim is still backed by a directive and that the stated version matches the title.
+- Any change set that alters a file's content MUST re-evaluate that file's `Summary:` and `Tags:` and
+  correct them where the content moved on. Review MUST reject frontmatter that no longer describes
+  the file.
+- After a pull request merges, its branch MUST be deleted and its worktree removed. A merged branch
+  left in place is stale state; an unmerged branch MUST NOT be deleted.
 
 ## Governance
 
@@ -559,4 +668,4 @@ Compliance review: every pull request MUST verify adherence to Principles I–XI
 that violates a principle MUST be justified in the plan's Complexity Tracking section or
 removed. Runtime development guidance lives in `instructions.md`.
 
-**Version**: 1.9.0 | **Ratified**: 2026-07-24 | **Last Amended**: 2026-07-25
+**Version**: 1.12.0 | **Ratified**: 2026-07-24 | **Last Amended**: 2026-07-25

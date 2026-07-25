@@ -1,5 +1,5 @@
 ---
-Summary: Directive register of all 41 rules present in the pre-revision instructions.md, with destination sections, plus the entity definitions used by the revision.
+Summary: Directive register covering the 41 pre-revision rules plus the 62 added by this feature, each mapped to a destination section, with the entity definitions used by the revision.
 Tags: [#data-model #directive-register #instructions]
 ---
 
@@ -15,7 +15,7 @@ One enforceable rule. The atomic unit that FR-001 protects.
 
 | Field | Meaning | Validation |
 |---|---|---|
-| `id` | Stable register key (`D01`…`D41`) | Unique; never reused after retirement |
+| `id` | Stable register key (`D01`…`D100`) | Unique; never reused after retirement |
 | `trigger` | Condition that activates the rule | Non-empty after revision (FR-002) |
 | `obligation` | Required behavior | MUST / MUST NOT / SHOULD; non-empty |
 | `exception` | Termination or suspension condition | May be `none`, but never blank/undefined |
@@ -90,7 +90,7 @@ refer to the Target Section Order in [[plan]].
 | D27 | Protocol: act as technical director; delegate multi-step milestones, never edit directly | Contextual intelligence | 11 | 3 |
 | D28 | Catalog: constitution — deepest-reasoning model, high effort, purple | Skill catalog | 11 + 12 | 3 |
 | D29 | Catalog: specify — deepest-reasoning model, max effort, pink | Skill catalog | 11 + 12 | 3 |
-| D30 | Catalog: baseline — primary coding model, high effort, violet | Skill catalog | 11 + 12 | 3 |
+| D30 | ~~Catalog: baseline~~ — **RETIRED** under the FR-001 carve-out: `baseline` appears in no integration manifest, so the row would be a dead reference prohibited by FR-015. Retirement recorded, not silently dropped | Skill catalog | none — retired | 3 |
 | D31 | Catalog: clarify — primary coding model, medium effort, orange | Skill catalog | 11 + 12 | 3 |
 | D32 | Catalog: plan — deepest-reasoning model, max effort, blue | Skill catalog | 11 + 12 | 3 |
 | D33 | Catalog: analyze — deepest-reasoning model, high effort, yellow | Skill catalog | 11 + 12 | 3 |
@@ -103,8 +103,11 @@ refer to the Target Section Order in [[plan]].
 | D40 | Context management: sub-agents receive isolated context to prevent context rot | Guardrails | 11 | 3 |
 | D41 | Resilience: persist orchestration logs and state under `.specify/workflows/runs/` | Guardrails | 11 | 3 |
 
-**Count**: 41 directives (D09 counted as four distinct obligations). SC-001 requires all 41 to be
-locatable in the revised file.
+**Pre-revision count**: **44 obligations across 41 IDs** — `D01`–`D41`, where `D09` is split into
+four distinct obligations (`D09a`–`D09d`) because the original rule bundled four independent
+triggers. The register therefore holds 44 pre-revision rows. SC-001 requires all 44 to be locatable. The register table below the added-
+directives heading extends past this point — `D42` onward are NEW obligations, not part of the
+preservation baseline, and are verified for presence rather than for preservation.
 
 ## Directives added by this revision
 
@@ -119,10 +122,10 @@ New entries extend the register; they do not replace anything above.
 | D46 | CRITICAL review findings freeze the branch; automerge MUST NOT be armed | 8 | FR-005, Principle VI |
 | D47 | Silence is consent to run the review chain; skipping requires an explicit per-change opt-out | 8 | FR-005, Principle VI |
 | D48 | Vendor values live only in the tool-scoped block and MUST be re-verified before use | 12 | FR-004 |
-| D49 | Degradation: no sub-agents → sequential single-agent execution of the same phases | 13 | FR-006 |
-| D50 | Degradation: no slash commands → follow the phase obligations manually in order | 13 | FR-006 |
-| D51 | Degradation: no git remote → review the local diff, log the shepherd step as pending | 13 | FR-006, Principle VI |
-| D52 | Degradation: no run-log directory → report state inline, declare resumption unrecoverable | 13 | FR-006 |
+| D49 | Degradation: no sub-agents → sequential single-agent execution of the same phases | 14 | FR-006 |
+| D50 | Degradation: no slash commands → follow the phase obligations manually in order | 14 | FR-006 |
+| D51 | Degradation: no git remote → review the local diff, log the shepherd step as pending | 14 | FR-006, Principle VI |
+| D52 | Degradation: no run-log directory → report state inline, declare resumption unrecoverable | 14 | FR-006 |
 | D53 | Conversational language mirrors the operator; every persisted artifact is English | 2 | Principle III |
 | D54 | Never emit secrets, operator-identifying data, or machine-local absolute paths | 3 | FR-012, authoring constraints |
 | D55 | Title carries an explicit MAJOR.MINOR.PATCH version; first versioned release is 0.0.1 and the `V4` marker is retired | 1 + 2 | FR-013, Principle VII |
@@ -157,6 +160,20 @@ New entries extend the register; they do not replace anything above.
 | D84 | README explains benefits in operator terms, never restating directive text | n/a — README obligation | FR-022, Principle XII |
 | D85 | No README benefit claim without a backing directive; no implied tool coverage that was not exercised | n/a — README obligation | FR-022, Principle XII |
 | D86 | README states the current instruction version and links into sections rather than duplicating them | n/a — README obligation | FR-022, Principle XII |
+| D87 | Review chain triggers automatically on pull request creation, and at end-of-unit when no request exists | 8 | FR-023, Principle VI |
+| D88 | Chain loops: review, fix, re-review the fixer's own diff, until a review closes clean | 8 | FR-023, Principle VI |
+| D89 | The fixer's own diff MUST be re-reviewed — merging it on the previous review's strength defeats the chain | 8 | FR-023, Principle VI |
+| D90 | Loop halts and reports after a stated maximum number of rounds | 8 | FR-023, Principle VI |
+| D91 | Fixer addresses only what review raised; scope expansion is prohibited because that work would be unreviewed | 8 | FR-023, Principle VI |
+| D92 | Branch protection MUST NOT be weakened to complete the loop; blocked merge halts and reports | 8 | FR-023, Principle VI |
+| D93 | Unconverged change leaves the request open with state recorded; never merged | 8 | FR-023, Principle VI |
+| D94 | Every round's verdict, findings, actions, and merge outcome recorded in the run log so an interrupted loop resumes | 8 | FR-023, Principle VI |
+| D95 | `Summary:` describes the directives actually carried; `Tags:` cover every capability area present | 1 | FR-024, Authoring Constraints |
+| D96 | Frontmatter re-evaluated on every content change; stale frontmatter is a defect | 1 + 2 | FR-024, Authoring Constraints |
+| D97 | Frontmatter never contradicts the title version and never claims scope the file lacks | 1 | FR-024, Principle VII |
+| D98 | Branch deleted after the MERGE completes — remote first, then local — with its worktree removed | 8 | FR-025, Principles VI and XI |
+| D99 | Approval alone never triggers branch deletion; an approved-but-unmerged branch survives | 8 | FR-025, Principle VI |
+| D100 | A branch that failed to merge is preserved with its pull request; the default branch is never deleted by this step | 8 | FR-025, Principle VI |
 
 ## State transitions
 

@@ -16,14 +16,14 @@ Plan: [[plan]] · Contract: [[contracts/instructions-file-contract]] · Register
 
 ## Step 1 — Losslessness (SC-001, FR-001)
 
-Walk the register. For each of `D01`…`D41`, locate the surviving directive in the revised file and
-record its destination section.
+Walk the register. For each of the 44 pre-revision rows (`D01`–`D41`, with `D09a`–`D09d`), locate the
+surviving directive in the revised file and record its destination section.
 
 ```bash
 grep -n '^#\{1,3\} ' instructions.md   # confirm sections 2-14 exist in order
 ```
 
-**Expected**: 41 of 41 register entries located, each in the destination section named in
+**Expected**: 44 of 44 register entries located, minus formally retired rows, each in the destination section named in
 [[data-model]], each with equal or stricter force. Any entry that cannot be located is a blocking
 defect — restore it before proceeding.
 
@@ -95,10 +95,10 @@ attempt for at least 5 sampled situations (SC-005).
 ## Step 6B — Version, region, and provisioning (SC-008, SC-009, SC-010)
 
 ```bash
-head -1 instructions.md | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+'   # esperado: v0.0.1
-grep -c 'AI-JEDI:INSTRUCTIONS:START\|AI-JEDI:INSTRUCTIONS:END' instructions.md   # esperado: 2
-grep -n 'AI-JEDI' CLAUDE.md   # esperado: sem saída — região proibida em config local
-grep -oE '/speckit\.[a-z]+' instructions.md   # esperado: sem saída — forma com ponto foi migrada
+head -1 instructions.md | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+'   # expected: v0.0.1
+grep -c 'AI-JEDI:INSTRUCTIONS:START\|AI-JEDI:INSTRUCTIONS:END' instructions.md   # expected: 2
+grep -n 'AI-JEDI' CLAUDE.md   # expected: no output - region prohibited in project-local config
+grep -oE '/speckit\.[a-z]+' instructions.md   # expected: no output - dot form has been migrated
 ```
 
 Catalog vs. manifest (SC-009): compare the section 11 catalog against
@@ -113,8 +113,8 @@ already current (no write), single marker (refuses), path inside a project tree 
 Tier vocabulary (SC-011):
 
 ```bash
-grep -cE 'deep-reasoning|balanced-coding|fast-lightweight' instructions.md   # esperado: >= 10
-grep -nE 'claude-[a-z0-9.-]+' instructions.md   # esperado: apenas dentro da seção 12
+grep -cE 'deep-reasoning|balanced-coding|fast-lightweight' instructions.md   # expected: >= 10
+grep -nE 'claude-[a-z0-9.-]+' instructions.md   # expected: only inside section 12
 ```
 
 Agent materialization (SC-012): ask an agent to set up the tooling, then confirm one definition per
@@ -125,8 +125,8 @@ confirm the collision is reported, not overwritten.
 Parallel execution rules (SC-013, SC-014):
 
 ```bash
-grep -cE 'worktree' instructions.md          # esperado: >= 1 na seção 11
-git worktree list                            # esperado: só o principal — nenhum órfão
+grep -cE 'worktree' instructions.md          # expected: >= 1 in section 11
+git worktree list                            # expected: main worktree only - no orphans
 ```
 
 Confirm section 11 states parallel-by-default, one worktree and branch per unit, no two agents in
@@ -142,9 +142,9 @@ stated, zero orphaned worktrees, zero false `[P]` markings.
 ## Step 6C — README coverage and honesty (SC-015)
 
 ```bash
-head -4 README.md                     # esperado: frontmatter com Summary e Tags
-grep -oE 'v?0\.0\.1' README.md        # esperado: versão presente e igual ao título
-grep -nE '/Users/|/home/|ghp_|sk-' README.md   # esperado: sem saída
+head -4 README.md                     # expected: frontmatter with Summary and Tags
+grep -oE 'v?0\.0\.1' README.md        # expected: version present and matching the title
+grep -nE '/Users/|/home/|ghp_|sk-' README.md   # expected: no output
 ```
 
 Coverage: list every capability in the shipped `instructions.md` and confirm each is represented in
@@ -162,14 +162,40 @@ coverage of untested tools.
 Run `/speckit-analyze` and confirm it reports convergence across `spec.md`, `plan.md`, and
 `tasks.md` before any edit to `instructions.md` is made.
 
-## Step 8 — Post-implementation review chain (Principle VI)
+## Step 8 — Autonomous review-to-merge loop (Principle VI, SC-016)
 
-After the revision lands, the chain runs automatically:
+The chain runs automatically when the pull request is opened — no one asks for it:
 
-1. `/pr-reviewer` — against the pull request, since the repository now has a remote.
-2. `/pr-shepherd` — only after the review closes; resolves comments, conflicts, and checks.
+1. `/pr-reviewer` against the pull request.
+2. `/pr-shepherd` only after the review closes; resolves comments, conflicts, and checks, fixing
+   only what review raised.
+3. `/pr-reviewer` again, against the shepherd's own diff. Those edits are code no reviewer has seen.
+4. Repeat until a review closes clean, then automerge lands the change on `main`.
 
 CRITICAL findings freeze the change until resolved.
+
+Verify the bounds hold (SC-016):
+
+- The loop halts and reports at the round limit rather than iterating indefinitely.
+- The shepherd's diff contains nothing beyond the findings it was resolving.
+- Branch protection on `main` is unchanged after the loop — required pull requests, required
+  conversation resolution, and `enforce_admins` all still set.
+- An unconverged change is left open with its state recorded, not merged.
+- Every round appears in `.specify/workflows/runs/001-instructions-quality-revision.md`.
+
+Post-merge cleanup (SC-018):
+
+```bash
+git branch -r --merged origin/main | grep -v 'main$'   # expected: no output
+git worktree list                                      # expected: main worktree only
+```
+
+Confirm the branch survived while the pull request was merely approved, and disappeared only after
+the merge. `main` must still exist.
+
+Frontmatter fidelity (SC-017): read the shipped `Summary:` and `Tags:` and confirm the summary
+describes the directives the file actually carries and that every capability area present has a tag.
+A capability with no tag is undiscoverable to a tag-filtering agent.
 
 ## Definition of done
 

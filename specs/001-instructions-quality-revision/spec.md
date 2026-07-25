@@ -106,8 +106,6 @@ returns the right rule without reading unrelated sections.
 
 ---
 
----
-
 ### User Story 5 - The instruction set can update itself in installed tools (Priority: P2)
 
 The operator says "update my AI Jedi instructions" and any agent — in any installed tool — can
@@ -155,6 +153,10 @@ was written.
 
 - **FR-001**: The revised `instructions.md` MUST preserve every directive present in the
   current version; no rule, threshold, catalog row, or scoped constraint may be dropped.
+  **Carve-out**: a catalog row naming a skill unavailable in the active harness is exempt, because
+  preserving it would violate FR-015 — the row would be a dead reference. Such a row MUST be
+  formally RETIRED, not silently dropped: recorded in the register with its reason and logged in the
+  run log. This is the only permitted preservation exception, and it applies to catalog rows alone.
 - **FR-002**: Every rule MUST state its activation trigger, the required behavior, and its
   termination or exception condition in explicit terms.
 - **FR-003**: The file MUST declare an explicit precedence order for conflicting rules, with
@@ -187,7 +189,9 @@ was written.
 - **FR-015**: Invocation syntax MUST be derived from the active integration's configured
   separator rather than written as a literal, and the skill catalog MUST agree with what is
   actually installed: no catalogued skill that is unavailable, no available skill left
-  uncatalogued.
+  uncatalogued. **Availability source of record**: the union of the integration manifests under
+  `.specify/integrations/` and the installed extensions declared in `.specify/extensions.yml`.
+  On-disk presence alone is NOT authoritative — a file can exist without being installed.
 - **FR-016**: The instruction content MUST be enclosed in an explicitly named start/end marker
   pair, with the start marker carrying the version, so an agent can locate and replace exactly
   that span without reading or disturbing operator-authored content.
@@ -216,6 +220,17 @@ was written.
   the current instruction version, MUST link into the instruction sections rather than duplicating
   them, MUST NOT claim a benefit no directive backs, and MUST NOT imply coverage of tools the set has
   not been exercised against.
+- **FR-023**: The file MUST state that the review chain triggers automatically on pull request
+  creation and loops — review, fix, re-review the fixer's own changes — until the change merges,
+  and MUST state its autonomy bounds: a round limit of 3, no scope expansion beyond the findings, no
+  weakening of branch protection, and halting with the request left open rather than merging an
+  unconverged change.
+- **FR-024**: The file's own `Summary:` MUST describe the directives it actually carries and its
+  `Tags:` MUST cover every capability area present in it, with both re-evaluated whenever content
+  changes. Frontmatter MUST NOT contradict the title version or claim scope the file lacks.
+- **FR-025**: The file MUST state that a pull request's branch is deleted after its MERGE completes —
+  remote copy first, then local — and MUST state that approval alone never triggers deletion, that an
+  unmerged branch is preserved, and that the default branch is never deleted by this step.
 
 ### Key Entities
 
@@ -231,14 +246,15 @@ was written.
 
 ### Measurable Outcomes
 
-- **SC-001**: 100% of directives inventoried from the current file are present in the revised
-  file.
+- **SC-001**: 100% of the 44 pre-revision obligations inventoried from the current file are present
+  in the revised file, except rows formally retired under the FR-001 carve-out, each recorded with
+  its reason.
 - **SC-002**: Zero retired vendor identifiers remain in the file.
 - **SC-003**: Every constitutional principle imposing runtime behavior is represented by at
   least one directive in the file.
-- **SC-004**: In a first-session test against each installed tool, the tool applies compression,
-  lifecycle routing, and frontmatter rules without being reminded, in at least 3 of 3 tools
-  tested.
+- **SC-004**: In a first-session test, every tool actually exercised applies compression, lifecycle
+  routing, and frontmatter rules without being reminded — 100% of tools tested, with at least 3
+  tools exercised out of the 4 assumed installed.
 - **SC-005**: For each of at least 5 sampled situations, a tool asked "which rule applies"
   names the correct section on the first attempt.
 - **SC-006**: The file stays within the stated file-length ceiling and opens with compliant
@@ -263,6 +279,14 @@ was written.
 - **SC-015**: Every capability in the shipped instruction set is represented in the README, every
   README benefit claim traces to a directive, and the README's stated version matches the title —
   zero unbacked claims, zero missing capabilities, zero version mismatch.
+- **SC-016**: A pull request opened without the operator asking for review receives one
+  automatically, and the loop either merges the change or halts with the request left open and its
+  state recorded — never merging a change whose review did not close, and never weakening branch
+  protection to do so.
+- **SC-017**: The file's `Summary:` and `Tags:` match its shipped content — every capability area
+  present is covered by a tag, and the summary describes the directives actually carried.
+- **SC-018**: After a merge, zero merged branches and zero worktrees remain for that change; after an
+  approval that has not yet merged, the branch still exists.
 
 ## Assumptions
 
