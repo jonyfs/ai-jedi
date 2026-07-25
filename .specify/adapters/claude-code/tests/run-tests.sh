@@ -7,6 +7,7 @@
 #
 # Usage: ./run-tests.sh [group ...]
 #   Groups: refusals create idempotent preserve fork drift backup size foreign selfverify
+#           retention composition lint
 #   No arguments runs every group.
 
 set -u
@@ -20,6 +21,7 @@ SOURCE="$REPO/instructions.md"
 
 PASS=0
 FAIL=0
+SKIP=0
 WORK=""
 
 cleanup() { [ -n "$WORK" ] && rm -rf "$WORK"; }
@@ -45,6 +47,9 @@ fingerprint() {
 
 ok()   { PASS=$((PASS+1)); printf '  PASS  %s\n' "$1"; }
 bad()  { FAIL=$((FAIL+1)); printf '  FAIL  %s\n' "$1"; }
+# SKIP is a third outcome, deliberately NOT counted toward PASS. A group reporting green
+# because its tool is missing is the vacuous assertion the stat -f defect already taught.
+skip() { SKIP=$((SKIP+1)); printf '  SKIP  %s\n' "$1"; }
 
 # assert_refused <label> <fixture> -- <args...>
 # Requires BOTH a non-zero exit AND a byte-unchanged fixture. A refusal that mutates the
@@ -276,6 +281,75 @@ group_selfverify() {
   rm -f "$base"
 }
 
+group_retention() {
+  echo "group: retention (FR-001, FR-002, FR-003, SC-001, SC-002)"
+  fresh_work
+  RETAIN=$(sed -n 's/^  retain: *//p' "$DECL" | head -1)
+  [ -n "$RETAIN" ] && ok "retention limit declared ($RETAIN)" || { bad "retain not declared"; return; }
+
+  # Below the limit: adds without removing.
+  target="$WORK/r1.md"; printf 'op\n' > "$target"
+  i=0
+  while [ "$i" -lt "$RETAIN" ]; do
+    sed -i '' "s/^<!-- AI-JEDI:INSTRUCTIONS:START v.*/<!-- AI-JEDI:INSTRUCTIONS:START v0.0.$i -->/" "$target" 2>/dev/null
+    AIJEDI_TARGET="$target" sh "$SCRIPT" -- >/dev/null 2>&1
+    i=$((i+1)); sleep 1
+  done
+  n=$(ls "$WORK"/r1.md.aijedi-backup-* 2>/dev/null | wc -l | tr -d ' ')
+  [ "$n" -le "$RETAIN" ] && ok "count within limit ($n <= $RETAIN)" || bad "count $n exceeds limit $RETAIN"
+
+  # Pre-seeded backups the adapter did not create are pruned too.
+  target2="$WORK/r2.md"; printf 'op\n' > "$target2"
+  j=0; while [ "$j" -lt 6 ]; do : > "$WORK/r2.md.aijedi-backup-2020010100000$j-999.bak"; j=$((j+1)); done
+  AIJEDI_TARGET="$target2" sh "$SCRIPT" -- >/dev/null 2>&1
+  n2=$(ls "$WORK"/r2.md.aijedi-backup-* 2>/dev/null | wc -l | tr -d ' ')
+  [ "$n2" -le "$RETAIN" ] && ok "pre-seeded backups pruned ($n2 <= $RETAIN)" || bad "pre-seeded not pruned ($n2)"
+
+  # Non-matching files are never considered.
+  : > "$WORK/r2.md.someothertool.bak"
+  AIJEDI_TARGET="$target2" sh "$SCRIPT" -- >/dev/null 2>&1
+  [ -f "$WORK/r2.md.someothertool.bak" ] && ok "foreign backup untouched" || bad "foreign backup deleted"
+
+  # The live target is never a pruning candidate.
+  [ -f "$target2" ] && ok "live target not pruned" || bad "live target deleted"
+
+  # A pruning failure must not fail the projection.
+  target3="$WORK/r3.md"; printf 'op\n' > "$target3"
+  AIJEDI_PRUNE_FAIL=1 AIJEDI_TARGET="$target3" sh "$SCRIPT" -- >/dev/null 2>&1
+  [ "$?" -eq 0 ] && ok "pruning failure did not fail the projection" || bad "pruning failure aborted the projection"
+}
+
+group_composition() {
+  echo "group: composition (FR-004, SC-003)"
+  fresh_work
+  for mode in truncate empty fail; do
+    target="$WORK/c-$mode.md"; printf 'operator content\n' > "$target"
+    before=$(fingerprint "$target")
+    AIJEDI_TEST_INJECT="$mode" AIJEDI_TARGET="$target" sh "$SCRIPT" -- >/dev/null 2>&1
+    rc=$?
+    after=$(fingerprint "$target")
+    [ "$rc" -ne 0 ] && ok "compose $mode rejected" || bad "compose $mode accepted"
+    [ "$before" = "$after" ] && ok "compose $mode left target byte-unchanged" || bad "compose $mode MUTATED target"
+  done
+}
+
+group_lint() {
+  echo "group: lint (FR-006, FR-008, SC-005)"
+  if ! command -v shellcheck >/dev/null 2>&1; then
+    skip "shellcheck not installed — group skipped, NOT counted as a pass"
+    return
+  fi
+  ver=$(shellcheck --version 2>/dev/null | sed -n 's/^version: *//p' | head -1)
+  ok "shellcheck version recorded: ${ver:-unknown}"
+  for f in "$SCRIPT" "$HERE/run-tests.sh"; do
+    if shellcheck -s sh "$f" >/dev/null 2>&1; then
+      ok "lint clean: $(basename "$f")"
+    else
+      bad "lint findings in $(basename "$f") — fix or suppress inline with justification"
+    fi
+  done
+}
+
 # ---------------------------------------------------------------------------
 
 [ -f "$DECL" ]   || { echo "missing declaration: $DECL"; exit 1; }
@@ -284,13 +358,13 @@ group_selfverify() {
 
 # NOTE: not named GROUPS — that is a special bash array (process group IDs); assigning it
 # is silently ignored under macOS /bin/sh, so the loop never iterates and nothing prints.
-TEST_GROUPS=${*:-"refusals create idempotent preserve fork drift backup size foreign selfverify"}
+TEST_GROUPS=${*:-"refusals create idempotent preserve fork drift backup size foreign selfverify retention composition lint"}
 for g in $TEST_GROUPS; do
   case $g in
-    refusals|create|idempotent|preserve|fork|drift|backup|size|foreign|selfverify) "group_$g" ;;
+    refusals|create|idempotent|preserve|fork|drift|backup|size|foreign|selfverify|retention|composition|lint) "group_$g" ;;
     *) echo "unknown group: $g"; exit 1 ;;
   esac
 done
 
-printf '\n%s passed, %s failed\n' "$PASS" "$FAIL"
+printf '\n%s passed, %s failed, %s skipped\n' "$PASS" "$FAIL" "$SKIP"
 [ "$FAIL" -eq 0 ]

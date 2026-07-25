@@ -45,9 +45,12 @@ rather than a same-loop patch:
   markers and version would be present. A pre-write length assertion now catches the truncation case;
   converting the whole script to `set -e` is riskier than the defect in a script this branch-heavy and
   needs its own test pass.
-- **`shellcheck`.** Neither shell file has ever been linted — the tool is not installed on this machine.
-  Adding it as a test group that skips when absent would create a group that always reports green here,
-  which is the vacuous-assertion pattern the PR #5 review already caught once in `stat -f`.
+- **`shellcheck` findings triage (FR-007, SC-006 of feature 004).** Feature 004 adds a lint group with a
+  real SKIPPED state, so the absent-linter case is handled honestly. What it cannot do is triage findings
+  that do not exist: the linter is not installed here, so no task in that feature can produce one. The
+  rule that suppressions be inline and justified is stated so it governs whoever first runs the linter,
+  and the criterion "zero unaddressed findings" is unmeasurable until then. Whoever installs `shellcheck`
+  discharges both.
 
 ### Feature 001 — 12 open tasks
 

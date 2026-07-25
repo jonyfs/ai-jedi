@@ -64,8 +64,20 @@ backup:
   # Suffix the target tool does NOT load as configuration. A backup named *.md inside
   # ~/.claude/ would be read as instructions, injecting a stale copy of the entire
   # instruction set into every session.
-  pattern: "%TARGET%.aijedi-backup-%TIMESTAMP%.bak"
+  #
+  # %PID% disambiguates two runs landing in the same second, which seconds-granularity
+  # timestamps alone cannot. An earlier version of this declaration omitted it while the
+  # script already emitted it — so the declared pattern described a file never written.
+  pattern: "%TARGET%.aijedi-backup-%TIMESTAMP%-%PID%.bak"
+  # The literal suffix between %TARGET% and the timestamp. project.sh derives its pruning
+  # glob from this rather than from a constant of its own, so the declaration stays the
+  # single source of truth (Principle II).
+  suffix: ".aijedi-backup"
   extension_is_loadable: false
+  # How many backups to keep. Enough to recover from a bad projection and the one before
+  # it; few enough that the config directory does not grow without bound. Pruning is
+  # subordinate to the projection — see FR-003.
+  retain: 3
 
 # Skill set provisioning for this harness (authoring constraints).
 skill_install: "specify integration install claude --version %SPECKIT_VERSION%"
