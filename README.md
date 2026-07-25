@@ -1,6 +1,6 @@
 ---
-Summary: Operator guide to AI Jedi — what the single global instruction set gives you across every installed AI coding tool, and what it deliberately does not claim.
-Tags: [#readme #onboarding #instructions #operator-guide]
+Summary: Operator guide to AI Jedi — what the single global instruction set gives you across every installed AI coding tool, how the Claude Code adapter installs it, and what the project deliberately does not claim.
+Tags: [#readme #onboarding #instructions #operator-guide #adapter #projection]
 ---
 
 # AI Jedi
@@ -149,19 +149,25 @@ rather than a rewrite. Being precise about what has actually been tested:
 
 | Tool | Status |
 |---|---|
-| Claude Code | Integration installed; skill manifest present |
+| Claude Code | **Adapter written and exercised.** Projection installed in the global config, verified idempotent |
 | Codex | Not yet exercised — no adapter written |
 | GitHub Copilot | Not yet exercised — no adapter written |
 | OpenCode | Not yet exercised — no adapter written |
 
-No adapter has been written for any tool yet, so projections into global configuration are not yet
-automated. The rules governing them are in place; the mechanism is not.
+One adapter exists, for Claude Code, at `.specify/adapters/claude-code/`. It projects the instruction set
+into the global configuration, replacing any hand-maintained fork on explicit confirmation, and leaves
+every byte of your own content untouched. Run it with `sh .specify/adapters/claude-code/project.sh`, or
+`--check` to ask whether your projection is current without writing anything.
+
+The other three tools have no adapter, so nothing projects to them. Their rules are in place; their
+mechanism is not.
 
 ## Status
 
 Honest current state rather than an aspirational one:
 
 - Instruction set: `0.1.0`. First release was `0.0.1`.
-- Constitution: 12 principles, v1.14.0.
-- Adapters: none written yet.
-- Behavioral verification across multiple tools: not yet performed.
+- Constitution: 12 principles, v1.16.0.
+- Adapters: one, for Claude Code. Ten test groups, 49 assertions, all passing.
+- Behavioral verification across multiple tools: not yet performed — it needs adapters for the other
+  three, which do not exist.

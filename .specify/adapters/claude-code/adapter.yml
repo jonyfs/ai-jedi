@@ -1,0 +1,93 @@
+# AI Jedi adapter declaration — Claude Code
+#
+# Single source of truth for every vendor-specific value this adapter needs.
+# project.sh and tests/run-tests.sh both read this file; neither hardcodes any of it.
+#
+# Principle II: vendor-specific values are isolated here so a rename touches one block.
+# Principle IX: no absolute path appears below — path_pattern is home-relative and expanded
+# at runtime, because this file is committed to a public repository and an absolute path
+# would leak the operator's username.
+
+target_tool: claude-code
+
+# Home-relative. Expanded against $HOME at runtime. NEVER an absolute path.
+path_pattern: .claude/CLAUDE.md
+
+format: markdown
+
+# Markdown accepts HTML comments, so the canonical comment markers apply and no
+# alternate delimiter mechanism is needed for this target.
+markers:
+  start: "<!-- AI-JEDI:INSTRUCTIONS:START v%VERSION% -->"
+  end: "<!-- AI-JEDI:INSTRUCTIONS:END -->"
+
+# Foreign regions this adapter must never touch or mistake for its own.
+foreign_markers:
+  - "<!-- SPECKIT START -->"
+  - "<!-- SPECKIT END -->"
+
+size_limit:
+  lines: 800
+  # Sourced from the project's own authoring constraints (200-400 typical, 800 maximum),
+  # NOT from a vendor document — Claude Code publishes no size limit for this file.
+  source: authoring-constraints
+  # The limit applies to the RESULTING FILE TOTAL, not to the projected content alone.
+  # The two differ by however much operator content the target already holds; comparing
+  # projected content against a file-derived cap would measure a different quantity than
+  # the limit is sourced from.
+  applies_to: resulting-file-total
+  # Constitution v1.16.0 permits either summarizing or refusing, and requires the
+  # declaration to record which. This adapter REFUSES: its contract is verbatim
+  # projection, and a summarized region would carry the source version while holding
+  # different content, so the drift check — which compares version strings alone — would
+  # report current on a region that is not.
+  over_limit: refuse
+
+# Fork detection. Literal expressions, not descriptions: "the title's shape" is not a
+# testable predicate, and the fixtures read these same values.
+#
+# Scanned ONLY outside every managed region, own and foreign. The projected content
+# carries a heading matching versioned_title, so a scan including region interiors would
+# detect this adapter's own output as a fork on the second run.
+fork_patterns:
+  # Current instruction titles: "# <name> v0.1.0: <subtitle>"
+  versioned_title: '^# .* v[0-9]+\.[0-9]+\.[0-9]+:'
+  # Pre-versioned generation marker, present in this operator's target today:
+  # "# SYSTEM SPECIFICATION V4: ..."
+  generation_marker: '^# .* V[0-9]+:'
+# Exactly one match, extending to end-of-file. Zero means no fork. Two or more means the
+# adapter cannot tell which is the fork. A match not reaching end-of-file means the span
+# cannot be bounded. All three non-single cases refuse.
+fork_bounding: exactly-one-to-eof
+
+backup:
+  # Suffix the target tool does NOT load as configuration. A backup named *.md inside
+  # ~/.claude/ would be read as instructions, injecting a stale copy of the entire
+  # instruction set into every session.
+  pattern: "%TARGET%.aijedi-backup-%TIMESTAMP%.bak"
+  extension_is_loadable: false
+
+# Skill set provisioning for this harness (authoring constraints).
+skill_install: "specify integration install claude --version %SPECKIT_VERSION%"
+skill_verify: "compare .claude/skills/**/SKILL.md against the SHA256 recorded per file in .specify/integrations/claude.manifest.json"
+skill_version_source: .specify/integration.json
+
+# Invocation syntax is DERIVED, never hardcoded (Principle VIII).
+invoke_separator_source: .specify/integration.json:integration_settings.claude.invoke_separator
+
+# Agent definitions for this harness (Principle X).
+agent_definition:
+  location: .claude/agents/
+  format: markdown-with-frontmatter
+  required_fields: [name, description, tools, model]
+
+# Capability tier to concrete model. Re-verify against the vendor before dispatch:
+# identifiers are renamed and retired without notice.
+tier_map:
+  deep-reasoning: claude-opus-5
+  balanced-coding: claude-sonnet-5
+  fast-lightweight: claude-haiku-4-5-20251001
+tier_map_verify_before_use: true
+# A harness offering fewer tiers collapses UPWARD: absent fast-lightweight resolves to
+# balanced-coding, absent deep-reasoning to the highest available. Never downward.
+tier_collapse: upward

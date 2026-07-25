@@ -36,9 +36,9 @@ configuration is a defect regardless of whether it passes.
 
 ## Phase 1: Setup
 
-- [ ] T001 [P] Create `.specify/workflows/runs/003-claude-code-adapter.md` with frontmatter to hold orchestration and review-chain state
-- [ ] T002 [P] Copy the operator's current `~/.claude/CLAUDE.md` to `specs/003-claude-code-adapter/.baseline-claude-md.txt` as the byte-identity reference for T028 — NOT under the system temp directory, which a reboot or cleaner can empty between T002 and T028, silently removing the only baseline — and record its line count and the fork span in the run log. Add that filename to `.gitignore`: it is a copy of the operator's personal configuration and MUST NOT be committed to a public repository
-- [ ] T003 Create `.specify/adapters/claude-code/tests/run-tests.sh` as an executable harness that dispatches named case groups (`refusals`, `create`, `idempotent`, `preserve`, `fork`, `drift`, `backup`, `size`, `foreign`, `selfverify`) and exits non-zero on any failure
+- [X] T001 [P] Create `.specify/workflows/runs/003-claude-code-adapter.md` with frontmatter to hold orchestration and review-chain state
+- [X] T002 [P] Copy the operator's current `~/.claude/CLAUDE.md` to `specs/003-claude-code-adapter/.baseline-claude-md.txt` as the byte-identity reference for T028 — NOT under the system temp directory, which a reboot or cleaner can empty between T002 and T028, silently removing the only baseline — and record its line count and the fork span in the run log. Add that filename to `.gitignore`: it is a copy of the operator's personal configuration and MUST NOT be committed to a public repository
+- [X] T003 Create `.specify/adapters/claude-code/tests/run-tests.sh` as an executable harness that dispatches named case groups (`refusals`, `create`, `idempotent`, `preserve`, `fork`, `drift`, `backup`, `size`, `foreign`, `selfverify`) and exits non-zero on any failure
 
 **Checkpoint**: Harness exists and fails — no cases implemented yet.
 
@@ -48,8 +48,8 @@ configuration is a defect regardless of whether it passes.
 
 **Purpose**: The script cannot resolve a target without a declaration. Blocks every story.
 
-- [ ] T004 Write `.specify/adapters/claude-code/adapter.yml` declaring `target_tool`, `path_pattern` (home-relative, NEVER an absolute path — a committed absolute path leaks the operator's username into a public repository), `format`, `size_limit`, plus the four fields the authoring constraints require of every adapter: skill install/verify procedure, invocation separator, agent-definition location and format, and the capability-tier to concrete-model mapping (FR-001, FR-001a)
-- [ ] T005 Create `.specify/adapters/claude-code/project.sh` as an executable stub that reads `adapter.yml`, expands `path_pattern` against the home directory at runtime, and exits with a not-implemented status
+- [X] T004 Write `.specify/adapters/claude-code/adapter.yml` declaring `target_tool`, `path_pattern` (home-relative, NEVER an absolute path — a committed absolute path leaks the operator's username into a public repository), `format`, `size_limit`, plus the four fields the authoring constraints require of every adapter: skill install/verify procedure, invocation separator, agent-definition location and format, and the capability-tier to concrete-model mapping (FR-001, FR-001a)
+- [X] T005 Create `.specify/adapters/claude-code/project.sh` as an executable stub that reads `adapter.yml`, expands `path_pattern` against the home directory at runtime, and exits with a not-implemented status
 
 **Checkpoint**: Declaration complete; script resolves a target and does nothing else.
 
@@ -64,11 +64,11 @@ correctly matters less than never writing wrongly, so this ships first.
 
 **Independent Test**: Quickstart Step 2 — 7 of 7 hostile cases refuse and write nothing.
 
-- [ ] T006 [US3] Write failing test cases in `.specify/adapters/claude-code/tests/run-tests.sh` for the `refusals` group: target path inside a git working tree, single start marker, markers in reverse order, unreadable target, a fork span bounded by TWO title-shaped headings (unboundable — must refuse), a fork migration attempted without operator confirmation, and a matching heading followed by operator content instead of end-of-file (span cannot be bounded — must refuse). Each asserts BOTH a non-zero exit AND that the fixture is byte-unchanged. Run and watch all seven fail
-- [ ] T007 [US3] Implement working-tree refusal in `.specify/adapters/claude-code/project.sh`: if the resolved target sits inside a git working tree, report and exit non-zero without writing (FR-002)
-- [ ] T008 [US3] Implement marker validation in `.specify/adapters/claude-code/project.sh`: exact full-line match on both markers, reporting corruption and writing nothing when one is missing or they are out of order (FR-007, FR-014)
-- [ ] T009 [US3] Implement unreadable-target handling in `.specify/adapters/claude-code/project.sh`: report and write nothing rather than overwriting a file that could not be read (FR-007)
-- [ ] T010 [US3] Run `.specify/adapters/claude-code/tests/run-tests.sh refusals` and confirm 7 of 7 now pass with every fixture byte-unchanged (SC-005)
+- [X] T006 [US3] Write failing test cases in `.specify/adapters/claude-code/tests/run-tests.sh` for the `refusals` group: target path inside a git working tree, single start marker, markers in reverse order, unreadable target, a fork span bounded by TWO title-shaped headings (unboundable — must refuse), a fork migration attempted without operator confirmation, and a matching heading followed by operator content instead of end-of-file (span cannot be bounded — must refuse). Each asserts BOTH a non-zero exit AND that the fixture is byte-unchanged. Run and watch all seven fail
+- [X] T007 [US3] Implement working-tree refusal in `.specify/adapters/claude-code/project.sh`: if the resolved target sits inside a git working tree, report and exit non-zero without writing (FR-002)
+- [X] T008 [US3] Implement marker validation in `.specify/adapters/claude-code/project.sh`: exact full-line match on both markers, reporting corruption and writing nothing when one is missing or they are out of order (FR-007, FR-014)
+- [X] T009 [US3] Implement unreadable-target handling in `.specify/adapters/claude-code/project.sh`: report and write nothing rather than overwriting a file that could not be read (FR-007)
+- [X] T010 [US3] Run `.specify/adapters/claude-code/tests/run-tests.sh refusals` and confirm 7 of 7 now pass with every fixture byte-unchanged (SC-005)
 
 **Checkpoint**: The adapter cannot damage a file. Safe to teach it to write.
 
@@ -80,11 +80,11 @@ correctly matters less than never writing wrongly, so this ships first.
 
 **Independent Test**: Quickstart Steps 3 and 6.
 
-- [ ] T011 [US1] Write failing test cases in `.specify/adapters/claude-code/tests/run-tests.sh` for the `create`, `idempotent`, and `drift` groups: absent target is created with exactly one region; a second run is byte-identical with still exactly one region; drift reports current / stale-naming-both-versions / not-installed as three distinct outcomes. Run and watch them fail
-- [ ] T012 [US1] Implement content extraction in `.specify/adapters/claude-code/project.sh`: read the span BETWEEN `instructions.md`'s own markers, not the markers themselves, and read the version from its start marker (FR-004)
-- [ ] T013 [US1] Implement creation in `.specify/adapters/claude-code/project.sh`: when the target is absent, create it at the resolved location containing only the marker pair and the content — never falling back to a project-local path (FR-003)
-- [ ] T014 [US1] Implement the version comparison in `.specify/adapters/claude-code/project.sh`: matching versions report the projection current and write nothing. Expose the drift check as an explicit read-only invocation — `project.sh --check` — reporting current, stale (naming both versions), or not-installed from version strings alone, and never writing (FR-009, FR-010)
-- [ ] T015 [US1] Run `.specify/adapters/claude-code/tests/run-tests.sh create idempotent drift` and confirm all pass (SC-004, SC-006). Note: FR-008 (idempotency) has no implementation task of its own — it emerges from T012–T014 and T020, and is verified here rather than built directly
+- [X] T011 [US1] Write failing test cases in `.specify/adapters/claude-code/tests/run-tests.sh` for the `create`, `idempotent`, and `drift` groups: absent target is created with exactly one region; a second run is byte-identical with still exactly one region; drift reports current / stale-naming-both-versions / not-installed as three distinct outcomes. Run and watch them fail
+- [X] T012 [US1] Implement content extraction in `.specify/adapters/claude-code/project.sh`: read the span BETWEEN `instructions.md`'s own markers, not the markers themselves, and read the version from its start marker (FR-004)
+- [X] T013 [US1] Implement creation in `.specify/adapters/claude-code/project.sh`: when the target is absent, create it at the resolved location containing only the marker pair and the content — never falling back to a project-local path (FR-003)
+- [X] T014 [US1] Implement the version comparison in `.specify/adapters/claude-code/project.sh`: matching versions report the projection current and write nothing. Expose the drift check as an explicit read-only invocation — `project.sh --check` — reporting current, stale (naming both versions), or not-installed from version strings alone, and never writing (FR-009, FR-010)
+- [X] T015 [US1] Run `.specify/adapters/claude-code/tests/run-tests.sh create idempotent drift` and confirm all pass (SC-004, SC-006). Note: FR-008 (idempotency) has no implementation task of its own — it emerges from T012–T014 and T020, and is verified here rather than built directly
 
 **Checkpoint**: The adapter writes correctly into an empty or current target.
 
@@ -102,21 +102,21 @@ constitution forbids and this file calls mandatory.
 
 ### Failing tests first
 
-- [ ] T016 [US2] Write failing cases in `.specify/adapters/claude-code/tests/run-tests.sh` for the `preserve` group: operator content above the region, below it, and both. Each asserts byte-identity outside the replaced span, **repeated three times per fixture** so SC-002's "3 of 3 runs" is actually measured. Run and watch them fail
-- [ ] T017 [US2] Write failing cases in `.specify/adapters/claude-code/tests/run-tests.sh` for the `fork` group, mirroring the operator's real file — import line, personal section, then unmarked instruction content. Assert byte-identity outside the span, that the span and matched signal are REPORTED, and that migration without confirmation refuses. Add a case that runs the adapter TWICE against a fresh target and asserts the second run detects NO fork — the projected content's own title matches the fork pattern, so a scan including region interiors would migrate its own output. Run and watch them fail
-- [ ] T018 [US2] Write failing cases in `.specify/adapters/claude-code/tests/run-tests.sh` for the `backup` and `size` groups: a backup exists on disk after any run that wrote; a simulated mid-write failure leaves the target byte-unchanged; content exceeding the declared limit is REFUSED, never truncated and never summarized. Run and watch them fail
-- [ ] T019 [US2] Write failing cases in `.specify/adapters/claude-code/tests/run-tests.sh` for the `foreign` and `selfverify` groups: a foreign `SPECKIT START`/`END` region is left untouched and never mistaken for this one; the next-session disclosure string is present in the output; post-write self-verification catches a deliberately corrupted write and rolls back from the backup. Run and watch them fail
+- [X] T016 [US2] Write failing cases in `.specify/adapters/claude-code/tests/run-tests.sh` for the `preserve` group: operator content above the region, below it, and both. Each asserts byte-identity outside the replaced span, **repeated three times per fixture** so SC-002's "3 of 3 runs" is actually measured. Run and watch them fail
+- [X] T017 [US2] Write failing cases in `.specify/adapters/claude-code/tests/run-tests.sh` for the `fork` group, mirroring the operator's real file — import line, personal section, then unmarked instruction content. Assert byte-identity outside the span, that the span and matched signal are REPORTED, and that migration without confirmation refuses. Add a case that runs the adapter TWICE against a fresh target and asserts the second run detects NO fork — the projected content's own title matches the fork pattern, so a scan including region interiors would migrate its own output. Run and watch them fail
+- [X] T018 [US2] Write failing cases in `.specify/adapters/claude-code/tests/run-tests.sh` for the `backup` and `size` groups: a backup exists on disk after any run that wrote; a simulated mid-write failure leaves the target byte-unchanged; content exceeding the declared limit is REFUSED, never truncated and never summarized. Run and watch them fail
+- [X] T019 [US2] Write failing cases in `.specify/adapters/claude-code/tests/run-tests.sh` for the `foreign` and `selfverify` groups: a foreign `SPECKIT START`/`END` region is left untouched and never mistaken for this one; the next-session disclosure string is present in the output; post-write self-verification catches a deliberately corrupted write and rolls back from the backup. Run and watch them fail
 
 ### Implementation
 
-- [ ] T020 [US2] Implement span replacement in `.specify/adapters/claude-code/project.sh`: replace only the text between markers, rewriting the start marker's version, leaving every other byte identical (FR-005)
-- [ ] T021 [US2] Implement the backup and write atomicity in `.specify/adapters/claude-code/project.sh`: copy the target beside itself before writing using the filename pattern declared in `adapter.yml` — a suffix the tool does NOT load as configuration, since a backup read as instructions would inject a stale copy of the whole instruction set into every session — and leave the target unmodified if the write cannot complete (FR-011)
-- [ ] T022 [US2] Implement confirmation-gated fork migration in `.specify/adapters/claude-code/project.sh` as ONE task, never as a bare replacement that a later task gates: scan ONLY content outside every managed region — its own and any foreign one, because the projected content carries a heading matching the same pattern and including region interiors would make the second run detect its own output as a fork — then bound the span by **exactly one** matching heading extending to end-of-file: zero matches means no fork, two or more means refuse, and a match not reaching end-of-file means refuse — report the span and the matched signal, and require explicit operator confirmation for that specific span before writing. Absent report, confirmation, or backup, refuse (FR-006, FR-016, Principle IX one-time migration)
-- [ ] T023 [US2] Implement size-limit handling in `.specify/adapters/claude-code/project.sh`: compare the RESULTING FILE TOTAL — projected content plus the operator content already present — against the declared limit and REFUSE when it exceeds, matching the quantity the limit is sourced from — this adapter does not summarize, because a summarized region would break the verbatim projection FR-004/FR-005 require and would carry a source version it does not actually contain (FR-001b)
-- [ ] T024 [US2] Implement foreign-region safety in `.specify/adapters/claude-code/project.sh`: a managed region owned by other tooling is left untouched and never mistaken for this one (FR-013)
-- [ ] T025 [US2] Add the next-session disclosure to `.specify/adapters/claude-code/project.sh` output: the projection takes effect from the tool's next session, not the one that ran the script (FR-012)
-- [ ] T026 [US2] Implement post-write self-verification and rollback in `.specify/adapters/claude-code/project.sh`: markers present and ordered, version matching, outside-region byte-identity, path still user-level — restoring from the backup when any check fails (FR-015)
-- [ ] T027 [US2] Run `.specify/adapters/claude-code/tests/run-tests.sh preserve fork backup size foreign selfverify` and confirm all pass with zero unintended bytes changed (SC-002, SC-003, SC-007)
+- [X] T020 [US2] Implement span replacement in `.specify/adapters/claude-code/project.sh`: replace only the text between markers, rewriting the start marker's version, leaving every other byte identical (FR-005)
+- [X] T021 [US2] Implement the backup and write atomicity in `.specify/adapters/claude-code/project.sh`: copy the target beside itself before writing using the filename pattern declared in `adapter.yml` — a suffix the tool does NOT load as configuration, since a backup read as instructions would inject a stale copy of the whole instruction set into every session — and leave the target unmodified if the write cannot complete (FR-011)
+- [X] T022 [US2] Implement confirmation-gated fork migration in `.specify/adapters/claude-code/project.sh` as ONE task, never as a bare replacement that a later task gates: scan ONLY content outside every managed region — its own and any foreign one, because the projected content carries a heading matching the same pattern and including region interiors would make the second run detect its own output as a fork — then bound the span by **exactly one** matching heading extending to end-of-file: zero matches means no fork, two or more means refuse, and a match not reaching end-of-file means refuse — report the span and the matched signal, and require explicit operator confirmation for that specific span before writing. Absent report, confirmation, or backup, refuse (FR-006, FR-016, Principle IX one-time migration)
+- [X] T023 [US2] Implement size-limit handling in `.specify/adapters/claude-code/project.sh`: compare the RESULTING FILE TOTAL — projected content plus the operator content already present — against the declared limit and REFUSE when it exceeds, matching the quantity the limit is sourced from — this adapter does not summarize, because a summarized region would break the verbatim projection FR-004/FR-005 require and would carry a source version it does not actually contain (FR-001b)
+- [X] T024 [US2] Implement foreign-region safety in `.specify/adapters/claude-code/project.sh`: a managed region owned by other tooling is left untouched and never mistaken for this one (FR-013)
+- [X] T025 [US2] Add the next-session disclosure to `.specify/adapters/claude-code/project.sh` output: the projection takes effect from the tool's next session, not the one that ran the script (FR-012)
+- [X] T026 [US2] Implement post-write self-verification and rollback in `.specify/adapters/claude-code/project.sh`: markers present and ordered, version matching, outside-region byte-identity, path still user-level — restoring from the backup when any check fails (FR-015)
+- [X] T027 [US2] Run `.specify/adapters/claude-code/tests/run-tests.sh preserve fork backup size foreign selfverify` and confirm all pass with zero unintended bytes changed (SC-002, SC-003, SC-007)
 
 **Checkpoint**: All fixture groups green. Safe to run against the real configuration.
 
@@ -124,18 +124,18 @@ constitution forbids and this file calls mandatory.
 
 ## Phase 6: Real Projection
 
-- [ ] T028 Run `sh .specify/adapters/claude-code/project.sh` against the operator's real `~/.claude/CLAUDE.md`, then verify per Quickstart Step 7: region present with the source version, pre-revision fork gone, `@RTK.md` import and `# graphify` section both intact, backup on disk. Diff against `specs/003-claude-code-adapter/.baseline-claude-md.txt` from T002 to confirm byte-identity outside the replaced span (SC-001, FR-011)
-- [ ] T029 Record the T028 outcome in `.specify/workflows/runs/003-claude-code-adapter.md`, including the exact span replaced and the backup filename
+- [X] T028 Run `sh .specify/adapters/claude-code/project.sh` against the operator's real `~/.claude/CLAUDE.md`, then verify per Quickstart Step 7: region present with the source version, pre-revision fork gone, `@RTK.md` import and `# graphify` section both intact, backup on disk. Diff against `specs/003-claude-code-adapter/.baseline-claude-md.txt` from T002 to confirm byte-identity outside the replaced span (SC-001, FR-011)
+- [X] T029 Record the T028 outcome in `.specify/workflows/runs/003-claude-code-adapter.md`, including the exact span replaced and the backup filename
 
 ---
 
 ## Phase 7: Polish & Parity
 
-- [ ] T030 [P] Correct `README.md`: the claim "No adapter has been written for any tool yet" becomes false on merge and MUST be replaced with what actually exists — one adapter for Claude Code — with the other three tools still stated as unexercised (Principle XII)
-- [ ] T031 [P] Update the `README.md` tools table so the Claude Code row reflects a working projection rather than only an installed integration
-- [ ] T031a Re-evaluate the `README.md` frontmatter after T030 and T031: `Summary:` and `Tags:` must describe the file as it now stands, or the reviewed no-change decision must be recorded in `.specify/workflows/runs/003-claude-code-adapter.md` (Authoring Constraints)
-- [ ] T032 Run Quickstart Steps 1, 2, 3, 4, 5, 5b, 6, 6b and 7 end to end and record every result in `.specify/workflows/runs/003-claude-code-adapter.md`. Step 8 is the deferred behavioral probe (T043); Step 9 is discharged by Phase 8
-- [ ] T033 Confirm no committed file under `.specify/adapters/` OR `specs/003-claude-code-adapter/` contains an absolute home path, a username, or any credential-shaped string, and that the T002 baseline copy is gitignored rather than committed (Principle IX authoring constraints)
+- [X] T030 [P] Correct `README.md`: the claim "No adapter has been written for any tool yet" becomes false on merge and MUST be replaced with what actually exists — one adapter for Claude Code — with the other three tools still stated as unexercised (Principle XII)
+- [X] T031 [P] Update the `README.md` tools table so the Claude Code row reflects a working projection rather than only an installed integration
+- [X] T031a Re-evaluate the `README.md` frontmatter after T030 and T031: `Summary:` and `Tags:` must describe the file as it now stands, or the reviewed no-change decision must be recorded in `.specify/workflows/runs/003-claude-code-adapter.md` (Authoring Constraints)
+- [X] T032 Run Quickstart Steps 1, 2, 3, 4, 5, 5b, 6, 6b and 7 end to end and record every result in `.specify/workflows/runs/003-claude-code-adapter.md`. Step 8 is the deferred behavioral probe (T043); Step 9 is discharged by Phase 8
+- [X] T033 Confirm no committed file under `.specify/adapters/` OR `specs/003-claude-code-adapter/` contains an absolute home path, a username, or any credential-shaped string, and that the T002 baseline copy is gitignored rather than committed (Principle IX authoring constraints)
 
 ---
 
