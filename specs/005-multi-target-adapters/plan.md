@@ -63,7 +63,7 @@ Verified by inspection, not assumed:
 | V. Spec-Driven Change | Full lifecycle | PASS |
 | VI. Review Chain | Loop, limit 3, check gate | PASS — governs this PR |
 | VII. Versioned Instruction Surface | Bump declared | PASS — **N/A**, no instruction content edited |
-| VIII. Executable Agent Provisioning | Per-adapter declaration completeness; invocation syntax derived, never hardcoded | PASS **with a declared degradation**. The four new targets have no SpecKit integration to derive from, so each records `speckit_integration: none` and points at Principle VIII's manual-execution fallback. Hardcoding a separator would have been the defect the Authoring Constraints name; fabricating a manifest would have been worse |
+| VIII. Executable Agent Provisioning | Per-adapter declaration completeness; invocation syntax derived, never hardcoded | PASS. The four new targets have no SpecKit integration to derive from, so each records `speckit_integration: none` and points at the manual-execution fallback. This is now sanctioned rather than qualified: constitution v1.17.0 added the no-integration case to the Authoring Constraints, after `/speckit-analyze` caught an earlier draft qualifying an unqualified MUST inside this cell |
 | IX. Delimited Managed Region | Markers, global-only, foreign untouched | PASS — FR-003 generalizes foreign-marker recognition, which the hardcoded `SPECKIT` pair could not cover |
 | X. Capability Tiers | Tier vocabulary | PASS — each declaration carries its own tier map |
 | XI. Isolated Parallel Execution | Worktree, merge order, PR granularity | PASS — see below |
@@ -132,4 +132,14 @@ tool-named directory, which only works for one tool.
 
 ## Complexity Tracking
 
-No violations.
+No violations — but only because the rule was amended rather than deviated from.
+
+An earlier draft of this plan recorded a "declared degradation" against the Authoring Constraint
+requiring every adapter to declare its skill install and verify procedure, and then asserted no
+violations two sections later. `/speckit-analyze` flagged that as CRITICAL, correctly: qualifying an
+unqualified MUST inside a table cell and calling it compliant is exactly what this section exists to
+prevent.
+
+The resolution was to amend, not to justify. For a target with no SpecKit integration the obligation has
+nothing to describe, which makes it a gap in the rule rather than an exception to it — and Principle VIII
+already carried the matching degradation while the constraints did not. Constitution v1.17.0 closes it.

@@ -82,8 +82,9 @@ whose README claims coverage it does not have is worse than one that covers less
 
 1. **Given** a tool with no discoverable global instruction file, **When** the tool table is read,
    **Then** it is listed as uncovered with the reason stated.
-2. **Given** a tool later gains such a surface, **When** an adapter is added, **Then** no existing
-   adapter changes.
+2. **Given** a tool later gains such a surface, **When** a declaration is added for it, **Then** no
+   existing declaration and no shared logic changes — adding a tool is adding a declaration, which is
+   what FR-002 makes structural.
 
 ---
 
@@ -93,8 +94,9 @@ whose README claims coverage it does not have is worse than one that covers less
 - Two targets share a filename convention (`AGENTS.md` for both Codex and OpenCode) but different
   directories: each adapter resolves its own path and neither writes the other's.
 - A target's directory does not exist: created, or refused with a clear reason — never silently skipped.
-  Which of the two is a declared policy, not a silent choice, mirroring the rule that the
-  summarize-versus-refuse decision must be recorded in the declaration.
+  Which of the two is a declared policy per target, not a silent choice, mirroring the rule that the
+  summarize-versus-refuse decision must be recorded. Every declaration states its own; none inherits a
+  default that would make the behavior invisible.
 - A foreign region's markers are not the pair this project uses: recognised from the target's own
   declaration rather than from a global constant.
 

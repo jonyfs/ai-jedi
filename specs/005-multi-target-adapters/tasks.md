@@ -17,8 +17,8 @@ Tags: [#tasks #adapter #multi-target #tdd]
 
 `.specify/adapters/` with one `project.sh`, one `tests/`, and `targets/<tool>.yml` per tool.
 
-**Safety rule**: no task writes any real global config. T016 projects for real, once, after every fixture
-group is green for every target. Four live tool configurations are at stake, not one — the fifth declared
+**Safety rule**: no task writes any real global config. T016 is the single real-write phase — it performs
+five writes, one per declaration — and runs only after every fixture group is green for every target. Four live tool configurations are at stake, not one — the fifth declared
 target has no file yet, so it is created rather than overwritten.
 
 ---
@@ -34,11 +34,12 @@ target has no file yet, so it is created rather than overwritten.
 ## Phase 2: Foundational — restructure (Blocking)
 
 - [ ] T004 Move `.specify/adapters/claude-code/adapter.yml` to `.specify/adapters/targets/claude-code.yml`, and `project.sh` plus `tests/` up to `.specify/adapters/`, with `git mv` so history follows
+- [ ] T004a Bring `.specify/adapters/targets/claude-code.yml` up to the normative field list T012 defines — it predates the schema and lacks `missing_directory` and `speckit_integration`. FR-001 requires EVERY target's declaration to carry its policy, so leaving the original behind would end the feature with its first target non-conforming to the schema its siblings use (FR-001, C1)
 - [ ] T005 Change `.specify/adapters/project.sh` to take its declaration from a `--target <name>` argument resolving to `targets/<name>.yml`, defaulting to `claude-code` so existing invocations keep working (FR-002)
 - [ ] T006 Make `.specify/adapters/project.sh` READ the `foreign_markers` key its declaration already carries, instead of the `SPECKIT` literals hardcoded at the awk block around lines 150 and 153. The declaration is not missing — the script ignores it, which is a different defect from the one an earlier draft of this task described. The hardcoded pair cannot recognise OpenCode's `caveman-begin`/`caveman-end` syntax, and failing to recognise a foreign region means overwriting a working tool's configuration (FR-003)
-- [ ] T007 Run `.specify/adapters/tests/run-tests.sh` and confirm all 64 assertions still pass for the Claude Code target after the restructure
+- [ ] T007 Run `.specify/adapters/tests/run-tests.sh` and confirm all 64 assertions still pass for the Claude Code target after the restructure AND after T006b's schema change — the gate must run last in this phase, not before the change it is meant to guard
 
-- [ ] T006a Add a `speckit_integration` key to the declaration schema read by `.specify/adapters/project.sh`: `claude` for the existing target, `none` for the four new ones. When it is `none`, the skill-provisioning and invocation fields resolve to Principle VIII's manual-execution degradation rather than to absent keys — there is no `integration_settings` entry or manifest for those tools, and fabricating one would invent data (FR-001, Principle VIII)
+- [ ] T006b Add a `speckit_integration` key to the declaration schema read by `.specify/adapters/project.sh`: `claude` for the existing target, `none` for the four new ones. When it is `none`, the skill-provisioning and invocation fields resolve to Principle VIII's manual-execution degradation rather than to absent keys — there is no `integration_settings` entry or manifest for those tools, and fabricating one would invent data (FR-001, Principle VIII)
 
 **Checkpoint**: one script, declaration-driven, existing target unaffected.
 
@@ -58,7 +59,7 @@ working before foreign-region safety works would risk destroying a live configur
 ## Phase 4: User Story 1 — Every capable tool is reached (Priority: P1)
 
 - [ ] T011 [US1] Write failing cases in `.specify/adapters/tests/run-tests.sh` for a `multi-target` group: every declared target projects, creates a missing file, is idempotent, and the content between markers is byte-identical across all of them. Include the two live edge conditions — an EMPTY target writes the region with no leading blank-line artefact (two real targets are 0 bytes today), and a target whose DIRECTORY does not exist is either created or refused with a clear reason, never silently skipped. Run and watch them fail (FR-001, FR-004, FR-005, SC-001, SC-002)
-- [ ] T012 [US1] Write `.specify/adapters/targets/opencode.yml`. **This task defines the NORMATIVE field list every declaration must carry, and T013/T014 reference it rather than re-enumerating**: `path_pattern`, `format`, own `markers`, `foreign_markers` (here the `caveman-begin`/`caveman-end` pair), `size_limit` with `applies_to` and `over_limit`, `backup` with `pattern`/`suffix`/`retain`, `fork_patterns` and `fork_bounding`, `missing_directory` policy, `speckit_integration`, and Principle X's `tier_map` plus `tier_map_verify_before_use` and `tier_collapse` (FR-001)
+- [ ] T012 [US1] Write `.specify/adapters/targets/opencode.yml`. **This task defines the NORMATIVE field list every declaration must carry, and T013/T014 reference it rather than re-enumerating**: `path_pattern`, `format`, own `markers`, `foreign_markers` (here the `caveman-begin`/`caveman-end` pair), `size_limit` with `applies_to` and `over_limit`, `backup` with `pattern`/`suffix`/`retain`, `fork_patterns` and `fork_bounding`, `missing_directory` policy, `agent_definition` with its location and format, `speckit_integration`, and Principle X's `tier_map` plus `tier_map_verify_before_use` and `tier_collapse`. When `speckit_integration` is `none`, the `skill_install`, `skill_verify` and `invoke_separator_source` fields are subsumed by it and MUST NOT be fabricated — constitution v1.17.0 requires the absence be declared, not papered over (FR-001)
 - [ ] T013 [US1] Write `.specify/adapters/targets/gemini.yml` and `.specify/adapters/targets/copilot.yml` carrying the complete normative field list defined in T012 — every field, no subset. Both targets are empty files today and neither has a foreign region, so `foreign_markers` is an empty list rather than an omitted key (FR-001)
 - [ ] T014 [US1] Write `.specify/adapters/targets/codex.yml` carrying the complete normative field list defined in T012. Its target file is absent — the adapter creates it, which is the documented behavior for a declared path with no file yet, and `missing_directory` records what to do if `~/.codex/` itself were gone (FR-001, D6)
 - [ ] T015 [US1] Run `.specify/adapters/tests/run-tests.sh` in full against EVERY target and confirm all 13 groups pass for each, not only the first (SC-005)
@@ -79,6 +80,7 @@ working before foreign-region safety works would risk destroying a live configur
 ## Phase 6: Parity & Regression
 
 - [ ] T019 [P] Update `README.md` on two fronts: the tool table lists every installed tool as either projected or uncovered-with-reason — Cursor and Windsurf expose no global instruction surface and MUST say so rather than being omitted — AND every `adapters/claude-code/` path reference is corrected, since T004 moves the script and the documented run command would otherwise ship stale in the operator's face (FR-006, FR-007, Principle XII)
+- [ ] T019a Verify SC-006 mechanically: cross-check the `README.md` tool table against the seven-tool survey in `specs/005-multi-target-adapters/plan.md` and confirm every surveyed tool appears as either projected or uncovered-with-reason — zero silent omissions. SC-002 and SC-004 each have a verification step; this one had only its authoring task
 - [ ] T020 [P] Re-evaluate `README.md` frontmatter after T019, or record the reviewed no-change decision in `.specify/workflows/runs/005-multi-target-adapters.md` (Authoring Constraints)
 - [ ] T021 Verify the Claude Code regression reference from T002: run `.specify/adapters/project.sh` against a temp fixture and confirm the success path is byte-identical to before the restructure
 - [ ] T022 Confirm `shellcheck -s sh` reports zero findings across `.specify/adapters/project.sh` and `.specify/adapters/tests/run-tests.sh`
@@ -109,7 +111,13 @@ working before foreign-region safety works would risk destroying a live configur
 live target is occupied end-to-end by a foreign region and a first run without that safety would destroy
 a working configuration.
 
+**Within Phase 2**: T004 → T004a → T005 → T006 → T006b → T007. T007 is the regression gate and must run
+LAST, after every restructure and schema change in the phase — an earlier draft placed T006b after it,
+which would have gated on a state the phase then left behind.
+
 **TDD ordering is mandatory**: T008 before T009, T011 before T012–T014. Observe each failing first.
+
+**T015a** verifies FR-002 mechanically and runs after T012–T014, since it inspects their diff.
 
 **T003 before T016** — snapshots of four live files must exist before the only task that writes them.
 **T007, T010, T015 all green before T016** — a real configuration is never the first target.

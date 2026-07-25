@@ -1,8 +1,20 @@
 <!--
 Sync Impact Report
-- Version change: 1.15.0 → 1.16.0
+- Version change: 1.16.0 → 1.17.0
 - Ratification date unchanged: 2026-07-24
 - Modified principles:
+  - Tool Adapter & Authoring Constraints — the skill-install/verify and derived-syntax
+    obligations gain an explicit no-integration case. Raised by /speckit-analyze against
+    feature 005 as CRITICAL: the plan had qualified an unqualified MUST inside a table
+    cell and then asserted "no violations" in Complexity Tracking. Four of that feature's
+    five targets have no SpecKit integration, so there is no install procedure, no
+    manifest, and no separator to derive — the requirement is meaningless for them rather
+    than merely inconvenient. That is a gap in the rule, not a justified deviation, and
+    Principle VIII already carried the corresponding degradation for an unavailable skill
+    while these constraints did not. The adapter must now DECLARE the absence; fabricating
+    an integration entry to satisfy the letter of the rule is prohibited, and so is
+    silently omitting the fields.
+- Superseded report for v1.16.0 — modified principles:
   - Tool Adapter & Authoring Constraints — the over-limit clause required content
     exceeding a target's limit to be SUMMARIZED. It now permits either summarizing or
     REFUSING, with the adapter's declaration required to record which, and states that
@@ -173,6 +185,8 @@ Sync Impact Report
   fallback no longer applies to work pushed to that remote.
 
 Prior version history
+- 1.16.0 (2026-07-25): the over-limit clause gained REFUSE as a sanctioned alternative
+  to summarizing.
 - 1.15.0 (2026-07-25): Principle IX gained the one-time fork migration exception;
   Principle XI sanctioned the PR-per-story exception.
 - 1.14.0 (2026-07-25): Principle VI recorded the standing merge authorization.
@@ -690,6 +704,14 @@ than having no README at all.
 - Every adapter MUST declare how its target harness installs and verifies the SpecKit skill set,
   and MUST derive invocation syntax from that integration's `invoke_separator` (Principle VIII).
   An adapter that emits a hardcoded slash-command form is defective.
+- **When a target has no SpecKit integration at all**, those two obligations have nothing to describe:
+  there is no install procedure, no manifest to verify against, and no separator to derive. The adapter
+  MUST then declare the absence explicitly — a `speckit_integration: none` field or equivalent — and its
+  provisioning fields resolve to Principle VIII's manual-execution degradation. Fabricating an
+  integration entry or a manifest to satisfy the letter of the rule is prohibited: it invents data, which
+  is worse than the gap it papers over. Silently omitting the fields is equally prohibited; the absence
+  must be stated. This mirrors the degradation Principle VIII already defines for an unavailable skill,
+  which these constraints had not carried.
 - Every adapter MUST declare its harness's agent-definition location and format, and MUST carry the
   capability-tier → concrete-model mapping for that harness (Principle X). An adapter that emits a
   vendor model identifier into shared content, or that collapses a tier downward, is defective.
@@ -775,4 +797,4 @@ Compliance review: every pull request MUST verify adherence to Principles I–XI
 that violates a principle MUST be justified in the plan's Complexity Tracking section or
 removed. Runtime development guidance lives in `instructions.md`.
 
-**Version**: 1.16.0 | **Ratified**: 2026-07-24 | **Last Amended**: 2026-07-25
+**Version**: 1.17.0 | **Ratified**: 2026-07-24 | **Last Amended**: 2026-07-25
