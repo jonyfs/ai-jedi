@@ -36,7 +36,7 @@ appears only on tasks writing to different files.
 **Purpose**: Freeze the pre-revision state so losslessness is verifiable.
 
 - [ ] T001 Copy the pre-revision file to `specs/001-instructions-quality-revision/instructions.pre-revision.md` as the register-walk reference
-- [ ] T002 [P] Verify the 41-entry pre-revision inventory (`D01`–`D41`) of the register in `specs/001-instructions-quality-revision/data-model.md` against `specs/001-instructions-quality-revision/instructions.pre-revision.md`, correcting any entry that misquotes the original
+- [ ] T002 [P] Verify the 44-row pre-revision inventory (`D01`–`D41`, `D09` split into `D09a`–`D09d`) of the register in `specs/001-instructions-quality-revision/data-model.md` against `specs/001-instructions-quality-revision/instructions.pre-revision.md`, correcting any entry that misquotes the original
 - [ ] T003 [P] Create `.specify/workflows/runs/001-instructions-quality-revision.md` with frontmatter to hold orchestration and review-chain state
 
 **Checkpoint**: Pre-revision state captured; register verified as an accurate inventory.
@@ -74,7 +74,7 @@ lifecycle routing, frontmatter — pass in a fresh session of each installed too
 - [ ] T013 [US1] Write section 9 "File Architecture" in `instructions.md`: mandatory frontmatter, atomic focused files with the size ceiling, `[[Wiki Links]]` for dependencies, `/inbox` triage for unformatted input (D18–D21)
 - [ ] T014 [US1] Write section 10 "Path-Scoped Rules" in `instructions.md`: frontend, backend/data, and config/infra globs with their obligations, preserving each glob pattern verbatim (D22–D24)
 - [ ] T015 [US1] Write section 11 "Orchestration" in `instructions.md`: activation triggers, technical-director delegation protocol, and the four guardrails — parallelization, the analyze-must-report-converged gate, isolated sub-agent context, run-log persistence (D26, D27, D38–D41)
-- [ ] T016 [US1] Write the skill catalog into section 11 of `instructions.md` using the closed tier vocabulary from Principle X (`deep-reasoning` / `balanced-coding` / `fast-lightweight`) plus effort and color ID for all ten lifecycle skills, deferring concrete identifiers to section 12 (D28–D37)
+- [ ] T016 [US1] Write the skill catalog into section 11 of `instructions.md` using the closed tier vocabulary from Principle X (`deep-reasoning` / `balanced-coding` / `fast-lightweight`) plus effort and color ID for the lifecycle skills that appear in the active manifest — EXCLUDING `baseline`, which is retired under the FR-001 carve-out and MUST NOT be written and then removed (D28–D37 minus D30)
 - [ ] T017 [US1] Audit every directive written in T009–T016 in `instructions.md` against the trigger/obligation/exception form, filling `Exception: none` where no exception exists (FR-002, invariant I4)
 - [ ] T018 [US1] Run Quickstart Step 6 probes against one installed tool and record outcomes in `.specify/workflows/runs/001-instructions-quality-revision.md`
 
@@ -84,18 +84,19 @@ lifecycle routing, frontmatter — pass in a fresh session of each installed too
 
 ## Phase 4: User Story 2 — No existing directive is lost or weakened (Priority: P1)
 
-**Goal**: All 41 pre-revision directives are present with equal or stricter force.
+**Goal**: All 44 pre-revision obligations (41 IDs, `D09` split into four) are present with equal or
+stricter force.
 
-**Independent Test**: Quickstart Step 1 register walk returns 41 of 41 located.
+**Independent Test**: Quickstart Step 1 register walk returns 44 of 44 located.
 
 - [ ] T019 [US2] Walk `D01`–`D41` from `specs/001-instructions-quality-revision/data-model.md` against `instructions.md`, recording the located line number for each in the run log
 - [ ] T020 [US2] Restore into `instructions.md` any register entry the walk could not locate, placing it in the destination section named in the register
 - [ ] T021 [US2] For each directive that was merged with another, confirm the merged text carries both original obligations, and split it back apart in `instructions.md` if either was weakened
 - [ ] T022 [US2] Diff `instructions.md` against `specs/001-instructions-quality-revision/instructions.pre-revision.md` for verbatim-sensitive strings — glob patterns and `.specify/workflows/runs/` — confirming each survived byte-identically. EXPLICITLY EXEMPT: slash-command names, which must migrate rather than be frozen (resolves `/speckit-analyze` finding F2)
-- [ ] T023 [US2] Record the final pre-revision register-walk result (must be 41/41 for `D01`–`D41`) in `.specify/workflows/runs/001-instructions-quality-revision.md`
+- [ ] T023 [US2] Record the final pre-revision register-walk result (must be 44/44 across `D01`–`D41`, minus any row formally retired under the FR-001 carve-out) in `.specify/workflows/runs/001-instructions-quality-revision.md`
 - [ ] T023a [US2] Walk the ADDED directives `D42`–`D100` from `specs/001-instructions-quality-revision/data-model.md` against `instructions.md`, confirming each is present in its destination section — presence verification, not preservation, since these are new obligations (FR-001 scope note)
 
-**Checkpoint**: SC-001 met at 100%. No content lost.
+**Checkpoint**: SC-001 met at 100% over the 44 rows. No content lost except formally retired rows.
 
 ---
 
@@ -107,7 +108,7 @@ represented; the file obeys the rules it imposes.
 **Independent Test**: Quickstart Steps 2, 3, and 4 pass — zero `claude-3*` matches, compliant
 self-structure, review-chain rules present.
 
-- [ ] T024 [US3] Write section 12 "Tool-Scoped Values" in `instructions.md` mapping the tier-neutral roles from T016 to current identifiers — `claude-opus-5`, `claude-sonnet-5`, `claude-haiku-4-5-20251001` — with the mandatory re-verify-before-use rule (D48, FR-004)
+- [ ] T024 [US3] Write section 12 "Tool-Scoped Values" in `instructions.md` mapping the tier roles from T016 to the vendor-current identifiers RESOLVED AT EXECUTION TIME per D48 — do not copy the illustrative values from `specs/001-instructions-quality-revision/research.md` R1, which may have gone stale — and state the mandatory re-verify-before-use rule (D48, FR-004)
 - [ ] T025 [US3] Remove every remaining `claude-3-*` identifier from `instructions.md` and confirm no vendor-specific literal appears outside section 12 (invariant I5, SC-002)
 - [ ] T026 [US3] Write section 8 "Post-Implementation Review Chain" in `instructions.md`: reviewer runs first and produces a severity-ranked verdict, shepherd runs only after review closes, running the shepherd early is prohibited (D45)
 - [ ] T027 [US3] Add to section 8 of `instructions.md` the CRITICAL-freezes-branch rule and the prohibition on arming automerge while CRITICAL findings are open (D46)
@@ -117,7 +118,7 @@ self-structure, review-chain rules present.
 - [ ] T031 [US3] Verify `instructions.md` self-compliance: compliant frontmatter, at least one `[[Wiki Link]]`, under the 800-line ceiling, no machine-local absolute paths, no credential-shaped strings (FR-007, FR-012, invariants I8, I9)
 - [ ] T032 [US3] Confirm each of the four rule-collision pairs in Quickstart Step 5 resolves by the ladder alone, and extend section 3 of `instructions.md` if any requires a judgment call (SC-007)
 - [ ] T032a [US3] Migrate every slash-command reference in `instructions.md` off the retired dot form (`/speckit.plan`), replacing shared-content references with phase names and placing the concrete form in section 12, derived from `integration_settings.<integration>.invoke_separator` in `.specify/integration.json` (D61, resolves findings F1 and F2)
-- [ ] T032b [US3] Reconcile the section 11 catalog in `instructions.md` against `.specify/integrations/claude.manifest.json`: remove `baseline` (catalogued, installed in no manifest) and add `taskstoissues` (installed, uncatalogued) (D62, SC-009)
+- [ ] T032b [US3] Reconcile the section 11 catalog in `instructions.md` against `.specify/integrations/claude.manifest.json`: and against the installed extensions in `.specify/extensions.yml` (the union is the availability source of record per FR-015): retire `baseline` (in no manifest) and add both `taskstoissues` (in the manifest) and `agent-context-update` (installed via the `agent-context` extension) (D62, SC-009)
 
 **Checkpoint**: File is current, governance-complete, and self-compliant.
 
@@ -148,6 +149,8 @@ the version, and writes to a global path.
 - [ ] T032q [US5] Write the autonomous review-to-merge loop into section 8 of `instructions.md`: triggers on PR creation and at end-of-unit when no PR exists, loops review → fix → re-review the fixer's own diff until a review closes clean, then merges through the PR (D87–D89, FR-023)
 - [ ] T032r [US5] Write the autonomy bounds into section 8 of `instructions.md`: round limit of 3 stated literally (constitutional default, not overridden by `specs/001-instructions-quality-revision/plan.md`), no scope expansion beyond the findings, branch protection never weakened, unconverged change left open rather than merged, every round recorded in the run log (D90–D94, FR-023)
 - [ ] T032s [US5] Write post-merge branch cleanup into section 8 of `instructions.md`: branch deleted after the MERGE completes (remote then local) with its worktree removed, approval alone never triggering deletion, unmerged and default branches preserved (D98–D100, FR-025)
+
+- [ ] T032u [US5] Execute Quickstart Step 6B against `instructions.md` — version probe, marker-pair count, refresh trial plus its three refusal cases, tier-token scan, catalog-vs-manifest reconciliation, agent-materialization idempotency and collision check — and record the SC-008, SC-009, SC-010, SC-011, and SC-012 results in `.specify/workflows/runs/001-instructions-quality-revision.md`
 
 **Checkpoint**: US5 delivers a self-describing, self-updating instruction surface that can
 materialize its own agent set.
@@ -183,6 +186,7 @@ section on the first attempt (SC-005).
 - [ ] T041d Create `README.md` at the repository root with compliant frontmatter, stating the instruction version `0.0.1` and explaining in operator-facing terms what each capability of `instructions.md` gives the operator (D84, D86, FR-022, Principle XII)
 - [ ] T041e Audit every benefit claim in `README.md` against the directive register in `specs/001-instructions-quality-revision/data-model.md`, removing any claim no directive backs, and confirming the tools listed are only those actually exercised (D85, FR-022, SC-015)
 - [ ] T041f Verify `README.md` links into `instructions.md` sections rather than duplicating directive text, and contains no secrets, operator-identifying data, or machine-local paths (D86, FR-022, Principle I)
+- [ ] T041f2 Execute Quickstart Step 6C against `README.md` — frontmatter, version match, no local paths, capability coverage, and claim-to-directive backing — and record the SC-015 result in `.specify/workflows/runs/001-instructions-quality-revision.md`
 - [ ] T041g LAST content task: rewrite the `instructions.md` frontmatter so `Summary:` describes the directives actually carried and `Tags:` cover every capability area present, without contradicting the title version. Runs at the END of Phase 7 because T037 and T041d still mutate content — frontmatter written earlier would ship stale, which D96 prohibits (D95–D97, FR-024)
 - [ ] T041h Re-evaluate the `Summary:` and `Tags:` of every artifact under `specs/001-instructions-quality-revision/` that this change set touched, correcting any that no longer describes its file (D96, Authoring Constraints)
 - [ ] T041i Record in `.specify/workflows/runs/001-instructions-quality-revision.md` that SC-013 is vacuous by design — `specs/001-instructions-quality-revision/plan.md` declares zero parallel implementation units because the single-file deliverable makes them contend — and that SC-014 holds because no `[P]` marking sits on a task writing `instructions.md`
@@ -199,6 +203,13 @@ automatically when the pull request is opened — the operator does not have to 
 
 A remote exists and `main` is protected behind pull requests, so the loop runs against the pull
 request. The local-diff degradation does NOT apply.
+
+**Availability fallback**: `/pr-reviewer` and `/pr-shepherd` are operator-invoked skills that appear
+in no integration manifest, so they are outside the FR-015 catalog and cannot be dispatched
+autonomously by this feature. When either is unavailable, its obligations are executed manually
+in-session in the same order — review before fix, re-review the fix before merge — and the manual
+execution is recorded in the run log. The phase is never skipped (D63 pattern extended to
+non-catalogued skills).
 
 - [ ] T042 Run `/pr-reviewer` against the pull request and record the severity-ranked verdict, with the round number, in `.specify/workflows/runs/001-instructions-quality-revision.md`
 - [ ] T043 Resolve every CRITICAL finding from T042 in `instructions.md`; CRITICAL findings freeze the change and block automerge

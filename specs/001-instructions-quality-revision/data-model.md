@@ -90,7 +90,7 @@ refer to the Target Section Order in [[plan]].
 | D27 | Protocol: act as technical director; delegate multi-step milestones, never edit directly | Contextual intelligence | 11 | 3 |
 | D28 | Catalog: constitution — deepest-reasoning model, high effort, purple | Skill catalog | 11 + 12 | 3 |
 | D29 | Catalog: specify — deepest-reasoning model, max effort, pink | Skill catalog | 11 + 12 | 3 |
-| D30 | Catalog: baseline — primary coding model, high effort, violet | Skill catalog | 11 + 12 | 3 |
+| D30 | ~~Catalog: baseline~~ — **RETIRED** under the FR-001 carve-out: `baseline` appears in no integration manifest, so the row would be a dead reference prohibited by FR-015. Retirement recorded, not silently dropped | Skill catalog | none — retired | 3 |
 | D31 | Catalog: clarify — primary coding model, medium effort, orange | Skill catalog | 11 + 12 | 3 |
 | D32 | Catalog: plan — deepest-reasoning model, max effort, blue | Skill catalog | 11 + 12 | 3 |
 | D33 | Catalog: analyze — deepest-reasoning model, high effort, yellow | Skill catalog | 11 + 12 | 3 |
@@ -103,8 +103,9 @@ refer to the Target Section Order in [[plan]].
 | D40 | Context management: sub-agents receive isolated context to prevent context rot | Guardrails | 11 | 3 |
 | D41 | Resilience: persist orchestration logs and state under `.specify/workflows/runs/` | Guardrails | 11 | 3 |
 
-**Pre-revision count**: 41 directives, `D01`–`D41` with `D09` counted as four distinct obligations.
-SC-001 requires all 41 to be locatable in the revised file. The register table below the added-
+**Pre-revision count**: **44 obligations across 41 IDs** — `D01`–`D41`, where `D09` is split into
+four distinct obligations (`D09a`–`D09d`) because the original rule bundled four independent
+triggers. The register therefore holds 44 pre-revision rows. SC-001 requires all 44 to be locatable. The register table below the added-
 directives heading extends past this point — `D42` onward are NEW obligations, not part of the
 preservation baseline, and are verified for presence rather than for preservation.
 

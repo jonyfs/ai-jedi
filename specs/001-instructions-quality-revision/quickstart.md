@@ -16,14 +16,14 @@ Plan: [[plan]] · Contract: [[contracts/instructions-file-contract]] · Register
 
 ## Step 1 — Losslessness (SC-001, FR-001)
 
-Walk the register. For each of `D01`…`D41`, locate the surviving directive in the revised file and
-record its destination section.
+Walk the register. For each of the 44 pre-revision rows (`D01`–`D41`, with `D09a`–`D09d`), locate the
+surviving directive in the revised file and record its destination section.
 
 ```bash
 grep -n '^#\{1,3\} ' instructions.md   # confirm sections 2-14 exist in order
 ```
 
-**Expected**: 41 of 41 register entries located, each in the destination section named in
+**Expected**: 44 of 44 register entries located, minus formally retired rows, each in the destination section named in
 [[data-model]], each with equal or stricter force. Any entry that cannot be located is a blocking
 defect — restore it before proceeding.
 

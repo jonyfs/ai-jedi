@@ -153,6 +153,10 @@ was written.
 
 - **FR-001**: The revised `instructions.md` MUST preserve every directive present in the
   current version; no rule, threshold, catalog row, or scoped constraint may be dropped.
+  **Carve-out**: a catalog row naming a skill unavailable in the active harness is exempt, because
+  preserving it would violate FR-015 — the row would be a dead reference. Such a row MUST be
+  formally RETIRED, not silently dropped: recorded in the register with its reason and logged in the
+  run log. This is the only permitted preservation exception, and it applies to catalog rows alone.
 - **FR-002**: Every rule MUST state its activation trigger, the required behavior, and its
   termination or exception condition in explicit terms.
 - **FR-003**: The file MUST declare an explicit precedence order for conflicting rules, with
@@ -185,7 +189,9 @@ was written.
 - **FR-015**: Invocation syntax MUST be derived from the active integration's configured
   separator rather than written as a literal, and the skill catalog MUST agree with what is
   actually installed: no catalogued skill that is unavailable, no available skill left
-  uncatalogued.
+  uncatalogued. **Availability source of record**: the union of the integration manifests under
+  `.specify/integrations/` and the installed extensions declared in `.specify/extensions.yml`.
+  On-disk presence alone is NOT authoritative — a file can exist without being installed.
 - **FR-016**: The instruction content MUST be enclosed in an explicitly named start/end marker
   pair, with the start marker carrying the version, so an agent can locate and replace exactly
   that span without reading or disturbing operator-authored content.
@@ -240,8 +246,9 @@ was written.
 
 ### Measurable Outcomes
 
-- **SC-001**: 100% of directives inventoried from the current file are present in the revised
-  file.
+- **SC-001**: 100% of the 44 pre-revision obligations inventoried from the current file are present
+  in the revised file, except rows formally retired under the FR-001 carve-out, each recorded with
+  its reason.
 - **SC-002**: Zero retired vendor identifiers remain in the file.
 - **SC-003**: Every constitutional principle imposing runtime behavior is represented by at
   least one directive in the file.

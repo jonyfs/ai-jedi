@@ -12,8 +12,8 @@ Tags: [#plan #instructions #portability]
 ## Summary
 
 Rewrite `instructions.md` in place so any AI tool loading it as a global instruction set
-applies every rule correctly on first read, while preserving 100% of the 41 directives present
-today. Approach: build a directive register from the current file, restructure the file into
+applies every rule correctly on first read, while preserving 100% of the 44 obligations present
+today (41 register IDs, `D09` split into four). Approach: build a directive register from the current file, restructure the file into
 urgency-ordered sections with each rule phrased as trigger → obligation → exception, add an
 explicit precedence ladder, isolate vendor-specific values into a tool-scoped block with
 current model identifiers, add the Principle VI review chain to the guardrails, add stated
@@ -45,8 +45,8 @@ reading unrelated sections
 machine-local absolute paths (FR-012); English only (Principle III); token additions must remove
 ambiguity, not restate (FR-011)
 
-**Scale/Scope**: One file, 82 lines today carrying 41 directives across 11 sections. The revision
-ships those 41 plus 62 added obligations across sections 2–14. Adapters and projections explicitly
+**Scale/Scope**: One file, 82 lines today carrying 44 obligations across 11 sections. The revision
+ships those 44 plus 59 added obligations (`D42`–`D100`) across sections 2–14. Adapters and projections explicitly
 out of scope.
 
 ## Constitution Check
