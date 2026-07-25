@@ -37,7 +37,10 @@ note() { printf '%s\n' "$1"; }
 
 # --- declaration ------------------------------------------------------------
 decl() { sed -n "s/^$1: *//p" "$DECL" | head -1 | sed 's/^"//;s/"$//'; }
-sub()  { sed -n "s/^  $1: *//p" "$DECL" | head -1 | sed "s/^'//;s/'$//"; }
+# Strips BOTH quote styles. An earlier version stripped only single quotes, so a
+# double-quoted value came back with the quotes attached — the backup glob then contained
+# literal quote characters and matched nothing, silently disabling pruning.
+sub()  { sed -n "s/^  $1: *//p" "$DECL" | head -1 | sed "s/^['\"]//;s/['\"]$//"; }
 
 PATH_PATTERN=$(decl path_pattern)
 [ -n "$PATH_PATTERN" ] || die "declaration has no path_pattern"
@@ -46,7 +49,12 @@ LIMIT_SCOPE=$(sub applies_to)
 OVER_LIMIT=$(sub over_limit)
 FORK_VERSIONED=$(sub versioned_title)
 FORK_GENERATION=$(sub generation_marker)
-BACKUP_SUFFIX=".aijedi-backup"
+# D1: derived from the declaration, not a constant of this script. The header's claim that
+# nothing is hardcoded here has to actually hold, and pruning must match a pattern the
+# declaration describes (Principle II).
+BACKUP_SUFFIX=$(sub suffix)
+[ -n "$BACKUP_SUFFIX" ] || die "declaration has no backup.suffix"
+BACKUP_RETAIN=$(sub retain)
 
 MSTART_RE='^<!-- AI-JEDI:INSTRUCTIONS:START v[0-9][0-9.]* -->$'
 MEND_RE='^<!-- AI-JEDI:INSTRUCTIONS:END -->$'
@@ -213,13 +221,24 @@ if [ -n "$LIMIT_LINES" ] && [ "$LIMIT_SCOPE" = resulting-file-total ]; then
   fi
 fi
 
-# M3 (partial): the compose block's head/tail/sed/awk are unchecked, and a truncated $NEW
-# would still pass FR-015 verification, since markers and version would be present. Assert
-# the composed file actually carries the projected content before touching the target.
-COMPOSED_LINES=$(wc -l < "$NEW" | tr -d ' ')
-SRC_LINES=$(printf '%s\n' "$SRC_CONTENT" | wc -l | tr -d ' ')
-if [ "$COMPOSED_LINES" -lt "$SRC_LINES" ]; then
-  die "composed output is $COMPOSED_LINES lines, shorter than the $SRC_LINES lines of source content — compose step failed"
+# Test-only injection. A single guarded branch: inert unless AIJEDI_TEST_INJECT is set, so
+# FR-005's byte-identity on the success path is unaffected by its presence.
+case "${AIJEDI_TEST_INJECT:-}" in
+  truncate) head -n 3 "$NEW" > "$NEW.t" && mv "$NEW.t" "$NEW" ;;
+  empty)    : > "$NEW" ;;
+  fail)     rm -f "$NEW"; die "injected compose-step failure" ;;
+  "")       : ;;
+  *)        die "unknown AIJEDI_TEST_INJECT mode: $AIJEDI_TEST_INJECT" ;;
+esac
+
+# FR-004: content-based, not structural. The post-write verification checks markers, order
+# and version — all of which a truncated file retains, so structural validity cannot see
+# this failure. Compare the region extracted from the composed file against the very
+# $SRC_CONTENT it was built from: exact by construction, and no trailing-newline ambiguity
+# because both sides come from one variable.
+COMPOSED_REGION=$(awk '/AI-JEDI:INSTRUCTIONS:START/{f=1;next} /AI-JEDI:INSTRUCTIONS:END/{f=0} f' "$NEW")
+if [ "$(printf '%s' "$COMPOSED_REGION" | cksum)" != "$(printf '%s' "$SRC_CONTENT" | cksum)" ]; then
+  die "composed region does not match the source content — a compose step failed silently"
 fi
 
 # --- FR-011: backup, then write ---------------------------------------------
@@ -260,6 +279,27 @@ LE=$(grep -nE "$MEND_RE" "$TARGET" | cut -d: -f1)
 [ "$LS" -lt "$LE" ] || rollback "markers out of order"
 WV=$(sed -n "${LS}p" "$TARGET" | sed 's/.*START v//;s/ -->.*//')
 [ "$WV" = "$SRC_VERSION" ] || rollback "written version v$WV does not match source v$SRC_VERSION"
+
+# --- FR-001/002/003: prune backups, AFTER a successful write ------------------
+# Never before: pruning first would delete the safety net this write might still need.
+# Every failure below is swallowed with a warning — FR-003 makes housekeeping subordinate
+# to the projection, because failing a good write over a stale file nobody asked about
+# would be the wrong trade.
+prune_backups() {
+  [ -n "$BACKUP_RETAIN" ] || return 0
+  [ "${AIJEDI_PRUNE_FAIL:-0}" = "1" ] && { printf 'WARNING: pruning failed (injected)\n' >&2; return 0; }
+  # Glob derived from the declared suffix, so only this adapter's own backups are
+  # candidates — never the live target, never another tool's files.
+  count=$(ls -1 "${TARGET}${BACKUP_SUFFIX}-"*.bak 2>/dev/null | wc -l | tr -d ' ')
+  [ "$count" -le "$BACKUP_RETAIN" ] && return 0
+  excess=$((count - BACKUP_RETAIN))
+  # Oldest first. Names carry a sortable timestamp, so lexical order is chronological.
+  ls -1 "${TARGET}${BACKUP_SUFFIX}-"*.bak 2>/dev/null | sort | head -n "$excess" | while IFS= read -r old; do
+    rm -f "$old" 2>/dev/null || printf 'WARNING: could not remove %s\n' "$old" >&2
+  done
+  return 0
+}
+prune_backups || printf 'WARNING: pruning step failed; projection is unaffected\n' >&2
 
 # --- report ------------------------------------------------------------------
 note "Projected instructions v$SRC_VERSION into $TARGET"

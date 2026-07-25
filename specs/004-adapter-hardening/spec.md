@@ -116,7 +116,10 @@ findings; run it without and confirm the group reports skipped, not passed.
 - **FR-006**: The test suite MUST include a static-analysis group that executes when the linter is
   present and reports SKIPPED, never PASSED, when it is absent.
 - **FR-007**: Suppressing a lint finding MUST be inline and justified at the site, never a global
-  disabling of the rule.
+  disabling of the rule. **Deferred, with reason**: the linter is not installed on this machine, so no
+  task in this feature can produce a finding to suppress. The rule is stated now so it governs whoever
+  first runs the linter; a task that pretended to triage findings it could not generate would be worse
+  than an honest deferral.
 - **FR-008**: The suite MUST record which linter version produced a result, so a differing result on
   another machine is attributable.
 
@@ -135,13 +138,16 @@ findings; run it without and confirm the group reports skipped, not passed.
 
 - **SC-001**: After running the adapter more times than the retention limit, the backup count equals the
   limit and the newest is present.
-- **SC-002**: A pruning failure leaves the projection successful — 3 of 3 injected failures.
-- **SC-003**: A truncated composition is rejected in 3 of 3 injections, and the target is byte-unchanged.
+- **SC-002**: A pruning failure leaves the projection successful, across all three injected failure
+  modes: an undeletable backup, an unreadable backup, and a pruning step that exits non-zero.
+- **SC-003**: A rejected composition leaves the target byte-unchanged, across all three injected modes:
+  truncation, empty output, and a compose step exiting non-zero.
 - **SC-004**: Output on the success path is byte-identical before and after this feature.
 - **SC-005**: With the linter absent, the lint group reports SKIPPED and the suite's pass count does not
   include it.
 - **SC-006**: Zero lint findings remain unaddressed — each is either fixed or suppressed inline with a
-  stated reason.
+  stated reason. **Deferred alongside FR-007**: unmeasurable until the linter runs. Tracked in
+  `specs/BACKLOG.md` rather than left as a success criterion no task can satisfy.
 
 ## Assumptions
 

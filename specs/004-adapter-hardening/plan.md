@@ -61,7 +61,7 @@ either a new guard on a failure path or housekeeping after a successful write.
 
 - Eligible for parallel dispatch: none. Every implementation task edits `project.sh` or `run-tests.sh`.
 - PR granularity: one pull request. The three stories describe one script's behavior and cannot merge
-  independently — the Principle XI exception, sanctioned at constitution v1.15.0.
+  independently — the Principle XI exception (sanctioned at v1.15.0; constitution is now v1.16.0).
 
 ## Design Decisions
 
@@ -70,14 +70,16 @@ enough that the directory does not grow. Declared in `adapter.yml` so a differen
 differently without editing the script — Principle II.
 
 **Pruning runs AFTER a successful write, never before.** Pruning first would delete the safety net the
-write might need. And a pruning failure is swallowed with a warning: FR-003 makes housekeeping
-subordinate, because failing a good projection over a stale file the operator never asked about would be
-the wrong trade.
+write might need. This is the canonical statement of the rationale FR-003 encodes; the tasks reference
+FR-003 rather than restating it, so the reasoning lives in one place and cannot drift across four copies.
 
-**The composition check compares line counts, not content.** A full content comparison would require
-holding the source twice and would fail on legitimate trailing-newline differences. The failure being
-guarded against is truncation, and a line-count floor catches it. Stated plainly because a reader will
-otherwise wonder why the check is not stricter.
+**The composition check compares a fingerprint, not a line count.** An earlier draft of this plan
+proposed a line-count floor and admitted it was weak. That was the wrong resolution: FR-004 demands
+rejection on content grounds, and a line count is itself a structural proxy — it would accept a
+same-length substitution. The check extracts the region from the composed file and compares its `cksum`
+against the `cksum` of the same `$SRC_CONTENT` the composition was built from. Exact by construction, and
+the trailing-newline concern that motivated the line-count idea does not arise when both sides come from
+the same variable.
 
 **The lint group's third state is the point.** Pass, fail, and SKIPPED — with skipped excluded from the
 pass count. A group that reports green because its tool is missing is the `stat -f` defect again: an
