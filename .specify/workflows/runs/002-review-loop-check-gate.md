@@ -56,3 +56,33 @@ start marker, and frontmatter all moved to `v0.1.0`.
 A `fixer` occurrence slipped into the README during T013 and was caught in verification — the same F1
 error recurring. Corrected. Zero occurrences remain in either deliverable.
 
+## Phase 7 — Review-to-merge loop
+
+**Round limit: 3** (constitutional default, not overridden). Target: PR #4.
+
+### Round 1 — reviewer
+
+Scope: 9 files, +783/-16, of which only ~45 lines are the deliverable. Deliverable reviewed in depth;
+the feature's own artifacts skimmed, having been checked by the analyze pass this session.
+
+Independently confirmed rather than trusting the change description: 30/30 prior directives identical
+by diff, trigger count 24 to 29, exclusion list complete at 4, gate table at 5 states, zero `fixer`
+occurrences.
+
+**Verdict: comment — 0 blocking, 1 high, 1 medium, 1 nit.**
+
+| ID | Severity | Finding |
+|---|---|---|
+| H1 | High | Loop step 4 read "no findings and no failing checks", a two-state condition, then deferred to a five-state gate. Pending is not failing, so an agent anchoring on step 4 could merge with checks still queued — exactly what the gate's pending row exists to prevent. FR-001 requires one action per state. |
+| M1 | Medium | Section 8 now holds 118 of 418 lines and six distinct concerns. Not a violation (the ceiling is per file), but it weakens the urgency-first ordering. Splitting is out of scope here; tracked. |
+| N1 | Nit | Once H1 is fixed the "no failing checks" phrase should be removed outright rather than reworded. |
+
+### Round 1 — shepherd
+
+Fixed H1 and N1 together: step 4 now defers entirely to the gate and states WHY it must not restate
+the condition — a looser inline version would admit a merge the gate forbids. That reason is what stops
+a future edit from reintroducing the same ambiguity.
+
+M1 deliberately not fixed. Splitting section 8 is a structural change needing its own lifecycle;
+doing it inside a review loop would be the scope expansion the autonomy bounds prohibit.
+

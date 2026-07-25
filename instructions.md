@@ -139,8 +139,10 @@ Implementation is not complete when code is written. It is complete when the cha
    plus an empty diff that step 3 must then examine. *Exception: none.*
 3. **Re-review the shepherd's own diff.** Its edits are content no reviewer has seen; merging them on
    the strength of the previous review would defeat the chain.
-4. When a review closes with no findings and no failing checks, arm automerge and let the change land
-   through the pull request, subject to the check gate below.
+4. When a review closes with no findings **and the check gate below is satisfied**, arm automerge and
+   let the change land through the pull request. Do not restate the check condition here — the gate is
+   the only place it is defined, and a looser inline version of it would admit a merge the gate
+   forbids.
 5. **After the merge completes**, delete the pull request's branch — remote first, then local — and
    remove its worktree.
 
