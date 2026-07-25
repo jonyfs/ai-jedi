@@ -117,3 +117,66 @@ still `current`, shellcheck still clean.
 
 No workflows configured, no checks reported, `required_status_checks` null — the absent-checks case.
 Merge proceeds on review approval; the absence is recorded here.
+
+## Phase 8 — T008/T010, completed after the merge
+
+T024–T031 were done during the loop but left unmarked; T009 landed inside T006. T008 and T010 were
+genuinely open, and the reason is worth recording: the `foreign` group tested the literal
+`<!-- SPECKIT START -->` pair and nothing else. Only one declaration actually uses that pair, so the
+group was passing **vacuously** for the other four — the same defect class as the `stat -f`
+fingerprints, caught the same way.
+
+New `foreignmulti` group, reading the pair out of the declaration under test:
+
+| Case | What it asserts |
+|---|---|
+| All-foreign file | A file that is entirely a foreign region in the DECLARED syntax keeps it byte-identical and gains the instruction region alongside |
+| Foreign interior | A heading inside the foreign region does not trigger fork detection, and survives |
+| Two syntaxes | A second, undeclared foreign syntax is ordinary operator content and survives byte-identical |
+| No pair declared | SKIP, plus a substitute assertion that the adapter invents no markers |
+
+Two of my own defects in writing it, both the vacuous-assertion pattern again:
+
+- The first fork fixture used the heading `# AI Jedi Instructions v0.0.9`. The declared fork pattern
+  requires a trailing colon, so nothing matched and the case could never fail.
+- Confirmed by mutation, not by inspection: hardcoding the SPECKIT pair back into `project.sh` left
+  the group fully green. After the fixture fix the same mutation produces 1 failure. The group is now
+  known non-vacuous rather than assumed so.
+
+Gemini, Copilot and Codex declare `foreign_markers: []`. That is correct — no other tool writes those
+files — so the group SKIPs for them and says why. A PASS there would have been the exact claim this
+group exists to stop making.
+
+Suite: 72/0/0 for Claude Code and OpenCode, 65/0/1 for the other three. 339 assertions. Zero
+shellcheck findings. All five live targets still `current (v0.1.0)`; OpenCode's caveman region intact.
+
+### PR #11 — review loop
+
+**Round 1 — reviewer.** Verified: 339 assertions, zero shellcheck findings, five live targets
+`current`, OpenCode's caveman region intact, and the mutation drops exactly one assertion, so the new
+group proves what it claims.
+
+**Verdict: comment — 0 blocking, 1 medium, 2 nits.**
+
+| ID | Severity | Finding |
+|---|---|---|
+| M1 | Medium | The "byte-identical" comparison stripped blank lines from BOTH sides, so it was not byte-identical. Verified: `a\n\n\nb` and `a\nb` compare equal after that sed. Had the adapter eaten or duplicated blank lines inside operator content, the assertion would have reported green — the exact defect this PR exists to fix, reproduced inside its own fix. |
+| N1 | Nit | Fixture `printf`s carry literal newlines at column 0 inside the function; breaks on reindent. |
+| N2 | Nit | `t`, `base`, `a`, `line` are globals reused across groups. |
+
+**Round 1 — shepherd.** M1 fixed by narrowing the exemption to what actually happens: an `awk` filter
+removes the managed region together with exactly the ONE blank separator line immediately preceding
+it, and compares everything else byte-for-byte, blank lines included. Extracted as
+`assert_outside_identical` and used by both call sites.
+
+Probed in both directions rather than assumed: a fixture that loses one internal blank line is
+reported as changed; a fixture with content intact plus the legitimate separator passes. N1 and N2 are
+cosmetic and left as-is — churning fixture formatting inside a review loop is the scope expansion
+Principle VI prohibits.
+
+**Round 2 — re-review of the shepherd's own diff.** One helper added, two call sites replaced. Suite
+unchanged at 72/0/0 and 65/0/1, zero shellcheck findings, live targets untouched.
+**Approve — 0 findings.** Rounds used: 2 of 3.
+
+**Check gate.** No workflows configured, `required_status_checks` null — the absent-checks case, same
+as PR #10. Merge proceeds on review approval.

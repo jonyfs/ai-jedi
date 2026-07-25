@@ -177,8 +177,11 @@ Honest current state rather than an aspirational one:
 
 - Instruction set: `0.1.0`. First release was `0.0.1`.
 - Constitution: 12 principles, v1.17.0.
-- Adapters: five, sharing one script. 13 test groups, 64 assertions, run against every target — 320
-  assertions in total, all passing. Zero `shellcheck` findings.
+- Adapters: five, sharing one script. 14 test groups run against every target: 72 assertions for
+  Claude Code and OpenCode, 65 plus one honest SKIP for Gemini, Copilot and Codex — those three
+  declare `foreign_markers: []`, so there is no other tool's region to preserve and the group says so
+  rather than reporting a green it did not earn. 339 assertions in total, all passing. Zero
+  `shellcheck` findings.
 - Behavioral verification: not yet performed. The projections exist and are verified byte-for-byte, but
   nobody has yet opened a fresh session in Codex, Copilot, Gemini or OpenCode to confirm each actually
   applies the rules it now carries.

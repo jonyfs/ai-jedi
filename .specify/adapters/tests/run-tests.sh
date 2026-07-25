@@ -6,7 +6,7 @@
 # whether or not it passes.
 #
 # Usage: ./run-tests.sh [group ...]
-#   Groups: refusals create idempotent preserve fork drift backup size foreign selfverify
+#   Groups: refusals create idempotent preserve fork drift backup size foreign foreignmulti selfverify
 #           retention composition lint
 #   No arguments runs every group.
 
@@ -310,6 +310,125 @@ group_foreign() {
   rm -f "$base"
 }
 
+# T008/T010. The `foreign` group above tests the literal SPECKIT pair and nothing else,
+# which means it proves the behaviour only for the one target whose declared markers happen
+# to BE that pair. Every other declaration was passing it vacuously — the same defect class
+# as the stat -f fingerprints. This group reads the pair out of the declaration under test,
+# so a target using caveman syntax is actually exercised with caveman syntax.
+# assert_outside_identical <label> <fixture> <baseline>
+# M1 from the PR #11 review, and the finding is the same defect this whole group exists to
+# fix. The first version stripped blank lines from BOTH sides before comparing, so it would
+# have reported "byte-identical" for content whose blank lines the adapter had eaten or
+# duplicated — verified: "a\n\n\nb" and "a\nb" compare equal after that sed.
+#
+# Only ONE separator blank line is legitimately introduced, immediately before the managed
+# region, and it is not a change to the content. So remove the region together with exactly
+# that one preceding blank line, and compare everything else byte-for-byte, blank lines and
+# all. The exemption is now as narrow as the real behaviour instead of global.
+assert_outside_identical() {
+  label=$1; fixture=$2; baseline=$3
+  awk '
+    /^<!-- AI-JEDI:INSTRUCTIONS:START/ { inr=1; if (held != "" || heldset) { heldset=0; held="" } ; next }
+    /^<!-- AI-JEDI:INSTRUCTIONS:END -->$/ { inr=0; next }
+    inr { next }
+    {
+      if (heldset) { print held; heldset=0 }
+      if ($0 == "") { held=$0; heldset=1; next }
+      print
+    }
+    END { if (heldset) print held }
+  ' "$fixture" > "$WORK/outside_now"
+  cp "$baseline" "$WORK/outside_was"
+  if cmp -s "$WORK/outside_now" "$WORK/outside_was"; then
+    ok "$label byte-identical outside the managed region"
+  else
+    bad "$label changed outside the managed region"
+  fi
+}
+
+group_foreignmulti() {
+  echo "group: foreignmulti (FR-003, SC-003)"
+  FS=$(sed -n '/^foreign_markers:/,/^[a-z_]/p' "$DECL" | sed -n 's/^  - "\(.*\)"$/\1/p' | sed -n 1p)
+  FE=$(sed -n '/^foreign_markers:/,/^[a-z_]/p' "$DECL" | sed -n 's/^  - "\(.*\)"$/\1/p' | sed -n 2p)
+  if [ -z "$FS" ] || [ -z "$FE" ]; then
+    # foreign_markers: [] is a legitimate declaration — gemini, copilot and codex host no
+    # other tool's region. SKIP rather than PASS: there is nothing to preserve here, and
+    # reporting green would claim a verification that did not happen.
+    skip "no foreign markers declared for $TEST_TARGET — nothing to preserve"
+    # Not vacuous, though: with no declared pair the adapter must not invent one. Assert
+    # that ordinary content resembling a foreign region is left alone as plain content.
+    fresh_work
+    t="$WORK/nomarkers.md"
+    printf '<!-- some-tool-begin -->\nnot declared foreign\n<!-- some-tool-end -->\n' > "$t"
+    base="$WORK/nomarkers.base"; cp "$t" "$base"
+    AIJEDI_TARGET="$t" sh "$SCRIPT" --target "$TEST_TARGET" -- >/dev/null 2>&1
+    assert_outside_identical "no declared pair: marker-shaped content" "$t" "$base"
+    return
+  fi
+  ok "declared foreign pair read from $TEST_TARGET"
+
+  # Case 1: the whole file IS a foreign region, in the DECLARED syntax rather than SPECKIT.
+  # This is OpenCode's real shape — 17 lines, all of it caveman.
+  fresh_work
+  t="$WORK/whole.md"
+  printf '%s
+entirely foreign
+second line
+%s
+' "$FS" "$FE" > "$t"
+  base="$WORK/whole.base"; cp "$t" "$base"
+  AIJEDI_TARGET="$t" sh "$SCRIPT" --target "$TEST_TARGET" -- >/dev/null 2>&1
+  awk -v s="$FS" -v e="$FE" 'index($0,s){f=1} f{print} index($0,e){f=0}' "$t"    > "$WORK/n1"
+  awk -v s="$FS" -v e="$FE" 'index($0,s){f=1} f{print} index($0,e){f=0}' "$base" > "$WORK/w1"
+  if cmp -s "$WORK/n1" "$WORK/w1"; then ok "all-foreign file: region byte-identical"; else bad "all-foreign file: region modified"; fi
+  if [ -s "$WORK/n1" ]; then ok "all-foreign file: region still present"; else bad "all-foreign file: region vanished"; fi
+  if grep -qE '^<!-- AI-JEDI:INSTRUCTIONS:START v[0-9][0-9.]* -->$' "$t"; then
+    ok "all-foreign file: instruction region added alongside"
+  else
+    bad "all-foreign file: no instruction region added"
+  fi
+
+  # Case 2: fork detection must not see the foreign interior. A heading inside the foreign
+  # region is the exact shape that made the adapter detect its OWN output as a fork once.
+  # The heading must genuinely MATCH the declaration's fork pattern, which requires a
+  # trailing colon. A first version of this fixture omitted it, so nothing matched and the
+  # case reported green under a deliberate mutation of the marker plumbing — proving
+  # nothing. Mutation-tested after the fix: it fails when the declared markers are ignored.
+  fresh_work
+  t="$WORK/interior.md"
+  printf '%s
+# AI Jedi Instructions v0.0.9: forked
+interior heading
+%s
+' "$FS" "$FE" > "$t"
+  out=$(AIJEDI_TARGET="$t" sh "$SCRIPT" --target "$TEST_TARGET" -- 2>&1); rc=$?
+  if [ "$rc" -eq 0 ]; then ok "fork scan ignores foreign interior (exit 0)"; else bad "fork scan flagged foreign interior: $(echo "$out" | head -1)"; fi
+  if grep -q 'interior heading' "$t"; then ok "foreign interior preserved"; else bad "foreign interior lost"; fi
+
+  # Case 3: a SECOND, undeclared foreign syntax. The adapter reads one pair per declaration,
+  # so this one is not recognised as foreign at all — it is ordinary operator content, and
+  # ordinary operator content must survive untouched. Asserted because "unrecognised" and
+  # "safe to rewrite" are easy to conflate.
+  fresh_work
+  t="$WORK/two.md"
+  printf '%s
+declared foreign
+%s
+<!-- other-tool-begin -->
+undeclared foreign
+<!-- other-tool-end -->
+' "$FS" "$FE" > "$t"
+  base="$WORK/two.base"; cp "$t" "$base"
+  AIJEDI_TARGET="$t" sh "$SCRIPT" --target "$TEST_TARGET" -- >/dev/null 2>&1
+  a=0
+  for line in 'declared foreign' 'undeclared foreign' 'other-tool-begin' 'other-tool-end'; do
+    grep -q "$line" "$t" || a=1
+  done
+  if [ "$a" -eq 0 ]; then ok "both foreign syntaxes survive"; else bad "a foreign syntax was lost"; fi
+  # And byte-identical, not merely present.
+  assert_outside_identical "both syntaxes: pre-existing content" "$t" "$base"
+}
+
 group_selfverify() {
   echo "group: selfverify (FR-012, FR-015)"
   fresh_work
@@ -408,10 +527,10 @@ group_lint() {
 
 # NOTE: not named GROUPS — that is a special bash array (process group IDs); assigning it
 # is silently ignored under macOS /bin/sh, so the loop never iterates and nothing prints.
-TEST_GROUPS=${*:-"refusals create idempotent preserve fork drift backup size foreign selfverify retention composition lint"}
+TEST_GROUPS=${*:-"refusals create idempotent preserve fork drift backup size foreign foreignmulti selfverify retention composition lint"}
 for g in $TEST_GROUPS; do
   case $g in
-    refusals|create|idempotent|preserve|fork|drift|backup|size|foreign|selfverify|retention|composition|lint) "group_$g" ;;
+    refusals|create|idempotent|preserve|fork|drift|backup|size|foreign|foreignmulti|selfverify|retention|composition|lint) "group_$g" ;;
     *) echo "unknown group: $g"; exit 1 ;;
   esac
 done

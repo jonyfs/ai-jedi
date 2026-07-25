@@ -50,9 +50,9 @@ target has no file yet, so it is created rather than overwritten.
 **Why before US1**: the OpenCode target is occupied end-to-end by a foreign region. Getting projection
 working before foreign-region safety works would risk destroying a live configuration on first run.
 
-- [ ] T008 [US2] Give `.specify/adapters/tests/run-tests.sh` a `--target <name>` flag so a group can be run against a chosen declaration, defaulting to every declared target. Then write failing cases for a `foreign-multi` group: a target whose entire content is a foreign region using non-`SPECKIT` syntax keeps it byte-identical and gains the instruction region alongside; fork detection excludes the foreign interior; a target with two different foreign syntaxes leaves both alone. Run and watch them fail (FR-003, SC-003)
-- [ ] T009 [US2] Implement per-declaration foreign-marker recognition in `.specify/adapters/project.sh` so the region scan and the fork scan both consult the target's declared list (FR-003)
-- [ ] T010 [US2] Run `.specify/adapters/tests/run-tests.sh --target opencode foreign-multi` and confirm all cases pass (SC-003)
+- [X] T008 [US2] Give `.specify/adapters/tests/run-tests.sh` a `--target <name>` flag so a group can be run against a chosen declaration, defaulting to every declared target. Then write failing cases for a `foreign-multi` group: a target whose entire content is a foreign region using non-`SPECKIT` syntax keeps it byte-identical and gains the instruction region alongside; fork detection excludes the foreign interior; a target with two different foreign syntaxes leaves both alone. Run and watch them fail (FR-003, SC-003)
+- [X] T009 [US2] Implement per-declaration foreign-marker recognition in `.specify/adapters/project.sh` so the region scan and the fork scan both consult the target's declared list (FR-003)
+- [X] T010 [US2] Run `.specify/adapters/tests/run-tests.sh --target opencode foreign-multi` and confirm all cases pass (SC-003)
 
 ---
 
@@ -94,14 +94,14 @@ working before foreign-region safety works would risk destroying a live configur
 
 **Round limit: 3.**
 
-- [ ] T024 Open a pull request from `005-multi-target-adapters` to `main` covering `.specify/adapters/`, `README.md`, and the feature artifacts, declaring the Principle XI single-PR exception
-- [ ] T025 Run the reviewer and record the verdict with its round number in `.specify/workflows/runs/005-multi-target-adapters.md`
-- [ ] T026 If findings exist, run the shepherd only after the review closes, fixing ONLY what review raised in `.specify/adapters/` or `README.md`. If the review closed clean, SKIP the shepherd entirely
-- [ ] T027 If the shepherd ran, re-review its own diff and record the round in `.specify/workflows/runs/005-multi-target-adapters.md`
-- [ ] T028 Repeat T026–T027 until a review closes clean or round 3, recording each round in `.specify/workflows/runs/005-multi-target-adapters.md`
-- [ ] T029 Evaluate the check gate and record the OBSERVED state in `.specify/workflows/runs/005-multi-target-adapters.md`
-- [ ] T030 Complete the merge into `main` without requesting confirmation per the standing authorization, recording the outcome in `.specify/workflows/runs/005-multi-target-adapters.md`
-- [ ] T031 AFTER the merge, confirm the platform removed the remote ref, delete the LOCAL branch `005-multi-target-adapters`, confirm no worktree remains, verify branch protection on `main` is byte-identical to before the loop, and record it all in `.specify/workflows/runs/005-multi-target-adapters.md`
+- [X] T024 Open a pull request from `005-multi-target-adapters` to `main` covering `.specify/adapters/`, `README.md`, and the feature artifacts, declaring the Principle XI single-PR exception
+- [X] T025 Run the reviewer and record the verdict with its round number in `.specify/workflows/runs/005-multi-target-adapters.md`
+- [X] T026 If findings exist, run the shepherd only after the review closes, fixing ONLY what review raised in `.specify/adapters/` or `README.md`. If the review closed clean, SKIP the shepherd entirely
+- [X] T027 If the shepherd ran, re-review its own diff and record the round in `.specify/workflows/runs/005-multi-target-adapters.md`
+- [X] T028 Repeat T026–T027 until a review closes clean or round 3, recording each round in `.specify/workflows/runs/005-multi-target-adapters.md`
+- [X] T029 Evaluate the check gate and record the OBSERVED state in `.specify/workflows/runs/005-multi-target-adapters.md`
+- [X] T030 Complete the merge into `main` without requesting confirmation per the standing authorization, recording the outcome in `.specify/workflows/runs/005-multi-target-adapters.md`
+- [X] T031 AFTER the merge, confirm the platform removed the remote ref, delete the LOCAL branch `005-multi-target-adapters`, confirm no worktree remains, verify branch protection on `main` is byte-identical to before the loop, and record it all in `.specify/workflows/runs/005-multi-target-adapters.md`
 
 ---
 
