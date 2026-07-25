@@ -153,7 +153,9 @@ without reading the projected content.
   owns checking the result and triggering the restore. Neither duplicates the other.
 - **FR-016**: Fork migration MUST be gated on explicit operator confirmation for that specific span. The
   adapter MUST report the exact span and the signal it matched, and MUST refuse when the span is not
-  bounded by exactly one heading matching the instruction title's shape extending to end-of-file.
+  bounded by exactly one heading matching the title pattern recorded in the adapter declaration and
+  extending to end-of-file. That pattern MUST be a literal expression in the declaration, not a
+  description — "the title's shape" is not a testable predicate.
 - **FR-002**: The adapter MUST refuse to write when the resolved target path falls inside a project
   working tree, and MUST report the refusal.
 - **FR-003**: The adapter MUST create the target file at the documented location when it does not exist,
@@ -174,7 +176,9 @@ without reading the projected content.
 - **FR-010**: The adapter MUST support a check that reports current, stale, or not-installed by
   comparing version strings alone, without reading projected content.
 - **FR-011**: The adapter MUST back up the target before writing, and MUST leave the target unmodified
-  if the write cannot complete.
+  if the write cannot complete. The backup filename MUST carry a suffix the target tool does not load as
+  configuration — a backup that the harness reads as instructions would inject a stale copy of the
+  instruction set into every session. The naming pattern MUST be recorded in the adapter declaration.
 - **FR-012**: The adapter MUST state that its effect applies from the tool's next session, not to the
   session that ran it.
 - **FR-013**: The adapter MUST leave any managed region owned by other tooling untouched, and MUST NOT

@@ -37,7 +37,7 @@ configuration is a defect regardless of whether it passes.
 ## Phase 1: Setup
 
 - [ ] T001 [P] Create `.specify/workflows/runs/003-claude-code-adapter.md` with frontmatter to hold orchestration and review-chain state
-- [ ] T002 [P] Copy the operator's current `~/.claude/CLAUDE.md` to `/tmp/claude-md-before.txt` as the byte-identity reference for T017, and record its line count and the span of the unmarked fork in the run log
+- [ ] T002 [P] Copy the operator's current `~/.claude/CLAUDE.md` to `specs/003-claude-code-adapter/.baseline-claude-md.txt` as the byte-identity reference for T028 — NOT under the system temp directory, which a reboot or cleaner can empty between T002 and T028, silently removing the only baseline — and record its line count and the fork span in the run log. Add that filename to `.gitignore`: it is a copy of the operator's personal configuration and MUST NOT be committed to a public repository
 - [ ] T003 Create `.specify/adapters/claude-code/tests/run-tests.sh` as an executable harness that dispatches named case groups (`refusals`, `create`, `idempotent`, `preserve`, `fork`, `drift`, `backup`, `size`, `foreign`, `selfverify`) and exits non-zero on any failure
 
 **Checkpoint**: Harness exists and fails — no cases implemented yet.
@@ -110,7 +110,7 @@ constitution forbids and this file calls mandatory.
 ### Implementation
 
 - [ ] T020 [US2] Implement span replacement in `.specify/adapters/claude-code/project.sh`: replace only the text between markers, rewriting the start marker's version, leaving every other byte identical (FR-005)
-- [ ] T021 [US2] Implement the backup and write atomicity in `.specify/adapters/claude-code/project.sh`: copy the target beside itself before writing, and leave the target unmodified if the write cannot complete (FR-011)
+- [ ] T021 [US2] Implement the backup and write atomicity in `.specify/adapters/claude-code/project.sh`: copy the target beside itself before writing using the filename pattern declared in `adapter.yml` — a suffix the tool does NOT load as configuration, since a backup read as instructions would inject a stale copy of the whole instruction set into every session — and leave the target unmodified if the write cannot complete (FR-011)
 - [ ] T022 [US2] Implement confirmation-gated fork migration in `.specify/adapters/claude-code/project.sh` as ONE task, never as a bare replacement that a later task gates: bound the span by **exactly one** heading matching the instruction title's shape extending to end-of-file — zero matches means no fork, two or more means refuse — report the span and the matched signal, and require explicit operator confirmation for that specific span before writing. Absent report, confirmation, or backup, refuse (FR-006, FR-016, Principle IX one-time migration)
 - [ ] T023 [US2] Implement size-limit handling in `.specify/adapters/claude-code/project.sh`: compare the projected content against the declared limit and REFUSE when it exceeds — this adapter does not summarize, because a summarized region would break the verbatim projection FR-004/FR-005 require and would carry a source version it does not actually contain (FR-001b)
 - [ ] T024 [US2] Implement foreign-region safety in `.specify/adapters/claude-code/project.sh`: a managed region owned by other tooling is left untouched and never mistaken for this one (FR-013)
@@ -124,7 +124,7 @@ constitution forbids and this file calls mandatory.
 
 ## Phase 6: Real Projection
 
-- [ ] T028 Run `sh .specify/adapters/claude-code/project.sh` against the operator's real `~/.claude/CLAUDE.md`, then verify per Quickstart Step 7: region present with the source version, pre-revision fork gone, `@RTK.md` import and `# graphify` section both intact, backup on disk. Diff against `/tmp/claude-md-before.txt` from T002 to confirm byte-identity outside the replaced span (SC-001, FR-011)
+- [ ] T028 Run `sh .specify/adapters/claude-code/project.sh` against the operator's real `~/.claude/CLAUDE.md`, then verify per Quickstart Step 7: region present with the source version, pre-revision fork gone, `@RTK.md` import and `# graphify` section both intact, backup on disk. Diff against `specs/003-claude-code-adapter/.baseline-claude-md.txt` from T002 to confirm byte-identity outside the replaced span (SC-001, FR-011)
 - [ ] T029 Record the T028 outcome in `.specify/workflows/runs/003-claude-code-adapter.md`, including the exact span replaced and the backup filename
 
 ---
@@ -133,8 +133,8 @@ constitution forbids and this file calls mandatory.
 
 - [ ] T030 [P] Correct `README.md`: the claim "No adapter has been written for any tool yet" becomes false on merge and MUST be replaced with what actually exists — one adapter for Claude Code — with the other three tools still stated as unexercised (Principle XII)
 - [ ] T031 [P] Update the `README.md` tools table so the Claude Code row reflects a working projection rather than only an installed integration
-- [ ] T032 Run Quickstart Steps 1–7 end to end and record every result in `.specify/workflows/runs/003-claude-code-adapter.md`
-- [ ] T033 Confirm no committed file under `.specify/adapters/` contains an absolute home path, a username, or any credential-shaped string (Principle IX authoring constraints)
+- [ ] T032 Run Quickstart Steps 1, 2, 3, 4, 5, 5b, 6, 6b and 7 end to end and record every result in `.specify/workflows/runs/003-claude-code-adapter.md`. Step 8 is the deferred behavioral probe (T043); Step 9 is discharged by Phase 8
+- [ ] T033 Confirm no committed file under `.specify/adapters/` OR `specs/003-claude-code-adapter/` contains an absolute home path, a username, or any credential-shaped string, and that the T002 baseline copy is gitignored rather than committed (Principle IX authoring constraints)
 
 ---
 
@@ -156,7 +156,7 @@ constitution forbids and this file calls mandatory.
 
 ## Behavioral Confirmation (deferred — requires a fresh session)
 
-- [ ] T043 DEFERRED: start a fresh Claude Code session loading `~/.claude/CLAUDE.md` and confirm it applies a rule present ONLY in `v0.1.0` — the five-state check gate or the standing merge authorization, neither of which exists in the pre-revision fork. This cannot be self-administered inside the session that ran the projection; the run log records it as pending (Quickstart Step 8, SC-001)
+- [ ] T043 DEFERRED: start a fresh Claude Code session loading `~/.claude/CLAUDE.md` and confirm it applies a rule present ONLY in `v0.1.0` — the check gate (four states plus the absent-workflows case) or the standing merge authorization, neither of which exists in the pre-revision fork. This cannot be self-administered inside the session that ran the projection; the run log records it as pending (Quickstart Step 8, SC-001)
 
 ---
 

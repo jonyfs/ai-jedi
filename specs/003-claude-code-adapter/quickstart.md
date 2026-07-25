@@ -20,6 +20,9 @@ Plan: [[plan]] · Spec: [[spec]]
 cat .specify/adapters/claude-code/adapter.yml
 grep -cE 'target_tool|path_pattern|format|size_limit' .specify/adapters/claude-code/adapter.yml
 grep -cE 'skill_install|skill_verify|invoke_separator|agent_definition|tier_map' .specify/adapters/claude-code/adapter.yml
+grep -E 'size_limit' .specify/adapters/claude-code/adapter.yml | grep -qE '[0-9]+' \
+  && echo "PASS size_limit is numeric" || echo "FAIL size_limit missing or non-numeric"
+grep -E 'title_pattern|fork_pattern' .specify/adapters/claude-code/adapter.yml
 ```
 
 **Expected**: all EIGHT declared fields present — the original four plus the four the authoring constraints
@@ -105,6 +108,20 @@ cd .specify/adapters/claude-code/tests && ./run-tests.sh drift
 from version strings alone, without reading projected content. `stale` and `not-installed` must not
 collapse into one result.
 
+## Step 6b — Foreign regions, exact markers, self-verification (FR-013, FR-014, FR-015)
+
+```bash
+cd .specify/adapters/claude-code/tests && ./run-tests.sh foreign selfverify
+```
+
+**Expected**: a `SPECKIT START`/`END` region belonging to other tooling is left untouched and never
+mistaken for this one. Operator text merely resembling a marker is not matched — detection is exact on the
+full marker line. A deliberately corrupted write is caught by post-write verification and rolled back from
+the backup. The next-session disclosure appears in the output.
+
+Without this step none of FR-013, FR-014, or FR-015 is reached by the end-to-end run, even though each has
+a fixture.
+
 ## Step 7 — Against the real configuration (SC-001, FR-011, FR-012)
 
 Only after Steps 1–6 pass.
@@ -113,20 +130,21 @@ Reuse the snapshot T002 already captured — do NOT re-copy here. Re-copying aft
 the pre-projection reference with post-projection content, destroying the baseline this step depends on.
 
 ```bash
-test -f /tmp/claude-md-before.txt || echo "FAIL: T002 snapshot missing, cannot verify byte-identity"
+BASE=specs/003-claude-code-adapter/.baseline-claude-md.txt
+test -f "$BASE" || echo "FAIL: T002 baseline missing, cannot verify byte-identity"
 sh .specify/adapters/claude-code/project.sh
 # byte-identity BELOW the region
 # Assert the exit status - an earlier draft silenced diff with 2>/dev/null and checked
 # nothing, so a failure read as a pass.
 diff <(sed -n '/AI-JEDI:INSTRUCTIONS:END/,$p' ~/.claude/CLAUDE.md) \
-     <(sed -n '/AI-JEDI:INSTRUCTIONS:END/,$p' /tmp/claude-md-before.txt) >/dev/null \
+     <(sed -n '/AI-JEDI:INSTRUCTIONS:END/,$p' "$BASE") >/dev/null \
   && echo "PASS below-region byte-identical" || echo "FAIL below-region differs"
 # byte-identity ABOVE the region - presence greps alone are weaker than SC-002 demands.
 # Derive the line count from the span T002 recorded; do NOT hardcode it. An earlier draft
 # assumed exactly 4 lines above the fork, which only held for one operator's file.
 ABOVE=$(grep -n 'AI-JEDI:INSTRUCTIONS:START' ~/.claude/CLAUDE.md | cut -d: -f1)
 ABOVE=$((ABOVE - 1))
-diff "<(head -n $ABOVE ~/.claude/CLAUDE.md)" "<(head -n $ABOVE /tmp/claude-md-before.txt)" >/dev/null \
+diff "<(head -n $ABOVE ~/.claude/CLAUDE.md)" "<(head -n $ABOVE "$BASE")" >/dev/null \
   && echo "PASS above-region byte-identical" || echo "FAIL above-region differs"
 grep -oE 'AI-JEDI:INSTRUCTIONS:START v[0-9.]+' ~/.claude/CLAUDE.md
 grep -c 'SYSTEM SPECIFICATION V4' ~/.claude/CLAUDE.md     # expected: 0 — fork gone

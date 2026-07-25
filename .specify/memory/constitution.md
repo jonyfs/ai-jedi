@@ -1,8 +1,20 @@
 <!--
 Sync Impact Report
-- Version change: 1.14.0 → 1.15.0
+- Version change: 1.15.0 → 1.16.0
 - Ratification date unchanged: 2026-07-24
 - Modified principles:
+  - Tool Adapter & Authoring Constraints — the over-limit clause required content
+    exceeding a target's limit to be SUMMARIZED. It now permits either summarizing or
+    REFUSING, with the adapter's declaration required to record which, and states that
+    refusing is correct whenever the projection must be verbatim. Raised by
+    /speckit-analyze against feature 003 as a CRITICAL conflict: FR-001b had specified
+    refusal, which contradicted a constitutional MUST. The reasoning that produced
+    FR-001b turned out to be constitution-grade rather than feature-local — a
+    summarized region carries the source version while holding different content, so
+    the drift check, which compares version strings alone, would report current on a
+    region that is not. Summarizing stays available to adapters whose target genuinely
+    cannot hold the full content and whose contract does not promise fidelity.
+- Superseded report for v1.15.0 — modified principles:
   - Principle IX. Delimited Managed Region — adds the ONE-TIME FORK MIGRATION
     exception, the only permitted reading or rewriting of unmarked operator content.
     Raised by /speckit-analyze against feature 003 as a CRITICAL principle-vs-principle
@@ -161,6 +173,8 @@ Sync Impact Report
   fallback no longer applies to work pushed to that remote.
 
 Prior version history
+- 1.15.0 (2026-07-25): Principle IX gained the one-time fork migration exception;
+  Principle XI sanctioned the PR-per-story exception.
 - 1.14.0 (2026-07-25): Principle VI recorded the standing merge authorization.
 - 1.13.0 (2026-07-25): Principle VI gained the merge check gate; clean review skips
   the shepherd.
@@ -654,8 +668,14 @@ than having no README at all.
 ## Tool Adapter & Authoring Constraints
 
 - Every adapter MUST declare: target tool, output path, format, and any tool-imposed size or
-  syntax limits. Content exceeding a target's limit MUST be summarized by the adapter, not
-  truncated arbitrarily.
+  syntax limits. Content exceeding a target's limit MUST NOT be truncated arbitrarily. The adapter
+  either summarizes it or REFUSES, and its declaration MUST record which it does — silence on the
+  choice is not permitted. **Refusing is the correct choice whenever the projection must be verbatim**:
+  a summarized managed region would carry the source version while holding different content, so two
+  regions could report the same version and mean different things, and the drift check that compares
+  version strings alone would report current on a region that is not. An adapter whose contract is
+  verbatim projection MUST refuse rather than summarize. Summarizing remains available to adapters whose
+  target genuinely cannot hold the full content and whose contract does not promise fidelity.
 - The declared output path MUST be the tool's user-level (global) configuration location
   (Principle IX). An adapter that resolves to a path inside a project working tree MUST refuse to
   write.
@@ -755,4 +775,4 @@ Compliance review: every pull request MUST verify adherence to Principles I–XI
 that violates a principle MUST be justified in the plan's Complexity Tracking section or
 removed. Runtime development guidance lives in `instructions.md`.
 
-**Version**: 1.15.0 | **Ratified**: 2026-07-24 | **Last Amended**: 2026-07-25
+**Version**: 1.16.0 | **Ratified**: 2026-07-24 | **Last Amended**: 2026-07-25
