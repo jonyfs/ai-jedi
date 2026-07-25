@@ -28,7 +28,8 @@ Adapters live at `.specify/adapters/<tool>/`, one self-contained directory per t
 `.specify/adapters/claude-code/` with `adapter.yml`, `project.sh`, and `tests/run-tests.sh`.
 
 **Safety rule for every task below**: tests run against temporary fixtures under the system temp
-directory. **No task except T017 touches `~/.claude/CLAUDE.md`.** A test that writes the operator's real
+directory. **No task except T017 WRITES `~/.claude/CLAUDE.md`.** T002 reads it to capture the
+byte-identity reference; reading is permitted, writing is not. A test that writes the operator's real
 configuration is a defect regardless of whether it passes.
 
 ---
@@ -37,7 +38,7 @@ configuration is a defect regardless of whether it passes.
 
 - [ ] T001 [P] Create `.specify/workflows/runs/003-claude-code-adapter.md` with frontmatter to hold orchestration and review-chain state
 - [ ] T002 [P] Copy the operator's current `~/.claude/CLAUDE.md` to `/tmp/claude-md-before.txt` as the byte-identity reference for T017, and record its line count and the span of the unmarked fork in the run log
-- [ ] T003 Create `.specify/adapters/claude-code/tests/run-tests.sh` as an executable harness that dispatches named case groups (`refusals`, `create`, `idempotent`, `preserve`, `fork`, `drift`) and exits non-zero on any failure
+- [ ] T003 Create `.specify/adapters/claude-code/tests/run-tests.sh` as an executable harness that dispatches named case groups (`refusals`, `create`, `idempotent`, `preserve`, `fork`, `drift`, `backup`, `foreign`, `selfverify`) and exits non-zero on any failure
 
 **Checkpoint**: Harness exists and fails — no cases implemented yet.
 
@@ -47,7 +48,7 @@ configuration is a defect regardless of whether it passes.
 
 **Purpose**: The script cannot resolve a target without a declaration. Blocks every story.
 
-- [ ] T004 Write `.specify/adapters/claude-code/adapter.yml` declaring `target_tool`, `path_pattern` (home-relative, NEVER an absolute path — a committed absolute path leaks the operator's username into a public repository), `format`, and `size_limit` (FR-001)
+- [ ] T004 Write `.specify/adapters/claude-code/adapter.yml` declaring `target_tool`, `path_pattern` (home-relative, NEVER an absolute path — a committed absolute path leaks the operator's username into a public repository), `format`, `size_limit`, plus the four fields the authoring constraints require of every adapter: skill install/verify procedure, invocation separator, agent-definition location and format, and the capability-tier to concrete-model mapping (FR-001, FR-001a)
 - [ ] T005 Create `.specify/adapters/claude-code/project.sh` as an executable stub that reads `adapter.yml`, expands `path_pattern` against the home directory at runtime, and exits with a not-implemented status
 
 **Checkpoint**: Declaration complete; script resolves a target and does nothing else.
@@ -63,11 +64,11 @@ correctly matters less than never writing wrongly, so this ships first.
 
 **Independent Test**: Quickstart Step 2 — 4 of 4 hostile cases refuse and write nothing.
 
-- [ ] T006 [US3] Write failing test cases in `.specify/adapters/claude-code/tests/run-tests.sh` for the `refusals` group: target path inside a git working tree, single start marker, markers in reverse order, unreadable target. Each asserts BOTH a non-zero exit AND that the fixture is byte-unchanged. Run and watch all four fail
+- [ ] T006 [US3] Write failing test cases in `.specify/adapters/claude-code/tests/run-tests.sh` for the `refusals` group: target path inside a git working tree, single start marker, markers in reverse order, unreadable target, a fork span bounded by TWO title-shaped headings (unboundable — must refuse), and a fork migration attempted without operator confirmation. Each asserts BOTH a non-zero exit AND that the fixture is byte-unchanged. Run and watch all six fail
 - [ ] T007 [US3] Implement working-tree refusal in `.specify/adapters/claude-code/project.sh`: if the resolved target sits inside a git working tree, report and exit non-zero without writing (FR-002)
 - [ ] T008 [US3] Implement marker validation in `.specify/adapters/claude-code/project.sh`: exact full-line match on both markers, reporting corruption and writing nothing when one is missing or they are out of order (FR-007, FR-014)
 - [ ] T009 [US3] Implement unreadable-target handling in `.specify/adapters/claude-code/project.sh`: report and write nothing rather than overwriting a file that could not be read (FR-007)
-- [ ] T010 [US3] Run `.specify/adapters/claude-code/tests/run-tests.sh refusals` and confirm 4 of 4 now pass with every fixture byte-unchanged (SC-005)
+- [ ] T010 [US3] Run `.specify/adapters/claude-code/tests/run-tests.sh refusals` and confirm 6 of 6 now pass with every fixture byte-unchanged (SC-005)
 
 **Checkpoint**: The adapter cannot damage a file. Safe to teach it to write.
 
@@ -83,7 +84,7 @@ correctly matters less than never writing wrongly, so this ships first.
 - [ ] T012 [US1] Implement content extraction in `.specify/adapters/claude-code/project.sh`: read the span BETWEEN `instructions.md`'s own markers, not the markers themselves, and read the version from its start marker (FR-004)
 - [ ] T013 [US1] Implement creation in `.specify/adapters/claude-code/project.sh`: when the target is absent, create it at the resolved location containing only the marker pair and the content — never falling back to a project-local path (FR-003)
 - [ ] T014 [US1] Implement the version comparison in `.specify/adapters/claude-code/project.sh`: matching versions report the projection current and write nothing; the drift check reports current, stale, or not-installed from version strings alone (FR-009, FR-010)
-- [ ] T015 [US1] Run `.specify/adapters/claude-code/tests/run-tests.sh create idempotent drift` and confirm all pass (SC-004, SC-006)
+- [ ] T015 [US1] Run `.specify/adapters/claude-code/tests/run-tests.sh create idempotent drift` and confirm all pass (SC-004, SC-006). Note: FR-008 (idempotency) has no implementation task of its own — it emerges from T012–T014 and T016b, and is verified here rather than built directly
 
 **Checkpoint**: The adapter writes correctly into an empty or current target.
 
@@ -102,6 +103,13 @@ correctly matters less than never writing wrongly, so this ships first.
 - [ ] T016e [US2] Implement foreign-region safety in `.specify/adapters/claude-code/project.sh`: a managed region owned by other tooling is left untouched and never mistaken for this one (FR-013)
 - [ ] T016f [US2] Add the next-session disclosure to `.specify/adapters/claude-code/project.sh` output: the projection takes effect from the tool's next session, not the one that ran the script (FR-012)
 - [ ] T016g [US2] Run `.specify/adapters/claude-code/tests/run-tests.sh preserve fork` and confirm all pass with zero unintended bytes changed (SC-002, SC-003)
+
+- [ ] T016h [US2] Write failing test cases in `.specify/adapters/claude-code/tests/run-tests.sh` for the `backup` group: a backup exists on disk after any run that wrote, and a simulated mid-write failure leaves the target byte-unchanged. Run and watch them fail (FR-011, SC-007)
+- [ ] T016i [US2] Write failing test cases for the `foreign` and `selfverify` groups in `.specify/adapters/claude-code/tests/run-tests.sh`: a foreign `SPECKIT START`/`END` region is left untouched and never mistaken for this one; the next-session disclosure string is present in the output; post-write self-verification catches a deliberately corrupted write and rolls back. Run and watch them fail (FR-012, FR-013, FR-015)
+- [ ] T016j [US2] Implement post-write self-verification and rollback in `.specify/adapters/claude-code/project.sh`: markers present and ordered, version matching, outside-region byte-identity, path still user-level — restoring from the backup when any check fails (FR-015)
+- [ ] T016k [US2] Implement size-limit handling in `.specify/adapters/claude-code/project.sh`: act on the declared limit rather than recording it, never truncating arbitrarily, and state whether it summarized or refused (FR-001b)
+- [ ] T016l [US2] Implement confirmation-gated fork migration in `.specify/adapters/claude-code/project.sh`: report the span and matched signal, require explicit operator confirmation for that span, refuse unless exactly one title-shaped heading extends to end-of-file (FR-016, Principle IX one-time migration)
+- [ ] T016m [US2] Run `.specify/adapters/claude-code/tests/run-tests.sh backup foreign selfverify` and confirm all pass
 
 **Checkpoint**: All fixture groups green. Safe to run against the real configuration.
 
@@ -185,5 +193,6 @@ valuable: it proves the safety properties before any capability exists to misuse
 
 **Increment 5**: Phases 7–8 — README parity, verification, and the loop.
 
-**Gate**: `/speckit-analyze` MUST report convergence before T004, the first task that writes a
-deliverable file (Principle V).
+**Gate**: `/speckit-analyze` MUST report convergence before T003, the first task that writes a committed
+deliverable file (Principle V). An earlier draft named T004; T003 creates the test harness, which is
+also committed.

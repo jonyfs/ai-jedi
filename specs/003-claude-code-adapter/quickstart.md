@@ -42,8 +42,10 @@ cd .specify/adapters/claude-code/tests && ./run-tests.sh refusals
 | Only a start marker | Report corruption, no write |
 | Markers in reverse order | Report corruption, no write |
 | Unreadable target | Report, no write |
+| Fork span bounded by two title-shaped headings | Refuse — cannot tell which is the fork |
+| Fork migration without operator confirmation | Refuse — the exception is confirmation-gated |
 
-**Expected**: 4 of 4 refuse. A single case that writes is a blocking defect — each represents a way to
+**Expected**: 6 of 6 refuse. A single case that writes is a blocking defect — each represents a way to
 corrupt a file the operator owns.
 
 ## Step 3 — Creation and idempotency (FR-003, FR-008, SC-004)
@@ -94,11 +96,18 @@ collapse into one result.
 
 Only after Steps 1–6 pass.
 
+Reuse the snapshot T002 already captured — do NOT re-copy here. Re-copying after a run would overwrite
+the pre-projection reference with post-projection content, destroying the baseline this step depends on.
+
 ```bash
-cp ~/.claude/CLAUDE.md /tmp/claude-md-before.txt
+test -f /tmp/claude-md-before.txt || echo "FAIL: T002 snapshot missing, cannot verify byte-identity"
 sh .specify/adapters/claude-code/project.sh
+# byte-identity BELOW the region
 diff <(sed -n '/AI-JEDI:INSTRUCTIONS:END/,$p' ~/.claude/CLAUDE.md) \
      <(sed -n '/AI-JEDI:INSTRUCTIONS:END/,$p' /tmp/claude-md-before.txt) 2>/dev/null
+# byte-identity ABOVE the region - presence greps alone are weaker than SC-002 demands
+diff <(sed -n '1,/AI-JEDI:INSTRUCTIONS:START/p' ~/.claude/CLAUDE.md | sed '$d') \
+     <(sed -n '1,4p' /tmp/claude-md-before.txt)
 grep -oE 'AI-JEDI:INSTRUCTIONS:START v[0-9.]+' ~/.claude/CLAUDE.md
 grep -c 'SYSTEM SPECIFICATION V4' ~/.claude/CLAUDE.md     # expected: 0 — fork gone
 grep -c '^@RTK.md' ~/.claude/CLAUDE.md                     # expected: 1 — operator import survived
@@ -113,7 +122,7 @@ next session — it does not change the session that ran it.
 ## Step 8 — Behavioral confirmation (SC-001)
 
 Start a fresh Claude Code session and confirm it applies a rule that exists ONLY in `v0.1.0` — the
-five-state check gate, or the standing merge authorization. Neither is in the pre-revision fork, so
+check gate, or the standing merge authorization. Neither is in the pre-revision fork, so
 either one proves the projection took effect rather than the old copy still being read.
 
 **Expected**: the new rule is applied. This is the first end-to-end proof that the instruction set

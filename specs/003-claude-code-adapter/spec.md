@@ -136,6 +136,20 @@ without reading the projected content.
 
 - **FR-001**: The adapter MUST declare its target tool, the user-level configuration path it writes, the
   file format, and any size limit that tool imposes.
+- **FR-001a**: The adapter MUST also declare the four fields the authoring constraints require of every
+  adapter: how its harness installs and verifies the skill set, the invocation separator its integration
+  uses, its harness's agent-definition location and format, and its capability-tier to concrete-model
+  mapping. An adapter declaring only its path and format is incomplete.
+- **FR-001b**: The adapter MUST act on the declared size limit rather than merely recording it. Content
+  exceeding the target's limit MUST NOT be truncated arbitrarily; the adapter either summarizes or
+  refuses, and states which.
+- **FR-015**: After writing, the adapter MUST verify its own output: both markers present and in order,
+  the start marker's version matching the source, content outside the region byte-identical to before,
+  and the written path still user-level. A write that cannot be verified MUST be rolled back from the
+  backup.
+- **FR-016**: Fork migration MUST be gated on explicit operator confirmation for that specific span. The
+  adapter MUST report the exact span and the signal it matched, and MUST refuse when the span is not
+  bounded by exactly one heading matching the instruction title's shape extending to end-of-file.
 - **FR-002**: The adapter MUST refuse to write when the resolved target path falls inside a project
   working tree, and MUST report the refusal.
 - **FR-003**: The adapter MUST create the target file at the documented location when it does not exist,
@@ -186,8 +200,9 @@ without reading the projected content.
   exactly one marked region, with zero duplicated instruction content.
 - **SC-004**: Running the adapter twice with unchanged source produces byte-identical output and exactly
   one region.
-- **SC-005**: The adapter refuses in 4 of 4 hostile cases: target inside a project tree, single marker,
-  markers reversed, unreadable target.
+- **SC-005**: The adapter refuses in 6 of 6 hostile cases: target inside a project tree, single marker,
+  markers reversed, unreadable target, a fork span bounded by two or more title-shaped headings, and a
+  fork migration without explicit operator confirmation.
 - **SC-006**: The drift check correctly reports current, stale, and not-installed across all three
   states, using version strings alone.
 - **SC-007**: A backup of the prior configuration exists after any run that wrote, and the target is

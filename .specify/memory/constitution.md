@@ -1,8 +1,24 @@
 <!--
 Sync Impact Report
-- Version change: 1.13.0 → 1.14.0
+- Version change: 1.14.0 → 1.15.0
 - Ratification date unchanged: 2026-07-24
 - Modified principles:
+  - Principle IX. Delimited Managed Region — adds the ONE-TIME FORK MIGRATION
+    exception, the only permitted reading or rewriting of unmarked operator content.
+    Raised by /speckit-analyze against feature 003 as a CRITICAL principle-vs-principle
+    conflict: Principle I calls a hand-maintained drifted projection a defect that MUST
+    be regenerated, while IX forbade touching anything outside the markers. Unresolved,
+    an adapter run would leave the operator holding two copies of the instruction set,
+    one stale. The exception is narrow and spent-on-use: report the exact span and the
+    signal matched, obtain explicit per-migration operator confirmation, back up first —
+    absent any of the three, refuse. An adapter MUST NOT decide autonomously that
+    operator content is a fork.
+  - Principle XI. Isolated Parallel Execution — the PR-per-story rule gains an explicit
+    exception for stories that mutate one artifact or describe one executable's behavior
+    and therefore cannot be split. This SANCTIONS a rule that instructions.md line 216
+    already carried without constitutional backing — a governance inversion caught by the
+    same analyze pass. Invoking it for splittable stories is prohibited.
+- Superseded report for v1.14.0 — modified principles:
   - Principle VI. Automated Post-Implementation Review — records the operator's
     STANDING merge authorization: when every gate is clear (review closed with no
     blocking findings, check gate satisfied, branch protection intact) the loop
@@ -145,6 +161,7 @@ Sync Impact Report
   fallback no longer applies to work pushed to that remote.
 
 Prior version history
+- 1.14.0 (2026-07-25): Principle VI recorded the standing merge authorization.
 - 1.13.0 (2026-07-25): Principle VI gained the merge check gate; clean review skips
   the shepherd.
 - 1.12.0 (2026-07-25): Principle VI round limit given a concrete default of 3.
@@ -460,6 +477,16 @@ Rules:
   corrupt: the agent MUST report it and MUST NOT attempt a partial replacement.
 - Content outside the markers is operator-authored and MUST NEVER be read for decisions, moved,
   reordered, or rewritten. Updating means replacing the span between markers, nothing else.
+- **One-time fork migration (the sole exception).** A target may already contain a hand-maintained
+  projection of instruction content with no markers around it. Principle I calls such a fork a defect
+  that MUST be regenerated, which pulls against the rule above; left unresolved, running an adapter
+  would leave the operator holding two copies of the instruction set, one of them stale. The tension
+  resolves one way only: the adapter MAY migrate such a span into a managed region, but ONLY when it
+  (a) reports the exact span it identified and the signal it matched, (b) obtains explicit
+  operator confirmation for that specific migration, and (c) backs the target up first. Absent any of
+  the three, it MUST refuse. The adapter MUST NOT decide autonomously that operator content is a fork.
+  After migration the span is inside markers and the rule above governs it normally — the exception is
+  spent, not standing.
 - Where the target format cannot carry comments (for example a JSON config), the adapter MUST
   define an equivalent explicit delimiter for that format — a dedicated key holding the managed
   string, or a documented sentinel line — and MUST record which mechanism it uses. Silently
@@ -566,7 +593,11 @@ Pull request organization, when git and a remote are configured:
 
 - One pull request per independently testable user story, matching the story decomposition in
   `tasks.md`. A PR spanning several stories defeats the independent-testability property the story
-  decomposition exists to create.
+  decomposition exists to create. **Exception**: stories that all mutate the same artifact, or that
+  describe one executable's behavior, cannot be merged independently — no decomposition makes them
+  separable. Such a feature MAY ship as one pull request, and the plan MUST state the exception and
+  why it applies rather than leaving a reviewer to infer it. Invoking the exception for stories that
+  COULD be split is prohibited.
 - Each PR MUST state its base branch, the story it implements, and its position in the dependency
   graph.
 - The Principle VI review chain applies per PR, not per parallel batch. A batch of five parallel
@@ -724,4 +755,4 @@ Compliance review: every pull request MUST verify adherence to Principles I–XI
 that violates a principle MUST be justified in the plan's Complexity Tracking section or
 removed. Runtime development guidance lives in `instructions.md`.
 
-**Version**: 1.14.0 | **Ratified**: 2026-07-24 | **Last Amended**: 2026-07-25
+**Version**: 1.15.0 | **Ratified**: 2026-07-24 | **Last Amended**: 2026-07-25

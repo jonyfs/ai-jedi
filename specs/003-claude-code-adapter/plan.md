@@ -88,7 +88,9 @@ scope and follow the same declaration shape.
 - Worktree/branch per unit: not applicable at this size. Single branch.
 - Merge order: single branch; dependency order is task order.
 - PR granularity: one pull request. The four stories describe one script's behavior and cannot ship
-  independently — the documented PR-per-story exception.
+  independently. This invokes the PR-per-story exception in Principle XI — which `instructions.md` line
+  216 already carried but the constitution did not sanction until v1.15.0. That governance inversion was
+  caught by `/speckit-analyze` and fixed in the constitution, not papered over here.
 
 Post-Phase 1 re-check: PASS. No violations; no Complexity Tracking entries required.
 
@@ -108,8 +110,22 @@ the operator's username.
 operator content (an import and a personal section) followed by an unmarked copy of the pre-revision
 instruction text. The script must recognise that span as replaceable without markers to guide it. The
 chosen signal is the source's own H1 title pattern: the fork begins at a heading matching the
-instruction title's shape and runs to end-of-file. Anything the script cannot bound confidently, it
-refuses to touch — FR-006 requires reporting the replaced span so the operator can audit the judgment.
+instruction title's shape and runs to end-of-file. FR-006 requires reporting the replaced span so the
+operator can audit the judgment.
+
+The bounding predicate is concrete rather than a matter of confidence: **exactly one** heading matching
+the instruction title's shape, extending to end-of-file. Zero matches means there is no fork. Two or more
+means the script cannot tell which one is the fork, and refuses. An earlier draft said "cannot bound
+confidently", which no fixture could falsify; this version can be tested.
+
+**The fork migration is a sanctioned exception, not a convenience.** Principle IX forbids reading or
+rewriting content outside the markers; Principle I calls a hand-maintained drifted projection a defect
+that must be regenerated. The fork in the target is both. `/speckit-analyze` raised this as a CRITICAL
+conflict, and it was resolved by amending the constitution (v1.15.0) rather than by asserting an
+exception in this plan — Governance says the constitution wins, so the plan cannot grant itself relief.
+The exception is narrow: report the span and the signal, obtain explicit per-migration confirmation, back
+up first. Absent any of the three, refuse. The adapter never decides on its own that operator content is
+a fork.
 
 **Backup before write, always.** FR-011. The target is a file the operator owns and did not expect a
 repository to modify. A timestamped copy beside it is cheap; losing hand-written global configuration
