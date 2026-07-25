@@ -315,6 +315,37 @@ group_foreign() {
 # to BE that pair. Every other declaration was passing it vacuously — the same defect class
 # as the stat -f fingerprints. This group reads the pair out of the declaration under test,
 # so a target using caveman syntax is actually exercised with caveman syntax.
+# assert_outside_identical <label> <fixture> <baseline>
+# M1 from the PR #11 review, and the finding is the same defect this whole group exists to
+# fix. The first version stripped blank lines from BOTH sides before comparing, so it would
+# have reported "byte-identical" for content whose blank lines the adapter had eaten or
+# duplicated — verified: "a\n\n\nb" and "a\nb" compare equal after that sed.
+#
+# Only ONE separator blank line is legitimately introduced, immediately before the managed
+# region, and it is not a change to the content. So remove the region together with exactly
+# that one preceding blank line, and compare everything else byte-for-byte, blank lines and
+# all. The exemption is now as narrow as the real behaviour instead of global.
+assert_outside_identical() {
+  label=$1; fixture=$2; baseline=$3
+  awk '
+    /^<!-- AI-JEDI:INSTRUCTIONS:START/ { inr=1; if (held != "" || heldset) { heldset=0; held="" } ; next }
+    /^<!-- AI-JEDI:INSTRUCTIONS:END -->$/ { inr=0; next }
+    inr { next }
+    {
+      if (heldset) { print held; heldset=0 }
+      if ($0 == "") { held=$0; heldset=1; next }
+      print
+    }
+    END { if (heldset) print held }
+  ' "$fixture" > "$WORK/outside_now"
+  cp "$baseline" "$WORK/outside_was"
+  if cmp -s "$WORK/outside_now" "$WORK/outside_was"; then
+    ok "$label byte-identical outside the managed region"
+  else
+    bad "$label changed outside the managed region"
+  fi
+}
+
 group_foreignmulti() {
   echo "group: foreignmulti (FR-003, SC-003)"
   FS=$(sed -n '/^foreign_markers:/,/^[a-z_]/p' "$DECL" | sed -n 's/^  - "\(.*\)"$/\1/p' | sed -n 1p)
@@ -331,14 +362,7 @@ group_foreignmulti() {
     printf '<!-- some-tool-begin -->\nnot declared foreign\n<!-- some-tool-end -->\n' > "$t"
     base="$WORK/nomarkers.base"; cp "$t" "$base"
     AIJEDI_TARGET="$t" sh "$SCRIPT" --target "$TEST_TARGET" -- >/dev/null 2>&1
-    sed '/^<!-- AI-JEDI:INSTRUCTIONS:START/,/^<!-- AI-JEDI:INSTRUCTIONS:END -->$/d' "$t" \
-      | sed '/^$/d' > "$WORK/stripped"
-    sed '/^$/d' "$base" > "$WORK/origstripped"
-    if cmp -s "$WORK/stripped" "$WORK/origstripped"; then
-      ok "no declared pair: marker-shaped content preserved as ordinary content"
-    else
-      bad "no declared pair: marker-shaped content altered"
-    fi
+    assert_outside_identical "no declared pair: marker-shaped content" "$t" "$base"
     return
   fi
   ok "declared foreign pair read from $TEST_TARGET"
@@ -402,17 +426,7 @@ undeclared foreign
   done
   if [ "$a" -eq 0 ]; then ok "both foreign syntaxes survive"; else bad "a foreign syntax was lost"; fi
   # And byte-identical, not merely present.
-  # Byte-identical, not merely present: strip the managed region and compare what is left.
-  # Blank lines are dropped on both sides because the adapter separates its region from
-  # existing content with one, and that separator is not a change to the content itself.
-  sed '/^<!-- AI-JEDI:INSTRUCTIONS:START/,/^<!-- AI-JEDI:INSTRUCTIONS:END -->$/d' "$t" \
-    | sed '/^$/d' > "$WORK/stripped"
-  sed '/^$/d' "$base" > "$WORK/origstripped"
-  if cmp -s "$WORK/stripped" "$WORK/origstripped"; then
-    ok "pre-existing content byte-identical outside the managed region"
-  else
-    bad "pre-existing content changed outside the managed region"
-  fi
+  assert_outside_identical "both syntaxes: pre-existing content" "$t" "$base"
 }
 
 group_selfverify() {

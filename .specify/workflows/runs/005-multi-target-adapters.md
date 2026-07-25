@@ -149,3 +149,34 @@ group exists to stop making.
 
 Suite: 72/0/0 for Claude Code and OpenCode, 65/0/1 for the other three. 339 assertions. Zero
 shellcheck findings. All five live targets still `current (v0.1.0)`; OpenCode's caveman region intact.
+
+### PR #11 — review loop
+
+**Round 1 — reviewer.** Verified: 339 assertions, zero shellcheck findings, five live targets
+`current`, OpenCode's caveman region intact, and the mutation drops exactly one assertion, so the new
+group proves what it claims.
+
+**Verdict: comment — 0 blocking, 1 medium, 2 nits.**
+
+| ID | Severity | Finding |
+|---|---|---|
+| M1 | Medium | The "byte-identical" comparison stripped blank lines from BOTH sides, so it was not byte-identical. Verified: `a\n\n\nb` and `a\nb` compare equal after that sed. Had the adapter eaten or duplicated blank lines inside operator content, the assertion would have reported green — the exact defect this PR exists to fix, reproduced inside its own fix. |
+| N1 | Nit | Fixture `printf`s carry literal newlines at column 0 inside the function; breaks on reindent. |
+| N2 | Nit | `t`, `base`, `a`, `line` are globals reused across groups. |
+
+**Round 1 — shepherd.** M1 fixed by narrowing the exemption to what actually happens: an `awk` filter
+removes the managed region together with exactly the ONE blank separator line immediately preceding
+it, and compares everything else byte-for-byte, blank lines included. Extracted as
+`assert_outside_identical` and used by both call sites.
+
+Probed in both directions rather than assumed: a fixture that loses one internal blank line is
+reported as changed; a fixture with content intact plus the legitimate separator passes. N1 and N2 are
+cosmetic and left as-is — churning fixture formatting inside a review loop is the scope expansion
+Principle VI prohibits.
+
+**Round 2 — re-review of the shepherd's own diff.** One helper added, two call sites replaced. Suite
+unchanged at 72/0/0 and 65/0/1, zero shellcheck findings, live targets untouched.
+**Approve — 0 findings.** Rounds used: 2 of 3.
+
+**Check gate.** No workflows configured, `required_status_checks` null — the absent-checks case, same
+as PR #10. Merge proceeds on review approval.
