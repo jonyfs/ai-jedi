@@ -1,0 +1,159 @@
+---
+Summary: Implementation plan for the first adapter — a shell script projecting instructions.md into the Claude Code global config, replacing the existing unmarked fork while preserving operator content byte-for-byte.
+Tags: [#plan #adapter #projection #claude-code]
+---
+
+# Implementation Plan: Claude Code Adapter
+
+**Branch**: `003-claude-code-adapter` | **Date**: 2026-07-25 | **Spec**: [[spec]] — `specs/003-claude-code-adapter/spec.md`
+
+**Input**: Feature specification from `specs/003-claude-code-adapter/spec.md`
+
+## Summary
+
+Deliver `.specify/adapters/claude-code/` — a declaration file plus an idempotent shell script that
+projects the content between `instructions.md`'s markers into the operator's global Claude Code
+configuration, wrapped in its own marker pair carrying the source version. The target already contains
+an unmarked fork of the pre-revision content; the script replaces exactly that span and leaves every
+other byte identical, after taking a backup.
+
+This is the first artifact in the project that makes `instructions.md` configure anything.
+
+## Technical Context
+
+**Language/Version**: POSIX shell (`sh`), matching the `script: "sh"` already recorded in
+`.specify/init-options.json`. No new runtime dependency.
+
+**Primary Dependencies**: `git` (working-tree detection), standard POSIX text tools. Deliberately no
+`jq`, `python`, or `node` — the adapter must run on a machine where the instruction set is being
+installed for the first time.
+
+**Storage**: Plain files. Target is the operator's global config; backups sit beside it.
+
+**Testing**: Executable, so TDD applies (constitution: "Where a change is executable, TDD applies").
+Test fixtures under `.specify/adapters/claude-code/tests/` covering every FR, run against temporary
+files — **never** against the operator's real config.
+
+**Target Platform**: The operator's machine. Claude Code global config is a Markdown file accepting HTML
+comments.
+
+**Project Type**: Adapter / projection tool
+
+**Performance Goals**: Irrelevant — a single file rewrite. Correctness is the only axis.
+
+**Constraints**: Byte-identity outside the managed region (FR-005) is the hard constraint everything
+else serves. No secrets, no operator-identifying data, no machine-local paths committed (Principle IX
+authoring constraints) — the target path is resolved at runtime from the home directory, never hardcoded
+into a committed file.
+
+**Scale/Scope**: One adapter, one tool. ~150 lines of shell plus tests. Other tools' adapters are out of
+scope and follow the same declaration shape.
+
+## Constitution Check
+
+*GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
+
+| Principle | Gate | Status |
+|---|---|---|
+| I. Single Source of Truth | Projection generated, never hand-edited | PASS — this feature CREATES the first projection and, in doing so, closes an active violation: the target currently holds a hand-maintained fork |
+| II. Multi-Tool Portability | Adding a tool means adding an adapter, not rewriting content | PASS — the adapter reads the source verbatim; all Claude-Code-specific values live in its declaration file |
+| III. Language Duality | Artifacts in English | PASS |
+| IV. Token Density with Auto-Clarity | N/A to executable code; applies to its output messages | PASS |
+| V. Spec-Driven Change | Full lifecycle | PASS — spec exists, this is the plan step, analyze gates implementation |
+| VI. Automated Post-Implementation Review | Loop, round limit 3, check gate, post-merge cleanup | PASS — governs this feature's own pull request |
+| VII. Versioned Instruction Surface | Bump declared before implementation | PASS — **N/A, and that is the point**: this feature adds no instruction content. See the bump declaration below |
+| VIII. Executable Agent Provisioning | Catalog/manifest agreement | PASS — no catalog change |
+| IX. Delimited Managed Region | Marker pair, global-only target, exact update protocol | PASS — this feature IMPLEMENTS the principle. FR-002 through FR-014 are its clauses made executable |
+| X. Capability-Tiered Agent Materialization | Tier vocabulary | PASS — no catalog or tier change |
+| XI. Isolated Parallel Execution | Worktree isolation, dependency-order merge | PASS — see the Parallel Execution Plan below |
+| XII. Operator-Facing README | README covers every capability, claims directive-backed | PASS — the README currently says "No adapter has been written for any tool yet". That becomes false on merge and MUST be corrected in the same change set; task-tracked |
+| Authoring constraints | Adapter declares target, path, format, limits; idempotent; managed region delimited | PASS — FR-001, FR-004, FR-008 |
+
+**Instruction Version Bump**
+
+- Current version: `0.1.0`
+- Declared bump: **N/A — no instruction content is edited.**
+- Justification: this feature adds an adapter, not a directive. `instructions.md` is read, not written.
+  Principle VII's bump obligation triggers on instruction-content changes; there is none here.
+- Consequence worth stating: the projection this adapter writes will carry `v0.1.0`, because that is the
+  source version at merge time. The adapter does not choose a version — it copies one.
+
+**Parallel Execution Plan** (Principle XI)
+
+- Units eligible for parallel dispatch: **the test suite and the script are genuinely separable**, but
+  TDD forbids running them in parallel — the test must exist and fail before the code. Serial by
+  methodology, not by contention.
+- Genuinely parallel: the declaration file, the README correction, and the run log all touch different
+  files from the script.
+- Worktree/branch per unit: not applicable at this size. Single branch.
+- Merge order: single branch; dependency order is task order.
+- PR granularity: one pull request. The four stories describe one script's behavior and cannot ship
+  independently — the documented PR-per-story exception.
+
+Post-Phase 1 re-check: PASS. No violations; no Complexity Tracking entries required.
+
+## Design Decisions
+
+**Shell, not a richer language.** The adapter must run when the instruction set is first installed on a
+machine, which is precisely when no project toolchain is guaranteed. POSIX `sh` plus `git` is the
+smallest dependency set that can do the job, and `script: "sh"` is already this project's recorded
+convention.
+
+**The target path is resolved, never committed.** Principle IX's authoring constraints forbid
+machine-local paths in committed files, and the repository is public. The declaration file records the
+path as a home-relative pattern; the script expands it at runtime. A committed absolute path would leak
+the operator's username.
+
+**Replacing the unmarked fork is the interesting case, not the empty one.** The target today holds
+operator content (an import and a personal section) followed by an unmarked copy of the pre-revision
+instruction text. The script must recognise that span as replaceable without markers to guide it. The
+chosen signal is the source's own H1 title pattern: the fork begins at a heading matching the
+instruction title's shape and runs to end-of-file. Anything the script cannot bound confidently, it
+refuses to touch — FR-006 requires reporting the replaced span so the operator can audit the judgment.
+
+**Backup before write, always.** FR-011. The target is a file the operator owns and did not expect a
+repository to modify. A timestamped copy beside it is cheap; losing hand-written global configuration
+is not recoverable.
+
+**Self-modification is disclosed, not solved.** Writing the file changes the instructions governing the
+session that ran the script. The script cannot avoid this — it can only say so. FR-012 makes the
+disclosure an obligation.
+
+## Project Structure
+
+### Documentation (this feature)
+
+```text
+specs/003-claude-code-adapter/
+├── plan.md              # This file
+├── quickstart.md        # Phase 1 output — validation guide
+├── checklists/
+│   └── requirements.md  # Spec quality checklist
+└── tasks.md             # Phase 2 output (/speckit-tasks)
+```
+
+Deliberately absent: `research.md` — the protocol is fully specified by Principle IX, nothing to
+research. `data-model.md` — the entities are four states and a file span, defined in the spec.
+`contracts/` — the adapter declaration file IS the contract, and it ships as code rather than as a spec
+artifact.
+
+### Source Code (repository root)
+
+```text
+.specify/adapters/claude-code/
+├── adapter.yml          # Declaration: target tool, path pattern, format, size limit
+├── project.sh           # The projection script
+└── tests/
+    └── run-tests.sh     # Fixture-driven suite, one case per FR
+instructions.md          # Read-only source
+README.md                # "No adapter written" claim corrected
+.specify/workflows/runs/003-claude-code-adapter.md
+```
+
+**Structure Decision**: Adapters live under `.specify/adapters/<tool>/` — one directory per tool, each
+self-contained with its declaration, script, and tests. This is the first, and the layout is chosen so
+the second requires no restructuring: adding a tool means adding a sibling directory.
+
+## Complexity Tracking
+
+No Constitution Check violations. Section not applicable.
