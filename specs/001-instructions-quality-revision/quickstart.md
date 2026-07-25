@@ -183,6 +183,20 @@ Verify the bounds hold (SC-016):
 - An unconverged change is left open with its state recorded, not merged.
 - Every round appears in `.specify/workflows/runs/001-instructions-quality-revision.md`.
 
+Post-merge cleanup (SC-018):
+
+```bash
+git branch -r --merged origin/main | grep -v 'main$'   # esperado: sem saída
+git worktree list                                      # esperado: só o principal
+```
+
+Confirm the branch survived while the pull request was merely approved, and disappeared only after
+the merge. `main` must still exist.
+
+Frontmatter fidelity (SC-017): read the shipped `Summary:` and `Tags:` and confirm the summary
+describes the directives the file actually carries and that every capability area present has a tag.
+A capability with no tag is undiscoverable to a tag-filtering agent.
+
 ## Definition of done
 
 - Steps 1–5 pass with zero blocking defects

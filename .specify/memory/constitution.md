@@ -1,9 +1,30 @@
 <!--
 Sync Impact Report
-- Version change: 1.9.0 → 1.10.0
+- Version change: 1.10.0 → 1.11.0
 - Ratification date unchanged: 2026-07-24
 - Modified principles:
-  - Principle VI. Automated Post-Implementation Review — scope materially expanded
+  - Principle VI. Automated Post-Implementation Review — gains step 5: after the
+    MERGE completes, the pull request's branch is deleted (remote then local) and
+    its worktree removed. Explicitly NOT triggered by approval — a branch deleted
+    between approval and merge closes the request without landing anything, since
+    the branch is what the merge consumes. `main` and operator-designated
+    long-lived branches are never deleted by this step.
+  - Principle XI. Isolated Parallel Execution — worktree cleanup now also covers
+    deleting the merged branch itself.
+  - Tool Adapter & Authoring Constraints — frontmatter must be ACCURATE, not merely
+    present. `Summary:` must describe what the file currently contains and `Tags:`
+    must reflect its actual subject matter, both re-evaluated in the same change
+    set as any content change. For `instructions.md`, `Summary:` must agree with
+    the directives carried and `Tags:` must cover every capability area present.
+  - Structural note: both requests were folded into existing sections rather than
+    ratified as Principles XIII and XIV. The constitution is already at ~620 lines
+    against a self-imposed 200–400 typical range, and these rules belong to
+    sections that already exist. Principle inflation would worsen the atomicity
+    tension without adding governance.
+- Added sections: none
+- Removed sections: none
+- Superseded report for v1.10.0 — Principle VI. Automated Post-Implementation
+  Review — scope materially expanded
     (not renamed). Trigger becomes pull-request creation as well as end-of-unit.
     The chain becomes an autonomous LOOP that drives the change to merge on `main`
     rather than stopping at "arming automerge". Adds the requirement that the
@@ -90,12 +111,18 @@ Sync Impact Report
     tasks.md gained Phase 5B (US5) plus the catalog-migration and
     finding-resolution tasks; quickstart.md gained Step 6B.
 - Deferred TODOs: none
+- Operational note: `delete_branch_on_merge` is now enabled on the GitHub
+  repository, so the remote branch is removed by the platform at merge time.
+  Principle VI step 5 still governs the LOCAL branch and the worktree, which the
+  platform setting does not touch.
 - Operational note: repository now has a GitHub remote
   (github.com/jonyfs/ai-jedi) with `main` protected behind pull requests.
   Principle VI's PR-scoped automation is therefore live; its local-diff
   fallback no longer applies to work pushed to that remote.
 
 Prior version history
+- 1.10.0 (2026-07-25): Principle VI became an autonomous review-to-merge loop with
+  shepherd-diff re-review and explicit autonomy bounds.
 - 1.9.0 (2026-07-25): added Principle XII. Operator-Facing README.
 - 1.8.0 (2026-07-25): Principle VII baseline corrected — first instruction release
   is 0.0.1; the `V4` generation marker retired.
@@ -192,6 +219,17 @@ when no pull request exists yet. Both entry points are automatic.
    them on the strength of the previous review would defeat the chain. Return to step 1.
 4. When a review closes with no findings and no failing checks, the shepherd arms automerge and the
    change lands on `main` through the pull request.
+5. **After the merge completes**, the pull request's branch MUST be deleted — remote first, then any
+   local copy — and its worktree removed per Principle XI.
+
+Branch deletion is triggered by the MERGE, never by the approval. Approval is not integration: a
+branch deleted between approval and merge closes the pull request without landing anything, because
+the branch is what the merge consumes. An approved-but-unmerged branch MUST survive.
+
+- Deletion MUST NOT run while the pull request is open, whatever its review state.
+- A branch that failed to merge MUST be preserved along with its pull request, so the work is
+  recoverable.
+- `main`, and any long-lived branch the operator designates, MUST NEVER be deleted by this step.
 
 Running the shepherd before the review has closed is prohibited — it would shepherd an unreviewed
 change. CRITICAL findings freeze the branch: automerge MUST NOT be armed until they are resolved.
@@ -450,6 +488,9 @@ Parallelism rules:
   finishes first does not thereby earn the right to land first.
 - A worktree MUST be removed once its branch has merged, or immediately if it produced no change.
   Abandoned worktrees are state that outlives its run log and MUST NOT accumulate.
+- The branch itself MUST be deleted after its merge completes, per Principle VI step 5 — remote copy
+  first, then any local copy. Merged branches that linger make the branch list a poor signal of what
+  work is actually open.
 - Orchestration state — which unit, which worktree, which branch, which status — MUST be recorded in
   the run log under `.specify/workflows/runs/` so an interrupted parallel run resumes without
   re-dispatching completed units.
@@ -536,6 +577,16 @@ than having no README at all.
   vendor model identifier into shared content, or that collapses a tier downward, is defective.
 - Every persisted Markdown artifact MUST open with frontmatter carrying `Summary:` (one
   sentence) and `Tags:`.
+- Frontmatter MUST be accurate, not merely present. `Summary:` MUST describe what the file actually
+  contains as of this revision, and `Tags:` MUST reflect its actual subject matter. Both MUST be
+  re-evaluated in the same change set as any content change, and corrected when the content moved on.
+  Stale frontmatter is worse than absent frontmatter: an agent that reads `Summary:` to decide
+  whether to load the file will skip a file that no longer matches its own description.
+- For `instructions.md` specifically, `Summary:` MUST agree with the directives the file actually
+  carries, and `Tags:` MUST cover every capability area present in it. A capability added without a
+  corresponding tag is undiscoverable to any agent that filters by tag.
+- Frontmatter MUST NOT contradict the title version (Principle VII) and MUST NOT claim scope the
+  file does not have.
 - Files MUST stay atomic and focused: 200–400 lines typical, 800 lines maximum. Split rather
   than grow.
 - Cross-file dependencies MUST be expressed as `[[Wiki Links]]`.
@@ -578,6 +629,11 @@ than having no README at all.
 - Any change set that edits instruction content MUST update `README.md` in the same change set, or
   record the reviewed no-change decision (Principle XII). Review MUST verify that every README
   benefit claim is still backed by a directive and that the stated version matches the title.
+- Any change set that alters a file's content MUST re-evaluate that file's `Summary:` and `Tags:` and
+  correct them where the content moved on. Review MUST reject frontmatter that no longer describes
+  the file.
+- After a pull request merges, its branch MUST be deleted and its worktree removed. A merged branch
+  left in place is stale state; an unmerged branch MUST NOT be deleted.
 
 ## Governance
 
@@ -601,4 +657,4 @@ Compliance review: every pull request MUST verify adherence to Principles I–XI
 that violates a principle MUST be justified in the plan's Complexity Tracking section or
 removed. Runtime development guidance lives in `instructions.md`.
 
-**Version**: 1.10.0 | **Ratified**: 2026-07-24 | **Last Amended**: 2026-07-25
+**Version**: 1.11.0 | **Ratified**: 2026-07-24 | **Last Amended**: 2026-07-25

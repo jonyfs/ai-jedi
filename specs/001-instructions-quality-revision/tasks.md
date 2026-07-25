@@ -145,6 +145,8 @@ the version, and writes to a global path.
 - [ ] T032o [US5] Write pull request organization into section 8 of `instructions.md`: one PR per independently testable story declaring base and dependency position, review chain per PR rather than per batch, no PR from a branch with no common ancestor, stacked work declares its parent (D79–D82, FR-021)
 - [ ] T032q [US5] Write the autonomous review-to-merge loop into section 8 of `instructions.md`: triggers on PR creation and at end-of-unit when no PR exists, loops review → fix → re-review the fixer's own diff until a review closes clean, then merges through the PR (D87–D89, FR-023)
 - [ ] T032r [US5] Write the autonomy bounds into section 8 of `instructions.md`: stated round limit, no scope expansion beyond the findings, branch protection never weakened, unconverged change left open rather than merged, every round recorded in the run log (D90–D94, FR-023)
+- [ ] T032s [US5] Write post-merge branch cleanup into section 8 of `instructions.md`: branch deleted after the MERGE completes (remote then local) with its worktree removed, approval alone never triggering deletion, unmerged and default branches preserved (D98–D100, FR-025)
+- [ ] T032t [US5] Rewrite the `instructions.md` frontmatter so `Summary:` describes the directives actually carried and `Tags:` cover every capability area present, without contradicting the title version (D95–D97, FR-024)
 - [ ] T032p [US5] Add the parallel-execution degradation rows to section 14 of `instructions.md`: no repository, no remote, and no parallel dispatch, each with its stated fallback and reporting obligation (D83, FR-020, FR-021)
 
 **Checkpoint**: US5 delivers a self-describing, self-updating instruction surface that can

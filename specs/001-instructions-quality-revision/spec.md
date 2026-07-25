@@ -221,6 +221,12 @@ was written.
   and MUST state its autonomy bounds: a round limit, no scope expansion beyond the findings, no
   weakening of branch protection, and halting with the request left open rather than merging an
   unconverged change.
+- **FR-024**: The file's own `Summary:` MUST describe the directives it actually carries and its
+  `Tags:` MUST cover every capability area present in it, with both re-evaluated whenever content
+  changes. Frontmatter MUST NOT contradict the title version or claim scope the file lacks.
+- **FR-025**: The file MUST state that a pull request's branch is deleted after its MERGE completes —
+  remote copy first, then local — and MUST state that approval alone never triggers deletion, that an
+  unmerged branch is preserved, and that the default branch is never deleted by this step.
 
 ### Key Entities
 
@@ -272,6 +278,10 @@ was written.
   automatically, and the loop either merges the change or halts with the request left open and its
   state recorded — never merging a change whose review did not close, and never weakening branch
   protection to do so.
+- **SC-017**: The file's `Summary:` and `Tags:` match its shipped content — every capability area
+  present is covered by a tag, and the summary describes the directives actually carried.
+- **SC-018**: After a merge, zero merged branches and zero worktrees remain for that change; after an
+  approval that has not yet merged, the branch still exists.
 
 ## Assumptions
 

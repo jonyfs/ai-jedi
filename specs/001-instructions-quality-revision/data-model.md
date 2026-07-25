@@ -165,6 +165,12 @@ New entries extend the register; they do not replace anything above.
 | D92 | Branch protection MUST NOT be weakened to complete the loop; blocked merge halts and reports | 8 | FR-023, Principle VI |
 | D93 | Unconverged change leaves the request open with state recorded; never merged | 8 | FR-023, Principle VI |
 | D94 | Every round's verdict, findings, actions, and merge outcome recorded in the run log so an interrupted loop resumes | 8 | FR-023, Principle VI |
+| D95 | `Summary:` describes the directives actually carried; `Tags:` cover every capability area present | 1 | FR-024, Authoring Constraints |
+| D96 | Frontmatter re-evaluated on every content change; stale frontmatter is a defect | 1 + 2 | FR-024, Authoring Constraints |
+| D97 | Frontmatter never contradicts the title version and never claims scope the file lacks | 1 | FR-024, Principle VII |
+| D98 | Branch deleted after the MERGE completes — remote first, then local — with its worktree removed | 8 | FR-025, Principles VI and XI |
+| D99 | Approval alone never triggers branch deletion; an approved-but-unmerged branch survives | 8 | FR-025, Principle VI |
+| D100 | A branch that failed to merge is preserved with its pull request; the default branch is never deleted by this step | 8 | FR-025, Principle VI |
 
 ## State transitions
 
