@@ -140,6 +140,10 @@ the version, and writes to a global path.
 - [ ] T032j [US5] Write the tier-to-concrete-model mapping into section 12 of `instructions.md`, one mapping per integration, plus the collapse-upward rule for harnesses offering fewer tiers (D65, D66, FR-018)
 - [ ] T032k [US5] Write the agent-materialization guidance into section 13 of `instructions.md`: per-harness definition location and format, required fields, idempotent creation, collision reporting, and the no-agent-without-manifest rule (D67–D71, FR-019)
 - [ ] T032l [US5] Add the no-sub-agent-concept degradation row to section 14 of `instructions.md`: phase obligations followed in the main session, in order, with the absence reported (D72, FR-019)
+- [ ] T032m [US5] Expand the Parallelization guardrail in section 11 of `instructions.md`: parallel by default, one worktree and branch per unit, no two agents in one working copy, serial requires a stated dependency or contention reason, and isolation does not create parallelism on a shared artifact (D73–D75, FR-020)
+- [ ] T032n [US5] Add merge-order, worktree-cleanup, and run-log-fields rules to section 11 of `instructions.md`: dependency order over completion order, worktree removed after merge or when unchanged, run log records unit/worktree/branch/status (D76–D78, FR-020)
+- [ ] T032o [US5] Write pull request organization into section 8 of `instructions.md`: one PR per independently testable story declaring base and dependency position, review chain per PR rather than per batch, no PR from a branch with no common ancestor, stacked work declares its parent (D79–D82, FR-021)
+- [ ] T032p [US5] Add the parallel-execution degradation rows to section 14 of `instructions.md`: no repository, no remote, and no parallel dispatch, each with its stated fallback and reporting obligation (D83, FR-020, FR-021)
 
 **Checkpoint**: US5 delivers a self-describing, self-updating instruction surface that can
 materialize its own agent set.

@@ -143,6 +143,17 @@ New entries extend the register; they do not replace anything above.
 | D70 | No agent is created for a skill absent from the active integration's manifest | 13 | FR-019, Principles VIII and X |
 | D71 | Every materialized agent carries the tier, effort, and scope of its catalog row, traceable back to it | 13 | FR-019, Principle X |
 | D72 | Harness with no sub-agent concept: phase obligations are followed in the main session, in order, and the absence is reported | 14 | FR-019, Principle X |
+| D73 | Parallel is the default for independent units; serial execution requires a stated dependency or write-contention reason | 11 | FR-020, Principle XI |
+| D74 | One worktree and one branch per parallel unit; two agents never share a working copy | 11 | FR-020, Principle XI |
+| D75 | Isolation does not create parallelism when units contend for the same artifact — such units are marked serial | 11 | FR-020, Principle XI |
+| D76 | Merge order follows the declared dependency graph, never completion order | 11 | FR-020, Principle XI |
+| D77 | Worktree removed after its branch merges, or immediately if it produced no change | 11 | FR-020, Principle XI |
+| D78 | Run log records unit, worktree, branch, and status for every dispatched agent | 11 | FR-020, Principle XI |
+| D79 | One pull request per independently testable story, each declaring base and dependency position | 8 | FR-021, Principle XI |
+| D80 | Review chain applies per pull request, not per parallel batch | 8 | FR-021, Principles VI and XI |
+| D81 | No pull request from a branch sharing no ancestor with its declared base | 8 | FR-021, Principle XI |
+| D82 | Stacked work declares its parent pull request explicitly | 8 | FR-021, Principle XI |
+| D83 | Degradation: no repository → serial in one tree and report; no remote → local branches, local review, shepherd pending; no parallel dispatch → sequential in dependency order and report | 14 | FR-020, FR-021, Principle XI |
 
 ## State transitions
 

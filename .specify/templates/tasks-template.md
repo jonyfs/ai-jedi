@@ -174,6 +174,8 @@ an adapter projection). Omit this phase entirely for features that touch neither
 - [ ] TXXX Verify every projection was written to its tool's user-level (global) config path, and that NO project-local config file received an `AI-JEDI:INSTRUCTIONS` region (Principle IX)
 - [ ] TXXX Verify the catalog's Model Selection column holds ONLY `deep-reasoning` / `balanced-coding` / `fast-lightweight`, with the concrete mapping confined to the tool-scoped section (Principle X)
 - [ ] TXXX Regenerate agent definitions for every catalog row whose tier, effort, or scope changed, confirming idempotency and that no operator-authored agent was overwritten (Principle X)
+- [ ] TXXX Verify every `[P]` task genuinely writes a distinct file — a `[P]` on units contending for the same artifact is a false promise and MUST be downgraded to serial (Principle XI)
+- [ ] TXXX Confirm each parallel unit ran in its own worktree and branch, merged in dependency order, and had its worktree removed after merge (Principle XI)
 
 ---
 

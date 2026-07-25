@@ -1,10 +1,10 @@
 <!--
 Sync Impact Report
-- Version change: 1.5.0 → 1.6.0
+- Version change: 1.6.0 → 1.7.0
 - Ratification date unchanged: 2026-07-24
 - Modified principles: none renamed or redefined
 - Added sections:
-  - Principle X. Capability-Tiered Agent Materialization
+  - Principle XI. Isolated Parallel Execution
 - Removed sections: none
 - Templates requiring updates:
   - ✅ .specify/templates/spec-template.md (no constitution-mandated section added)
@@ -26,6 +26,9 @@ Sync Impact Report
     (h) no agent-materialization guidance exists; Principle X requires per-harness
     agent-definition location, format, idempotent creation, and collision
     reporting,
+    (i) the Parallelization guardrail says only "dispatch multiple implement
+    sessions"; Principle XI requires per-unit worktree isolation, dependency-order
+    merging, worktree cleanup, and PR-per-story organization,
     (b) Execution Guardrails do not yet mention the Principle VI review chain,
     (c) title carries the unversioned marker `V4`; Principle VII requires a
     full MAJOR.MINOR.PATCH version in the title, with `4.0.0` as the baseline,
@@ -51,10 +54,12 @@ Sync Impact Report
     (exists), `~/.config/github-copilot/` (exists),
     `~/.cursor/` (exists), `~/.codex/AGENTS.md` (absent — adapter must create
     or report unconfigured, never fall back to project-local).
-  - ✅ specs/001-instructions-quality-revision/ — reconciled against Principle X
-    as well: spec.md gained FR-018/FR-019 and SC-011/SC-012; data-model.md gained
-    directives D64…D72; tasks.md gained T032i…T032l in Phase 5B; quickstart.md
-    Step 6B gained the tier-vocabulary and agent-materialization checks.
+  - ✅ specs/001-instructions-quality-revision/ — reconciled against Principles X
+    and XI: spec.md gained FR-018…FR-021 and SC-011…SC-014; data-model.md gained
+    directives D64…D83; tasks.md gained T032i…T032p in Phase 5B; plan.md gained the
+    Parallel Execution Plan (declaring zero parallel implementation units, since
+    the single-file deliverable makes them contend); quickstart.md Step 6B gained
+    the tier-vocabulary, agent-materialization, and parallel-rule checks.
   - Detail of the v1.5.0 reconciliation: spec.md gained FR-013…FR-017,
     SC-008…SC-010, and User Story 5;
     plan.md gained the Instruction Version Bump declaration (MINOR → 4.1.0) and
@@ -68,6 +73,7 @@ Sync Impact Report
   fallback no longer applies to work pushed to that remote.
 
 Prior version history
+- 1.6.0 (2026-07-24): added Principle X. Capability-Tiered Agent Materialization.
 - 1.5.0 (2026-07-24): Principle IX scope expanded — projections target global
   user-level config only; project-local writes prohibited.
 - 1.4.0 (2026-07-24): added Principle IX. Delimited Managed Region.
@@ -359,6 +365,60 @@ Rationale: Tier names survive vendor churn; model identifiers do not. And an age
 operator must assemble by hand will drift from the catalog immediately, which reintroduces exactly
 the divergence Principle I exists to eliminate.
 
+### XI. Isolated Parallel Execution
+
+Independent work MUST be dispatched in parallel, and every parallel implementation unit MUST run in
+its own git worktree on its own branch. Two agents MUST NEVER hold the same working tree: their
+edits interleave, the loser's work is silently overwritten, and neither diff is trustworthy
+afterward.
+
+Parallelism rules:
+
+- Parallel is the DEFAULT for units with no dependency between them. Serial execution MUST be
+  justified by a real dependency or by write contention on the same file, and the reason MUST be
+  stated in `tasks.md`.
+- **A worktree does not create parallelism where the deliverable is a single file.** When multiple
+  units write the same artifact, they contend regardless of isolation, and `tasks.md` MUST mark them
+  serial rather than advertising a `[P]` that cannot be honored.
+- One worktree per unit, one branch per worktree. The branch name MUST derive from the feature
+  directory and the unit it implements, so a stray worktree is traceable to its origin.
+- Sub-agents receive isolated context — only the relevant `spec.md`, `plan.md`, and their own task
+  slice — so parallel units cannot inherit each other's assumptions.
+- Merge order MUST follow the dependency graph in `tasks.md`, never completion order. A unit that
+  finishes first does not thereby earn the right to land first.
+- A worktree MUST be removed once its branch has merged, or immediately if it produced no change.
+  Abandoned worktrees are state that outlives its run log and MUST NOT accumulate.
+- Orchestration state — which unit, which worktree, which branch, which status — MUST be recorded in
+  the run log under `.specify/workflows/runs/` so an interrupted parallel run resumes without
+  re-dispatching completed units.
+
+Pull request organization, when git and a remote are configured:
+
+- One pull request per independently testable user story, matching the story decomposition in
+  `tasks.md`. A PR spanning several stories defeats the independent-testability property the story
+  decomposition exists to create.
+- Each PR MUST state its base branch, the story it implements, and its position in the dependency
+  graph.
+- The Principle VI review chain applies per PR, not per parallel batch. A batch of five parallel
+  units produces five reviews.
+- A PR MUST NOT be opened from a worktree whose branch shares no ancestor with its declared base.
+  Unrelated histories cannot merge, and discovering this at merge time wastes the entire review.
+- Stacked work MUST declare its parent PR explicitly rather than relying on the reviewer to infer
+  the order.
+
+Degradation, per Principle VIII's rules:
+
+- No git repository → no worktrees. Units run serially in the single working tree, and the loss of
+  parallelism MUST be reported, not silently absorbed.
+- Git but no remote → no pull requests. Branches remain local, review runs against the local diff,
+  and the shepherd step is recorded as pending.
+- Harness without parallel dispatch → units run sequentially in dependency order, and the absence
+  is reported.
+
+Rationale: Parallelism is the only lever that changes wall-clock time on multi-unit work, and
+worktrees are what make it safe. Without isolation, concurrency is not speed — it is data loss with
+a progress bar.
+
 ## Tool Adapter & Authoring Constraints
 
 - Every adapter MUST declare: target tool, output path, format, and any tool-imposed size or
@@ -399,7 +459,10 @@ the divergence Principle I exists to eliminate.
   automatically at the end of every implementation unit. Its outcome — verdict, findings,
   and shepherd state — MUST be recorded in the run log.
 - Orchestration state and logs MUST be persisted under `.specify/workflows/runs/` so an
-  interrupted run can resume.
+  interrupted run can resume. For parallel runs this MUST include the unit, worktree, branch, and
+  status of each dispatched agent (Principle XI).
+- Parallel implementation units MUST each run in their own worktree and branch, and MUST merge in
+  the dependency order declared in `tasks.md` rather than completion order (Principle XI).
 - After any change to `instructions.md`, all adapter outputs MUST be regenerated and verified
   in the same change set. A merge that updates the source without its projections is
   incomplete.
@@ -436,8 +499,8 @@ This constitution's version and the `instructions.md` version (Principle VII) ar
 counters and MUST NOT be conflated. Amending this file does not bump the instruction version,
 and vice versa.
 
-Compliance review: every pull request MUST verify adherence to Principles I–X. Complexity
+Compliance review: every pull request MUST verify adherence to Principles I–XI. Complexity
 that violates a principle MUST be justified in the plan's Complexity Tracking section or
 removed. Runtime development guidance lives in `instructions.md`.
 
-**Version**: 1.6.0 | **Ratified**: 2026-07-24 | **Last Amended**: 2026-07-24
+**Version**: 1.7.0 | **Ratified**: 2026-07-24 | **Last Amended**: 2026-07-25

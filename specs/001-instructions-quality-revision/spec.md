@@ -202,6 +202,14 @@ was written.
   what fields they require, that creation is idempotent, that name collisions with
   operator-authored agents are reported rather than overwritten, and that no agent is created for
   a skill unavailable in that harness.
+- **FR-020**: The file MUST state that independent work is dispatched in parallel by default, that
+  every parallel implementation unit runs in its own isolated working copy on its own branch, that
+  two agents never share a working copy, and that merging follows the declared dependency order
+  rather than completion order. It MUST also state that isolation does not create parallelism when
+  units contend for the same artifact.
+- **FR-021**: The file MUST state how to organize pull requests when version control and a remote
+  are configured — one per independently testable story, each declaring its base and its position in
+  the dependency graph — and MUST state the fallbacks when no repository or no remote exists.
 
 ### Key Entities
 
@@ -242,6 +250,10 @@ was written.
 - **SC-012**: An agent asked to set up the tooling produces one agent definition per available
   catalogued skill, with tier, effort, and scope traceable to its catalog row; a second run changes
   nothing, and a pre-existing operator-authored agent of the same name is reported, not replaced.
+- **SC-013**: In a multi-unit run, every unit works in its own isolated copy, no two units share
+  one, merges occur in declared dependency order, and zero isolated copies remain after completion.
+- **SC-014**: Every task marked parallel writes a distinct artifact — zero parallel markings on
+  units that contend for the same file.
 
 ## Assumptions
 

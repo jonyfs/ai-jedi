@@ -79,6 +79,21 @@ explicitly out of scope.
 - Not MAJOR: reordering sections and rewording rules into trigger/obligation/exception form does
   not change any obligation's force. Not PATCH: new directives are added.
 
+**Parallel Execution Plan** (Principle XI)
+
+- Units eligible for parallel dispatch: **none for the implementation phases**. The deliverable is a
+  single file, `instructions.md`, so every writing unit contends for it. Per Principle XI, isolation
+  does not manufacture parallelism here, and marking these `[P]` would be a false promise.
+- Worktree/branch per unit: not applicable — no parallel implementation units exist. This feature
+  runs on the single branch `001-instructions-quality-revision`.
+- Serialization justification: write contention on `instructions.md`. Only T002/T003 (distinct
+  files) and T040/T041 (distinct files) are genuinely parallel, and only the probe tasks (T018,
+  T035, T039) fan out — across tools, not across files.
+- Merge order: single branch, so dependency order is the task order in `tasks.md`.
+- PR granularity: one PR for this feature. The user stories all mutate the same artifact and cannot
+  be independently merged, which is the documented exception to PR-per-story — stated here rather
+  than left for a reviewer to infer.
+
 Post-Phase 1 re-check: PASS. No new violations; no Complexity Tracking entries required.
 
 ## Project Structure

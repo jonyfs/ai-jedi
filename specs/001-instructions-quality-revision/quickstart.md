@@ -122,9 +122,22 @@ available catalogued skill, each carrying the tier, effort, and scope of its cat
 second time — nothing changes. Plant an operator-authored agent sharing a catalogued name and
 confirm the collision is reported, not overwritten.
 
+Parallel execution rules (SC-013, SC-014):
+
+```bash
+grep -cE 'worktree' instructions.md          # esperado: >= 1 na seção 11
+git worktree list                            # esperado: só o principal — nenhum órfão
+```
+
+Confirm section 11 states parallel-by-default, one worktree and branch per unit, no two agents in
+one working copy, dependency-order merging, and worktree cleanup. Confirm section 8 states
+PR-per-story with base and dependency position, and that no `[P]` marking in `tasks.md` sits on a
+task writing `instructions.md`.
+
 **Expected**: version present and consistent, exactly one marker pair, no region in project-local
 config, zero dot-form command references, catalog reconciled, all three refusal cases honored, tier
-tokens only outside section 12, agent set idempotent and collision-safe.
+tokens only outside section 12, agent set idempotent and collision-safe, parallel and PR rules
+stated, zero orphaned worktrees, zero false `[P]` markings.
 
 ## Step 7 — Constitution gate before implementation (Principle V)
 
