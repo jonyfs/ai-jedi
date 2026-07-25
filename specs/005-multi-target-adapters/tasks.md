@@ -48,7 +48,7 @@ working before foreign-region safety works would risk destroying a live configur
 
 - [ ] T008 [US2] Write failing cases in `.specify/adapters/tests/run-tests.sh` for a `foreign-multi` group: a target whose entire content is a foreign region using non-`SPECKIT` syntax keeps it byte-identical and gains the instruction region alongside; fork detection excludes the foreign interior; a target with two different foreign syntaxes leaves both alone. Run and watch them fail (FR-003, SC-003)
 - [ ] T009 [US2] Implement per-declaration foreign-marker recognition in `.specify/adapters/project.sh` so the region scan and the fork scan both consult the target's declared list (FR-003)
-- [ ] T010 [US2] Run `.specify/adapters/tests/run-tests.sh foreign-multi` and confirm all cases pass (SC-003)
+- [ ] T010 [US2] Run `.specify/adapters/tests/run-tests.sh foreign-multi` against `.specify/adapters/targets/opencode.yml` fixtures and confirm all cases pass (SC-003)
 
 ---
 
@@ -66,8 +66,8 @@ working before foreign-region safety works would risk destroying a live configur
 
 ## Phase 5: Real Projection
 
-- [ ] T016 Project into all four real targets, confirming for each: region present at the current version, foreign regions byte-identical, operator content byte-identical, backup on disk. Compare against the T003 snapshots (SC-001, SC-003)
-- [ ] T017 Verify SC-002 against the real targets: extract the region from each and confirm the content between markers is byte-identical across all five projected tools including Claude Code
+- [ ] T016 Run `.specify/adapters/project.sh --target <name>` for each of the four declarations in `.specify/adapters/targets/`, confirming per target: region present at the current version, foreign regions byte-identical, operator content byte-identical, backup on disk. Compare against the T003 snapshots (SC-001, SC-003)
+- [ ] T017 Verify SC-002 against the real targets named in each `.specify/adapters/targets/*.yml`: extract the region from every projected file and confirm the content between markers is byte-identical across all five, Claude Code included
 - [ ] T018 Record the T016 and T017 outcomes in `.specify/workflows/runs/005-multi-target-adapters.md`, including each backup filename
 
 ---
@@ -76,7 +76,7 @@ working before foreign-region safety works would risk destroying a live configur
 
 - [ ] T019 [P] Update the tool table in `README.md` so every installed tool is listed as either projected or uncovered-with-reason — Cursor and Windsurf expose no global instruction surface and MUST say so rather than being omitted (FR-006, FR-007)
 - [ ] T020 [P] Re-evaluate `README.md` frontmatter after T019, or record the reviewed no-change decision in `.specify/workflows/runs/005-multi-target-adapters.md` (Authoring Constraints)
-- [ ] T021 Verify the Claude Code regression reference from T002: project into a temp fixture and confirm the success path is byte-identical to before the restructure
+- [ ] T021 Verify the Claude Code regression reference from T002: run `.specify/adapters/project.sh` against a temp fixture and confirm the success path is byte-identical to before the restructure
 - [ ] T022 Confirm `shellcheck -s sh` reports zero findings across `.specify/adapters/project.sh` and `.specify/adapters/tests/run-tests.sh`
 - [ ] T023 Confirm no committed file under `.specify/adapters/` contains an absolute home path, a username, or a credential-shaped string (Principle IX)
 
@@ -88,12 +88,12 @@ working before foreign-region safety works would risk destroying a live configur
 
 - [ ] T024 Open a pull request from `005-multi-target-adapters` to `main` covering `.specify/adapters/`, `README.md`, and the feature artifacts, declaring the Principle XI single-PR exception
 - [ ] T025 Run the reviewer and record the verdict with its round number in `.specify/workflows/runs/005-multi-target-adapters.md`
-- [ ] T026 If findings exist, run the shepherd only after the review closes, fixing ONLY what review raised. If the review closed clean, SKIP the shepherd entirely
+- [ ] T026 If findings exist, run the shepherd only after the review closes, fixing ONLY what review raised in `.specify/adapters/` or `README.md`. If the review closed clean, SKIP the shepherd entirely
 - [ ] T027 If the shepherd ran, re-review its own diff and record the round in `.specify/workflows/runs/005-multi-target-adapters.md`
 - [ ] T028 Repeat T026–T027 until a review closes clean or round 3, recording each round in `.specify/workflows/runs/005-multi-target-adapters.md`
 - [ ] T029 Evaluate the check gate and record the OBSERVED state in `.specify/workflows/runs/005-multi-target-adapters.md`
 - [ ] T030 Complete the merge into `main` without requesting confirmation per the standing authorization, recording the outcome in `.specify/workflows/runs/005-multi-target-adapters.md`
-- [ ] T031 AFTER the merge, confirm the platform removed the remote ref, delete the LOCAL branch, confirm no worktree remains, verify branch protection is byte-identical, and record it all in `.specify/workflows/runs/005-multi-target-adapters.md`
+- [ ] T031 AFTER the merge, confirm the platform removed the remote ref, delete the LOCAL branch `005-multi-target-adapters`, confirm no worktree remains, verify branch protection on `main` is byte-identical to before the loop, and record it all in `.specify/workflows/runs/005-multi-target-adapters.md`
 
 ---
 
