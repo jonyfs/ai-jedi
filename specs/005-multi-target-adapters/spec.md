@@ -14,9 +14,12 @@ Tags: [#spec #adapter #multi-target #projection]
 **Input**: One adapter exists and is hardened. The operator has other AI tools installed, and the
 instruction set should reach the ones that can actually load it.
 
-A survey of the machine found four tools with a real global instruction file and two without. Cursor and
-Windsurf hold only agent definitions placed there by other tooling — no global instruction surface was
-found for either, so this feature does not invent one.
+A survey of the machine found **five declared targets, four of which have an existing file**; the fifth
+is a documented path with no file yet, which the adapter creates. Two further installed tools hold only
+agent definitions placed there by other tooling — no global instruction surface was found for either, so
+this feature does not invent one.
+
+That vocabulary is used consistently below: *declared targets* is five, *existing files* is four.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -127,8 +130,9 @@ whose README claims coverage it does not have is worse than one that covers less
 
 - **SC-001**: Every declared target carries a region at the current version after its adapter runs.
 - **SC-002**: The content between markers is byte-identical across all projected targets.
-- **SC-003**: A foreign region is byte-identical before and after projection, in 3 of 3 targets that have
-  one.
+- **SC-003**: A foreign region is byte-identical before and after projection: 1 of 1 real target that
+  has one, plus every fixture case. The number is one because exactly one target carries a foreign region
+  today — an earlier draft claimed three, which was invented rather than surveyed.
 - **SC-004**: Adding a target requires no change to shared projection logic — demonstrated by the last
   target added touching only a declaration.
 - **SC-005**: Every existing test group passes for every target, not only the first.

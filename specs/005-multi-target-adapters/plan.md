@@ -12,8 +12,8 @@ Tags: [#plan #adapter #multi-target]
 ## Summary
 
 Turn the single Claude Code adapter into a target-parameterized one: `project.sh` takes a declaration,
-and each tool ships only a declaration. Four targets verified on this machine. Two installed tools
-excluded because no global instruction surface was found for either.
+and each tool ships only a declaration. **Five declared targets, four of which have an existing file.**
+Two further installed tools excluded because no global instruction surface was found for either.
 
 ## Technical Context
 
@@ -23,16 +23,17 @@ excluded because no global instruction surface was found for either.
 
 **Storage**: files.
 
-**Testing**: TDD. The existing ten groups must pass for EVERY target, not only the first — that is the
-real assertion this feature makes.
+**Testing**: TDD. The existing **13** groups and 64 assertions must pass for EVERY target, not only the
+first — that is the real assertion this feature makes. An earlier draft said ten, which was a guess.
 
 **Target Platform**: the operator's machine.
 
 **Project Type**: adapter generalization.
 
 **Constraints**: every guarantee the hardened adapter already provides must hold per target. The
-success path for the Claude Code target must stay byte-identical — the same FR-005 discipline as
-feature 004, now with more ways to break it.
+success path for the Claude Code target must stay byte-identical — the same discipline as feature 004's FR-005 — a
+different requirement from this feature's FR-005, which is why it is qualified — now with more ways to
+break it.
 
 **Scale/Scope**: one script generalized, four declarations, one shared test harness run per target.
 

@@ -26,7 +26,7 @@ fixture group is green for every target. Four live tool configurations are at st
 
 - [ ] T001 [P] Create `.specify/workflows/runs/005-multi-target-adapters.md` with frontmatter for orchestration and review state
 - [ ] T002 [P] Capture the current Claude Code success-path output as the regression reference: run the existing adapter against a temp fixture and record its cksum in `.specify/workflows/runs/005-multi-target-adapters.md`
-- [ ] T003 [P] Back up all four real target files that exist to the system temp directory, recording each path and cksum in `.specify/workflows/runs/005-multi-target-adapters.md`, so T016 can be verified and reverted
+- [ ] T003 [P] Back up the four target files that EXIST to the system temp directory — Codex has none to back up, recording each path and cksum in `.specify/workflows/runs/005-multi-target-adapters.md`, so T016 can be verified and reverted
 
 ---
 
@@ -34,7 +34,7 @@ fixture group is green for every target. Four live tool configurations are at st
 
 - [ ] T004 Move `.specify/adapters/claude-code/adapter.yml` to `.specify/adapters/targets/claude-code.yml`, and `project.sh` plus `tests/` up to `.specify/adapters/`, with `git mv` so history follows
 - [ ] T005 Change `.specify/adapters/project.sh` to take its declaration from a `--target <name>` argument resolving to `targets/<name>.yml`, defaulting to `claude-code` so existing invocations keep working (FR-002)
-- [ ] T006 Move the foreign-marker list out of `project.sh` into each declaration under a `foreign_markers` key, and read it from there — the hardcoded `SPECKIT` pair cannot recognise OpenCode's `caveman-begin`/`caveman-end` syntax, and failing to recognise a foreign region means overwriting a working tool's configuration (FR-003)
+- [ ] T006 Make `.specify/adapters/project.sh` READ the `foreign_markers` key its declaration already carries, instead of the `SPECKIT` literals hardcoded at the awk block around lines 150 and 153. The declaration is not missing — the script ignores it, which is a different defect from the one an earlier draft of this task described. The hardcoded pair cannot recognise OpenCode's `caveman-begin`/`caveman-end` syntax, and failing to recognise a foreign region means overwriting a working tool's configuration (FR-003)
 - [ ] T007 Run `.specify/adapters/tests/run-tests.sh` and confirm all 64 assertions still pass for the Claude Code target after the restructure
 
 **Checkpoint**: one script, declaration-driven, existing target unaffected.
@@ -54,11 +54,12 @@ working before foreign-region safety works would risk destroying a live configur
 
 ## Phase 4: User Story 1 — Every capable tool is reached (Priority: P1)
 
-- [ ] T011 [US1] Write failing cases in `.specify/adapters/tests/run-tests.sh` for a `multi-target` group: every declared target projects, creates a missing file, is idempotent, and the content between markers is byte-identical across all of them. Run and watch them fail (FR-001, FR-004, FR-005, SC-001, SC-002)
+- [ ] T011 [US1] Write failing cases in `.specify/adapters/tests/run-tests.sh` for a `multi-target` group: every declared target projects, creates a missing file, is idempotent, and the content between markers is byte-identical across all of them. Include the two live edge conditions — an EMPTY target writes the region with no leading blank-line artefact (two real targets are 0 bytes today), and a target whose DIRECTORY does not exist is either created or refused with a clear reason, never silently skipped. Run and watch them fail (FR-001, FR-004, FR-005, SC-001, SC-002)
 - [ ] T012 [US1] Write `.specify/adapters/targets/opencode.yml` declaring its path, format, own markers, the `caveman-begin`/`caveman-end` foreign pair, size limit, backup policy, and tier map (FR-001)
-- [ ] T013 [US1] Write `.specify/adapters/targets/gemini.yml` and `.specify/adapters/targets/copilot.yml` with the same required fields (FR-001)
+- [ ] T013 [US1] Write `.specify/adapters/targets/gemini.yml` and `.specify/adapters/targets/copilot.yml` carrying the same field set T012 enumerates — path, format, own markers, foreign markers, size limit and scope, backup pattern and retention, skill install/verify, invoke separator source, agent-definition location, plus `tier_map`, `tier_map_verify_before_use` and `tier_collapse` as Principle X requires of every declaration (FR-001)
 - [ ] T014 [US1] Write `.specify/adapters/targets/codex.yml`, whose target file is absent — the adapter creates it, which is the documented behavior for a declared path with no file yet (FR-001)
-- [ ] T015 [US1] Run `.specify/adapters/tests/run-tests.sh` in full against EVERY target and confirm all groups pass for each, not only the first (SC-005)
+- [ ] T015 [US1] Run `.specify/adapters/tests/run-tests.sh` in full against EVERY target and confirm all 13 groups pass for each, not only the first (SC-005)
+- [ ] T015a [US1] Verify SC-004 mechanically: confirm `git diff` for T012–T014 touches ONLY files under `.specify/adapters/targets/`. If adding a declaration required editing shared logic, the generalization did not actually work and FR-002 is unmet regardless of the tests passing
 
 **Checkpoint**: every fixture group green for every target. Only now is a real write safe.
 
@@ -66,7 +67,7 @@ working before foreign-region safety works would risk destroying a live configur
 
 ## Phase 5: Real Projection
 
-- [ ] T016 Run `.specify/adapters/project.sh --target <name>` for each of the four declarations in `.specify/adapters/targets/`, confirming per target: region present at the current version, foreign regions byte-identical, operator content byte-identical, backup on disk. Compare against the T003 snapshots (SC-001, SC-003)
+- [ ] T016 Run `.specify/adapters/project.sh --target <name>` for ALL FIVE declarations in `.specify/adapters/targets/`, confirming per target: region present at the current version, foreign regions byte-identical, operator content byte-identical, backup on disk where a file existed. Codex is included explicitly — its file is absent, so this is the only real-world execution of the create-missing-file behavior (US1 AS3), which four-target wording would have skipped. Compare against the T003 snapshots (SC-001, SC-003)
 - [ ] T017 Verify SC-002 against the real targets named in each `.specify/adapters/targets/*.yml`: extract the region from every projected file and confirm the content between markers is byte-identical across all five, Claude Code included
 - [ ] T018 Record the T016 and T017 outcomes in `.specify/workflows/runs/005-multi-target-adapters.md`, including each backup filename
 
