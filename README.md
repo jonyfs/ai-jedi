@@ -27,8 +27,8 @@ code block, error string, API name, or CLI command, which are reproduced exactly
 
 You choose the level: `lite` keeps full sentences, `full` is the default, `ultra` is keywords only.
 
-→ [Output Compression Protocol](instructions.md), [Auto-Clarity Exceptions](instructions.md),
-[Intensity Levels](instructions.md)
+→ [Output Compression Protocol](instructions.md#5-output-compression-protocol), [Auto-Clarity Exceptions](instructions.md#4-auto-clarity-exceptions),
+[Intensity Levels](instructions.md#6-intensity-levels)
 
 ### No rule ever collides with another
 
@@ -36,7 +36,7 @@ A single precedence ladder — safety, then clarity, then lifecycle, then densit
 conflicting pair. The tool never has to guess which rule wins, so two sessions reading the same file
 resolve the same conflict the same way.
 
-→ [Precedence Ladder](instructions.md)
+→ [Precedence Ladder](instructions.md#3-precedence-ladder)
 
 ### Work routes through a lifecycle instead of ad-hoc edits
 
@@ -44,7 +44,7 @@ Anything beyond a typo goes brainstorm → plan → incremental execution → te
 break into 2–5 minute tasks with exact paths and verification steps. Unchanged files are never
 rewritten. Review findings are severity-ranked, and CRITICAL findings freeze the branch.
 
-→ [Engineering Lifecycle](instructions.md)
+→ [Engineering Lifecycle](instructions.md#7-engineering-lifecycle)
 
 ### Review runs itself, all the way to merge
 
@@ -56,7 +56,7 @@ The autonomy is bounded on purpose. Three rounds maximum. Fixes stay inside what
 Branch protection is never weakened to get a merge through — a blocked merge halts and reports rather
 than routing around the guardrail. An unconverged change is left open, never merged.
 
-→ [Post-Implementation Review Chain](instructions.md)
+→ [Post-Implementation Review Chain](instructions.md#8-post-implementation-review-chain)
 
 ### Files an AI can actually navigate
 
@@ -64,14 +64,14 @@ Every document opens with an accurate one-line summary and tags, so a tool with 
 decide whether to load it. Files stay atomic — 200–400 lines typical, 800 maximum. Dependencies are
 explicit wiki links.
 
-→ [File Architecture](instructions.md)
+→ [File Architecture](instructions.md#9-file-architecture)
 
 ### Rules that know where they apply
 
 Frontend, backend/data, and config/infra paths each carry their own constraints, applied when the
 edited path matches.
 
-→ [Path-Scoped Rules](instructions.md)
+→ [Path-Scoped Rules](instructions.md#10-path-scoped-rules)
 
 ### Parallel work that does not corrupt itself
 
@@ -82,7 +82,7 @@ The honest caveat is stated in the file itself: **isolation does not create para
 contends for a single file.** Such units are marked serial rather than advertising speed that cannot
 be delivered.
 
-→ [Orchestration](instructions.md)
+→ [Orchestration](instructions.md#11-orchestration)
 
 ### Model choice that survives vendor renames
 
@@ -91,7 +91,7 @@ never a vendor model name. Concrete identifiers live in one tool-scoped block, s
 one-block edit. A harness with fewer tiers collapses **upward**: your deep-reasoning work is never
 silently downgraded to save cost.
 
-→ [Tool-Scoped Values](instructions.md)
+→ [Tool-Scoped Values](instructions.md#12-tool-scoped-values)
 
 ### Tooling that installs and verifies itself
 
@@ -100,7 +100,7 @@ installed, install what is missing, and verify it against per-file checksums. Ag
 created idempotently and never overwrite an agent you wrote yourself — a name collision is reported,
 not clobbered.
 
-→ [Agent Provisioning](instructions.md)
+→ [Agent Provisioning](instructions.md#13-agent-provisioning)
 
 ### Updates that cannot damage your config
 
@@ -111,7 +111,7 @@ byte-identical. If the markers are missing or malformed, it reports and stops in
 Updates target each tool's **global** configuration, never a project-local file, so one instruction
 set really does apply everywhere.
 
-→ [Managed region update](instructions.md)
+→ [Managed region update](instructions.md#managed-region-update)
 
 ### Nothing fails silently
 
@@ -119,7 +119,7 @@ Every rule that assumes a capability names its fallback: no sub-agents, no slash
 remote, no run-log directory, a skill missing from the harness. The phase degrades and reports. It is
 never skipped.
 
-→ [Degradation Paths](instructions.md)
+→ [Degradation Paths](instructions.md#14-degradation-paths)
 
 ## Governance
 

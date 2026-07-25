@@ -167,7 +167,7 @@ section on the first attempt (SC-005).
 - [X] T033 [US4] Verify section order in `instructions.md` matches the Target Section Order in `specs/001-instructions-quality-revision/plan.md` exactly across sections 2–14, and that no section retains the empty body scaffolded by T005 (Section entity rule in `specs/001-instructions-quality-revision/data-model.md`)
 - [X] T034 [US4] Normalize headings in `instructions.md` so each is stable, unique, and citable, since `specs/001-instructions-quality-revision/contracts/instructions-file-contract.md` permits consumers to cite them
 - [ ] T035 [US4] Run the locatability probe against `instructions.md` for 5 sampled situations — destructive command, new Markdown file, multi-step feature, model selection, missing git remote — recording which section each tool names in `.specify/workflows/runs/001-instructions-quality-revision.md`
-- [X] T036 [US4] Fix any section in `instructions.md` whose scope was ambiguous in the T035 probe by tightening its heading or opening trigger sentence
+- [ ] T036 [US4] BLOCKED on T035 (probe unrun — nothing to act on yet): fix any section in `instructions.md` whose scope was ambiguous in the T035 probe by tightening its heading or opening trigger sentence
 
 **Checkpoint**: SC-005 met.
 

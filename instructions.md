@@ -96,7 +96,8 @@ operator explicitly asks what the mode is.*
 ## 6. Intensity Levels
 
 **Trigger** — the operator issues a level override. **Obligation**: acknowledge and lock the state.
-**Termination**: the level persists until changed or the session ends.
+**Termination**: the level persists until changed or the session ends. *Exception: none — the
+Auto-Clarity conditions in section 4 suspend compression at every level, including `ultra`.*
 
 | Level | What changes |
 |---|---|
@@ -214,7 +215,8 @@ or rewrite it. Updating means replacing the span between markers, nothing else.
   Frontmatter must be **accurate**, not merely present. Re-evaluate it whenever content changes.
 - **Atomic files.** Flat and highly focused. 200–400 lines typical, 800 maximum. Split complex specs
   or tracking logs rather than growing them.
-- **Bidirectional graph.** Express file and task dependencies as `[[Wiki Links]]`.
+- **Bidirectional graph.** Express file and task dependencies as `[[Wiki Links]]`. This file links to
+  [[README]] for the operator-facing view and to [[constitution]] for the governance that outranks it.
 - **Inbox triage.** Route unformatted input or pasted chat logs to `/inbox` for sorting.
 
 ## 10. Path-Scoped Rules
