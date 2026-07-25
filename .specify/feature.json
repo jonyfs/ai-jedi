@@ -1,3 +1,1 @@
-{
-  "feature_directory": "specs/005-multi-target-adapters"
-}
+{"feature_directory": "specs/006-merge-scope-propagation"}
