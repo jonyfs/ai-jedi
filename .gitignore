@@ -1,0 +1,14 @@
+# Local session state — never published
+.remember/
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+
+# Local scratch
+*.log
+*.pid
+tmp/
