@@ -38,7 +38,7 @@ recording finished work as pending, which makes the task lists useless as a sign
 
 | Task | Feature | Why it cannot be closed here |
 |---|---|---|
-| T018, T035, T039 | 001 | Behavioral probes needing fresh sessions of Codex, Copilot or OpenCode loading the instruction set as their global config. Blocked until feature 005 projects to them. |
+| T018, T035, T039 | 001 | Behavioral probes needing fresh sessions of Codex, Copilot or OpenCode loading the instruction set as their global config. **No longer blocked** — feature 005 projected v0.1.0 into all five targets, so the configs those sessions would load now exist. What remains is that a probe cannot be self-administered: the session running it already holds the instructions it loaded at start. These are the operator's to run. |
 | T036 | 001 | Depends on T035's probe output; nothing to act on until it runs. |
 
 An earlier version of this table listed **T038** among the blocked probes. That was wrong and worth
@@ -73,8 +73,10 @@ rather than a same-loop patch:
 ### Feature 001 — 12 open tasks
 
 Behavioral probes (SC-004, SC-005) require fresh sessions of Codex, Copilot, or OpenCode loading the
-instruction set as their global configuration. **Blocked on adapters**: with no projection, there is
-nothing for those tools to load. Unblocked by 003 for Claude Code and by 004 for the rest.
+instruction set as their global configuration. The adapter blocker is **discharged** — 003 projected
+to Claude Code and 005 to the other four, so every one of those tools now has a v0.1.0 region to load.
+The remaining constraint is not tooling but self-administration: a session cannot probe the
+instructions it started with.
 
 ### Feature 002 — section 8 carries six concerns
 
