@@ -10,11 +10,15 @@ Sync Impact Report
     Principle VI grants standing merge consent with silence as consent to run the chain. Neither
     principle is wrong alone; composed, they carried a delegation granted for one repository into
     every repository on the machine. The grant was recorded without the scope it was given with.
+    Round 1 of the review loop then found the first draft of the clause stated its own scope as
+    "THIS repository" — correct inside this file, meaningless once propagated into the machine-wide
+    surface the same report requires it to reach. Replaced with a lookup against the working tree's
+    own constitution, so the rule keeps its meaning when it moves.
 - Structural change: the 214-line header comment was split. Only the CURRENT amendment's report
   stays here; superseded reports and the version list moved to
   `.specify/memory/constitution-history.md`. The file's own File Architecture rule mandates
   splitting rather than growing, and it stood at exactly 800/800 lines — its stated maximum — so
-  no amendment could land without this. Now 645 lines. No governance content was removed.
+  no amendment could land without this. Now 664 lines. No governance content was removed.
 - Added sections: none. Removed sections: none.
 - Bump rationale: MINOR, not MAJOR. The clause narrows what the text permits, which reads like a
   backward-incompatible redefinition, but the operator's actual grant was always for this project;
@@ -135,15 +139,29 @@ The consent covers the merge step only. It does NOT extend to: weakening branch 
 pushing, deleting an unmerged branch, or merging with a blocking finding open. Those remain gated on
 explicit per-instance consent regardless of this authorization.
 
-**Scope: this repository, not every repository.** Principle IX projects the instruction surface into
-each tool's machine-wide configuration, so a rule written into it reaches every project on the
-operator's machine. That is correct for the behavioural rules and wrong for this one. The standing
-authorization was granted in conversation, for THIS repository, where `main` carries enforced branch
-protection and the operator was present to watch the first loops run. Nothing in that grant extended
-it to repositories the operator has not looked at in months.
+**Scope: the granting repository, not every repository.** Principle IX projects the instruction
+surface into each tool's machine-wide configuration, so a rule written into it reaches every project
+on the operator's machine. That is correct for the behavioural rules and wrong for this one. The
+standing authorization was granted in conversation, for the repository whose constitution records it
+— AI Jedi — where `main` carries enforced branch protection and the operator was present to watch
+the first loops run. Nothing in that grant extended it to repositories the operator has not opened in
+months.
+
+**Identifying an authorized repository.** The grant MUST be recoverable from the working tree, never
+from where the reading agent happens to be. A repository is authorized when its own
+`.specify/memory/constitution.md` records the grant — that is, when a constitution is present AND its
+Principle VI carries this authorization. Absent that file, or present without the grant, the
+repository is unauthorized and the loop halts at the merge.
+
+This is stated as a lookup rather than as "this repository" deliberately. The deictic form resolves
+correctly inside this file, which lives in the granting repository, and resolves to nothing once the
+clause is projected into a machine-wide instruction surface — where an agent reading "this
+repository" while sitting in an unauthorized one would conclude it is authorized, producing exactly
+the merge this clause exists to prevent. A rule about scope MUST NOT be written in a form that
+changes meaning when it moves.
 
 - The authorization MUST NOT be assumed in another repository merely because the instruction surface
-  is loaded there. Loading is not granting.
+  is loaded there. Loading is not granting, and neither is proximity.
 - Outside this repository the loop still runs — review, shepherd, re-review, check gate, run log —
   and then **stops at the merge and reports**. The review work is the valuable part and is not
   affected; only the final unattended write to a shared branch is withheld.
@@ -151,9 +169,10 @@ it to repositories the operator has not looked at in months.
   The operator says so explicitly for that repository; silence is not consent here, in deliberate
   contrast to the chain-level rule above, because the cost of guessing wrong is a merge nobody saw
   rather than a review nobody asked for.
-- A repository with no configured checks AND no branch protection has no independent gate at all: the
-  reviewer, the author, and the merger are one agent. There the halt is not a formality, and the
-  report MUST say which of the two protections was absent.
+- In an authorized repository, if the merge would land with no configured checks AND no branch
+  protection, there is no independent gate at all — reviewer, author and merger are one agent. The
+  merge still proceeds under the grant, but the run log MUST record which of the two protections was
+  absent, so the operator can see that the grant, not a gate, is what allowed it.
 
 Rationale: Principle VI and Principle IX are each sound in isolation. Composed without this clause
 they silently widen a project-scoped delegation into a machine-wide one that nobody granted — the
