@@ -48,6 +48,25 @@ tool at all. It was classified as blocked without being read. Run and passed —
 secrets, every governance area represented, four collision pairs resolved by the ladder alone.
 | T043 | 003 | Cross-tool confirmation that a fresh session applies a v0.1.0-only rule. Cannot be self-administered by the session that ran the projection, which still holds the instructions it loaded at start. |
 
+## Decided, not started
+
+### Propagate the review-agent isolation into instructions.md — constitution v1.19.0
+
+Principle VI now requires the reviewer and shepherd to run as separate catalogued agents in isolated
+contexts, and Principle X fixes their catalog rows. `instructions.md` carries none of it yet, and it
+is the projection agents actually read.
+
+**Scope**: section 8 gains the isolation clause (separate agents, no reasoning-chain leakage into the
+reviewer's prompt, no authorship framing, fresh context for the re-review); section 11's catalog gains
+`pr-reviewer` (`deep-reasoning`, `high`, #00695C Teal) and `pr-shepherd` (`balanced-coding`, `medium`,
+#283593 Indigo); section 14's "Reviewer or shepherd skill unavailable" row must additionally require
+the run log to state the review was NOT independent.
+
+**Also needs deciding during that feature**: whether the harness dispatches these as subagents
+automatically or the operator invokes them, and what the run log records as evidence that isolation
+actually held — a claim of isolation is worth no more than the self-review it replaced if nothing
+verifies it.
+
 ## Shipped since being recorded here
 
 ### Propagate the merge-authorization scope into instructions.md — DONE, feature 006

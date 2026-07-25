@@ -1,9 +1,25 @@
 <!--
 Sync Impact Report
-- Version change: 1.17.0 → 1.18.1
+- Version change: 1.18.1 → 1.19.0
 - Ratification date unchanged: 2026-07-24
 - Last amended: 2026-07-25
 - Modified principles:
+  - VI. Automated Post-Implementation Review — gains a NON-NEGOTIABLE **Context isolation** clause.
+    The reviewer and the shepherd MUST be separate catalogued agents in their own contexts, never
+    roles the implementing session plays in its own window. Grounded in published measurement rather
+    than intuition: LLM evaluators score their own generations above human judgment of them,
+    self-preference tracks self-recognition, it is emergent from perplexity and therefore cannot be
+    instructed away, larger models often show it MORE strongly, and the resulting errors concentrate
+    where the model is wrong. Also bars reasoning-chain leakage into the reviewer's prompt, bars
+    authorship framing, requires a fresh reviewer context for the re-review, and requires a run log
+    that says plainly when isolation was impossible.
+  - X. Capability-Tiered Agent Materialization — fixes the normative catalog rows for `pr-reviewer`
+    (`deep-reasoning`, `high`, #00695C Teal) and `pr-shepherd` (`balanced-coding`, `medium`,
+    #283593 Indigo), with the colors checked against the eleven already assigned.
+  - Immediate cause: every pull request in the session that produced v1.18.x was reviewed by the
+    agent that wrote it. The verdicts, the run logs and the merges all read as though a review had
+    happened. Real defects were found — but self-confirmation and review are indistinguishable from
+    their artifacts, which is the whole problem.
   - VI. Automated Post-Implementation Review — gains a "Scope: this repository, not every
     repository" clause bounding the standing merge authorization. Raised by an assessment of
     instructions.md as a global surface: Principle IX projects the surface machine-wide, and
@@ -33,6 +49,12 @@ Sync Impact Report
   was treated as MINOR.
 - Templates checked: plan-template.md, spec-template.md, tasks-template.md — no Constitution Check
   gate references the merge authorization's scope; no change required.
+- File size: 765/800 lines after this amendment. Within the ceiling but with little headroom; the
+  next amendment of any size will need a split, as v1.18.0 did.
+- Propagation to instructions.md sections 8, 11 and 14: REQUIRED, and deliberately NOT done here.
+  Section 8 needs the isolation clause, section 11's catalog needs the two rows, and section 14's
+  "Reviewer or shepherd skill unavailable" row must additionally say the review was NOT independent.
+  Until then the rule governs this file only — agents read the projection, never the constitution.
 - Propagation to instructions.md section 8: REQUIRED, and deliberately NOT done in this amendment.
   Principle V routes instruction-content changes through the SDD lifecycle; an ad-hoc edit here
   would violate the principle this amendment is meant to strengthen. Tracked in specs/BACKLOG.md.
@@ -258,9 +280,53 @@ When no pull request exists (no remote, or work still local), the chain degrades
 skipped: `/pr-reviewer` runs against the local diff, and the shepherd step is deferred and recorded
 as pending in the run log.
 
+**Context isolation (NON-NEGOTIABLE).** The reviewer and the shepherd MUST each run as a separate
+agent in its own context, never as a role the implementing session plays in its own window.
+
+This is the verifier pattern: a dedicated agent inspects another's output with no shared context,
+memory, or reasoning chain from the step that produced it. A session that both writes a change and
+reviews it is not reviewing — it is confirming. The two activities are indistinguishable from the
+outside, which is precisely why the separation MUST be structural rather than a matter of the
+implementing agent trying harder to be impartial.
+
+The measured basis, not an intuition:
+
+- LLM evaluators score their own generations higher than human annotators judge them to be worth, and
+  a model's self-preference rises in step with how well it recognises its own output.
+- Self-preference is emergent from perplexity: a model rates low-perplexity text higher, and its own
+  output is necessarily low-perplexity to it. Impartiality cannot be instructed away, because the
+  mechanism is not an attitude.
+- Larger and more capable models often exhibit STRONGER self-preference — so assigning the review to
+  the best available tier does not mitigate this and may worsen it. Isolation is the mitigation; tier
+  is not.
+- The failures concentrate where they cost most: self-preference produces evaluation errors
+  disproportionately when the model is wrong.
+
+Requirements:
+
+- **Separate agents.** The reviewer and the shepherd MUST be distinct catalogued agents, each
+  materialized per Principle X, each dispatched into its own context.
+- **No reasoning-chain leakage.** The reviewer MUST receive the diff and the governing artifacts —
+  `spec.md`, `plan.md`, `tasks.md`, the constitution. It MUST NOT receive the implementing session's
+  narrative, self-assessment, or list of what it believes it did well. Passing that reasoning forward
+  reconstructs the shared chain the pattern exists to break, and does so invisibly.
+- **No authorship framing.** The reviewer MUST NOT be told the change is the session's own work. It
+  reviews a diff, not a colleague's diff.
+- **The shepherd is separate from the reviewer too.** One agent that both finds and fixes has an
+  interest in its own findings being tractable, which biases what it reports as a finding at all.
+- **Re-review after the shepherd** (step 3 above) MUST likewise run in a fresh reviewer context. A
+  reviewer holding its own prior verdict is anchored to it.
+- **Honest degradation.** Where the harness offers no sub-agent mechanism, the chain still runs, but
+  the run log MUST record that the review was NOT independent and name the reason. Recording a
+  self-review as though it were an independent one is prohibited — it converts a known-weak signal
+  into an apparently strong one, which is worse than having no review, because a halt would at least
+  be visible.
+
 Rationale: An automation that must be remembered is an automation that gets skipped exactly on the
 rushed changes that most needed it. And an autonomous loop without bounds converts a review gate
-into a merge rubber stamp — the bounds are what keep the delegation honest.
+into a merge rubber stamp — the bounds are what keep the delegation honest. Context isolation is the
+bound that makes the review itself real rather than nominal: without it the loop still produces a
+verdict, a run log, and a merge, and every one of those artifacts overstates what actually happened.
 
 ### VII. Versioned Instruction Surface
 
@@ -453,6 +519,23 @@ Rules on the vocabulary:
   `fast-lightweight` resolves to `balanced-coding`, and an absent `deep-reasoning` resolves to the
   highest tier available. Silently downgrading a `deep-reasoning` phase is prohibited.
 - The Effort column is already harness-neutral and MUST remain so.
+
+**The review chain's two agents MUST appear in the catalog** like every other dispatchable skill,
+because Principle VI now requires them to be real agents rather than roles. Their normative rows:
+
+| Skill | Model Selection | Effort | Visual Color ID | Scope & Outcome |
+| :--- | :--- | :--- | :--- | :--- |
+| `pr-reviewer` | `deep-reasoning` | `high` | **#00695C (Teal)** | Severity-ranked, evidence-based verdict on a diff. Reads only the diff and the governing artifacts. Never fixes. |
+| `pr-shepherd` | `balanced-coding` | `medium` | **#283593 (Indigo)** | Resolves ONLY what a closed review raised: comments, conflicts, failing checks. Never judges its own fixes. |
+
+- The two colors MUST NOT collide with the eleven already assigned. Teal and Indigo were unused;
+  a collision makes two agents visually indistinguishable in a harness that renders the column.
+- `pr-reviewer` sits at `deep-reasoning` for judgment quality, NOT as a mitigation for
+  self-preference — Principle VI records that the highest tier can carry the strongest such bias.
+  Isolation is the mitigation. Choosing a lower tier to "reduce bias" would trade real analytic
+  capability for an effect the tier does not control.
+- `pr-shepherd` sits at `balanced-coding` because it applies decided fixes rather than deciding.
+  Elevating it invites it to reinterpret findings, which is the scope expansion Principle VI bounds.
 
 Agent materialization requirements:
 
@@ -685,4 +768,4 @@ Compliance review: every pull request MUST verify adherence to Principles I–XI
 that violates a principle MUST be justified in the plan's Complexity Tracking section or
 removed. Runtime development guidance lives in `instructions.md`.
 
-**Version**: 1.18.1 | **Ratified**: 2026-07-24 | **Last Amended**: 2026-07-25
+**Version**: 1.19.0 | **Ratified**: 2026-07-24 | **Last Amended**: 2026-07-25
