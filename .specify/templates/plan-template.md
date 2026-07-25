@@ -42,6 +42,17 @@
 
 [Gates determined based on constitution file]
 
+**Instruction Version Bump** *(required if this feature edits `instructions.md` or any adapter
+projection; state "N/A — no instruction content touched" otherwise)*
+
+- Current version: [MAJOR.MINOR.PATCH from the `instructions.md` title]
+- Declared bump: [MAJOR | MINOR | PATCH] → [resulting version]
+- Justification: [which directives are removed/redefined (MAJOR), added/expanded (MINOR), or
+  merely clarified (PATCH)]
+
+Per Constitution Principle VII, `/speckit-analyze` verifies this declared bump against the
+actual diff, and `/speckit-converge` verifies the shipped title matches it.
+
 ## Project Structure
 
 ### Documentation (this feature)

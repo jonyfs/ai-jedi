@@ -16,7 +16,7 @@ Tags: [#tasks #instructions #implementation]
 ## Format: `[ID] [P?] [Story] Description`
 
 - **[P]**: Can run in parallel (different files, no dependencies)
-- **[Story]**: US1–US4 per [[spec]]
+- **[Story]**: US1–US5 per [[spec]]
 - Exact file paths in every description
 
 ## Path Conventions
@@ -50,7 +50,7 @@ into. Blocks all user stories — a directive cannot be assigned a precedence le
 ladder exists.
 
 - [ ] T004 Rewrite the frontmatter of `instructions.md` with a one-sentence `Summary:` and `Tags:` covering the revised scope
-- [ ] T005 Create the 13 section headings in `instructions.md` in the urgency-first order defined in `specs/001-instructions-quality-revision/plan.md` (Target Section Order), leaving each body empty for now
+- [ ] T005 Create section headings 2–14 in `instructions.md` in the urgency-first order defined in `specs/001-instructions-quality-revision/plan.md` (Target Section Order), leaving each body empty for now — these empties are transient scaffolding and must not survive the change set
 - [ ] T006 Write section 3 "Precedence Ladder" in `instructions.md`: safety > clarity > lifecycle > density, stating that verbatim reproduction of code, error strings, API names, and CLI commands sits at clarity level (D43, D44)
 - [ ] T007 Write section 2 "First-Read Bootstrap" in `instructions.md`: on load, apply the ladder, then compression, then lifecycle routing; include the meta-objectives and the language-duality rule (D01–D04, D42, D53)
 - [ ] T008 Add the no-secrets / no-operator-data / no-machine-local-paths rule to section 3 of `instructions.md` (D54)
@@ -75,7 +75,7 @@ lifecycle routing, frontmatter — pass in a fresh session of each installed too
 - [ ] T014 [US1] Write section 10 "Path-Scoped Rules" in `instructions.md`: frontend, backend/data, and config/infra globs with their obligations, preserving each glob pattern verbatim (D22–D24)
 - [ ] T015 [US1] Write section 11 "Orchestration" in `instructions.md`: activation triggers, technical-director delegation protocol, and the four guardrails — parallelization, the analyze-must-report-converged gate, isolated sub-agent context, run-log persistence (D26, D27, D38–D41)
 - [ ] T016 [US1] Write the skill catalog into section 11 of `instructions.md` using tier-neutral model roles (deepest-reasoning / primary-coding / lightweight) plus effort and color ID for all ten lifecycle skills, deferring concrete identifiers to section 12 (D28–D37)
-- [ ] T017 [US1] Audit every directive written in T009–T016 against the trigger/obligation/exception form, filling `Exception: none` where no exception exists (FR-002, invariant I4)
+- [ ] T017 [US1] Audit every directive written in T009–T016 in `instructions.md` against the trigger/obligation/exception form, filling `Exception: none` where no exception exists (FR-002, invariant I4)
 - [ ] T018 [US1] Run Quickstart Step 6 probes against one installed tool and record outcomes in `.specify/workflows/runs/001-instructions-quality-revision.md`
 
 **Checkpoint**: US1 delivers a usable instruction file on its own — sections 2–7 and 9–11 complete.
@@ -91,7 +91,7 @@ lifecycle routing, frontmatter — pass in a fresh session of each installed too
 - [ ] T019 [US2] Walk `D01`–`D41` from `specs/001-instructions-quality-revision/data-model.md` against `instructions.md`, recording the located line number for each in the run log
 - [ ] T020 [US2] Restore into `instructions.md` any register entry the walk could not locate, placing it in the destination section named in the register
 - [ ] T021 [US2] For each directive that was merged with another, confirm the merged text carries both original obligations, and split it back apart in `instructions.md` if either was weakened
-- [ ] T022 [US2] Diff `instructions.md` against `specs/001-instructions-quality-revision/instructions.pre-revision.md` for verbatim-sensitive strings — glob patterns, slash-command names, `.specify/workflows/runs/` — confirming each survived byte-identically
+- [ ] T022 [US2] Diff `instructions.md` against `specs/001-instructions-quality-revision/instructions.pre-revision.md` for verbatim-sensitive strings — glob patterns and `.specify/workflows/runs/` — confirming each survived byte-identically. EXPLICITLY EXEMPT: slash-command names, which must migrate rather than be frozen (resolves `/speckit-analyze` finding F2)
 - [ ] T023 [US2] Record the final register-walk result (must be 41/41) in `.specify/workflows/runs/001-instructions-quality-revision.md`
 
 **Checkpoint**: SC-001 met at 100%. No content lost.
@@ -115,8 +115,29 @@ self-structure, review-chain rules present.
 - [ ] T030 [US3] Cross-check `instructions.md` against Principles I–VI in `.specify/memory/constitution.md`, confirming each principle imposing runtime behavior is carried by at least one directive (SC-003)
 - [ ] T031 [US3] Verify `instructions.md` self-compliance: compliant frontmatter, at least one `[[Wiki Link]]`, under the 800-line ceiling, no machine-local absolute paths, no credential-shaped strings (FR-007, FR-012, invariants I8, I9)
 - [ ] T032 [US3] Confirm each of the four rule-collision pairs in Quickstart Step 5 resolves by the ladder alone, and extend section 3 of `instructions.md` if any requires a judgment call (SC-007)
+- [ ] T032a [US3] Migrate every slash-command reference in `instructions.md` off the retired dot form (`/speckit.plan`), replacing shared-content references with phase names and placing the concrete form in section 12, derived from `integration_settings.<integration>.invoke_separator` in `.specify/integration.json` (D61, resolves findings F1 and F2)
+- [ ] T032b [US3] Reconcile the section 11 catalog in `instructions.md` against `.specify/integrations/claude.manifest.json`: remove `baseline` (catalogued, installed in no manifest) and add `taskstoissues` (installed, uncatalogued) (D62, SC-009)
 
 **Checkpoint**: File is current, governance-complete, and self-compliant.
+
+---
+
+## Phase 5B: User Story 5 — The instruction set can update itself in installed tools (Priority: P2)
+
+**Goal**: Versioned title, delimited managed region, provisioning guidance, and global-only
+targeting, so an agent can refresh the instructions in any installed tool safely.
+
+**Independent Test**: Quickstart Step 6B — refresh trial replaces only the marked span, advances
+the version, and writes to a global path.
+
+- [ ] T032c [US5] Rewrite the `instructions.md` H1 title to carry `v4.1.0` per the bump declared in `specs/001-instructions-quality-revision/plan.md`, and mirror the version in the frontmatter `Summary:` without contradiction (D55, FR-013)
+- [ ] T032d [US5] Wrap the instruction content in `instructions.md` with `<!-- AI-JEDI:INSTRUCTIONS:START v4.1.0 -->` and `<!-- AI-JEDI:INSTRUCTIONS:END -->` (D56, FR-016)
+- [ ] T032e [US5] Write the update protocol into section 2 of `instructions.md`: resolve the global path, refuse if it falls inside a project working tree, compare marker version, replace only the marked span, verify outside-region byte-identity (D57, D58, FR-016, FR-017)
+- [ ] T032f [US5] Write section 13 "Agent Provisioning" in `instructions.md`: detection via the integration manifests, installation with the SpecKit version pinned to `.specify/integration.json`, verification against the manifest SHA256 with drift reported (D59, D60, FR-014)
+- [ ] T032g [US5] Add the unavailable-skill degradation row to section 14 of `instructions.md`: the phase's obligations are followed manually, never dropped (D63, FR-006)
+- [ ] T032h [US5] Confirm no project-local file in this repository carries an `AI-JEDI:INSTRUCTIONS` region, and that `CLAUDE.md` retains only its `SPECKIT` pointer region (FR-017, Principle IX)
+
+**Checkpoint**: US5 delivers a self-describing, self-updating instruction surface.
 
 ---
 
@@ -127,9 +148,9 @@ self-structure, review-chain rules present.
 **Independent Test**: For 5 sampled situations, a tool asked "which rule applies" names the correct
 section on the first attempt (SC-005).
 
-- [ ] T033 [US4] Verify section order in `instructions.md` matches the Target Section Order in `specs/001-instructions-quality-revision/plan.md` exactly, and that no section is empty (Section entity rule in `specs/001-instructions-quality-revision/data-model.md`)
+- [ ] T033 [US4] Verify section order in `instructions.md` matches the Target Section Order in `specs/001-instructions-quality-revision/plan.md` exactly across sections 2–14, and that no section retains the empty body scaffolded by T005 (Section entity rule in `specs/001-instructions-quality-revision/data-model.md`)
 - [ ] T034 [US4] Normalize headings in `instructions.md` so each is stable, unique, and citable, since `specs/001-instructions-quality-revision/contracts/instructions-file-contract.md` permits consumers to cite them
-- [ ] T035 [US4] Run the locatability probe for 5 sampled situations — destructive command, new Markdown file, multi-step feature, model selection, missing git remote — and record which section each tool names in the run log
+- [ ] T035 [US4] Run the locatability probe against `instructions.md` for 5 sampled situations — destructive command, new Markdown file, multi-step feature, model selection, missing git remote — recording which section each tool names in `.specify/workflows/runs/001-instructions-quality-revision.md`
 - [ ] T036 [US4] Fix any section in `instructions.md` whose scope was ambiguous in the T035 probe by tightening its heading or opening trigger sentence
 
 **Checkpoint**: SC-005 met.
@@ -138,11 +159,14 @@ section on the first attempt (SC-005).
 
 ## Phase 7: Polish & Cross-Cutting Concerns
 
-- [ ] T037 Remove any content added during the revision that restates an existing rule without removing ambiguity (FR-011)
+- [ ] T037 Remove from `instructions.md` any content added during the revision that restates an existing rule without removing ambiguity (FR-011)
 - [ ] T038 Run the full Quickstart Steps 1–5 sweep against `instructions.md` and record every result in `.specify/workflows/runs/001-instructions-quality-revision.md`
 - [ ] T039 Run Quickstart Step 6 probes across all installed tools against `instructions.md`, requiring at least 3 of 3 to pass, and record outcomes in `.specify/workflows/runs/001-instructions-quality-revision.md` (SC-004)
 - [ ] T040 [P] Delete `specs/001-instructions-quality-revision/instructions.pre-revision.md` once the register walk has passed, so no stale fork of the source survives (Principle I)
 - [ ] T041 Confirm `CLAUDE.md` managed SPECKIT region still points at `specs/001-instructions-quality-revision/plan.md` and contains no hand-edited instruction content (Principle I)
+- [ ] T041a Record in `.specify/workflows/runs/001-instructions-quality-revision.md` that zero adapters exist today, so the constitutional "regenerate all adapter outputs" gate has no targets in this change set (resolves finding F3)
+- [ ] T041b Cross-walk every directive in `instructions.md` that assumes a harness capability against section 14, confirming each names a fallback — invariant I6 requires total coverage, not four fixed rows (resolves finding F5)
+- [ ] T041c Verify `instructions.md` is loadable as a single artifact with no includes, no companion file, and no tool-specific preprocessing (FR-009, resolves finding F7)
 
 ---
 
@@ -159,16 +183,17 @@ automatically at the end of the implementation unit — the operator does not ha
 
 ## Dependencies & Execution Order
 
-**Phase order**: Phase 1 → Phase 2 (blocking) → Phase 3 (US1) → Phase 4 (US2) → Phase 5 (US3) → Phase 6 (US4) → Phase 7 → Phase 8.
+**Phase order**: Phase 1 → Phase 2 (blocking) → Phase 3 (US1) → Phase 4 (US2) → Phase 5 (US3) → Phase 5B (US5) → Phase 6 (US4) → Phase 7 → Phase 8.
 
 **Story dependencies**:
 
 - US1 depends on Phase 2 only. It is the MVP and ships alone.
-- US2 verifies the file US1 produced — it cannot start before US1's sections exist. Its own tasks are independent of US3 and US4.
+- US2 verifies the file US1 produced — it cannot start before US1's sections exist. Its own tasks are independent of US3, US4, and US5.
 - US3 depends on US1 (section 11 must exist before section 12 can map its roles) but not on US2.
-- US4 depends on all sections existing, so it runs last of the four.
+- US5 depends on US3: the version bump it writes must reflect the final directive set, and section 13 provisioning references the catalog US3 reconciled.
+- US4 depends on all sections existing, so it runs last of the five.
 
-**Within-phase order**: T006 before T007 (bootstrap references the ladder). T016 before T024 (section 12 maps roles the catalog defines). T019 before T020 and T021. T042 before T044 — running the shepherd before the review closes is prohibited.
+**Within-phase order**: T006 before T007 (bootstrap references the ladder). T016 before T024 (section 12 maps roles the catalog defines). T019 before T020 and T021. T032a and T032b before T032c — the version must be bumped only once the catalog is final. T042 before T044 — running the shepherd before the review closes is prohibited.
 
 ## Parallel Opportunities
 
@@ -191,7 +216,9 @@ considered safe to keep.
 
 **Increment 3**: Phase 5 (US3) — corrects stale identifiers and closes governance gaps.
 
-**Increment 4**: Phase 6 (US4) + Phase 7 — navigability and cleanup.
+**Increment 4**: Phase 5B (US5) — versioned title, managed region, provisioning, global targeting.
+
+**Increment 5**: Phase 6 (US4) + Phase 7 — navigability and cleanup.
 
 **Gate**: `/speckit-analyze` MUST report convergence before T004, the first task that edits
 `instructions.md` (Principle V).

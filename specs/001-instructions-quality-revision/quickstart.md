@@ -92,6 +92,27 @@ the six acceptance surfaces from [[contracts/instructions-file-contract]]:
 **Expected**: passes in at least 3 of 3 tools tested (SC-004); locatability correct on the first
 attempt for at least 5 sampled situations (SC-005).
 
+## Step 6B — Version, region, and provisioning (SC-008, SC-009, SC-010)
+
+```bash
+head -1 instructions.md | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+'   # esperado: v4.1.0
+grep -c 'AI-JEDI:INSTRUCTIONS:START\|AI-JEDI:INSTRUCTIONS:END' instructions.md   # esperado: 2
+grep -n 'AI-JEDI' CLAUDE.md   # esperado: sem saída — região proibida em config local
+grep -oE '/speckit\.[a-z]+' instructions.md   # esperado: sem saída — forma com ponto foi migrada
+```
+
+Catalog vs. manifest (SC-009): compare the section 11 catalog against
+`.specify/integrations/claude.manifest.json`. Every catalogued skill must appear in the manifest
+and vice versa — `baseline` must be gone, `taskstoissues` must be present.
+
+Refresh trial (SC-010): copy a global config file carrying the region to a scratch path, ask an
+agent to refresh it, then confirm only the marked span changed, the start marker's version
+advanced, and content outside the region is byte-identical. Repeat the three failure cases: version
+already current (no write), single marker (refuses), path inside a project tree (refuses).
+
+**Expected**: version present and consistent, exactly one marker pair, no region in project-local
+config, zero dot-form command references, catalog reconciled, all three refusal cases honored.
+
 ## Step 7 — Constitution gate before implementation (Principle V)
 
 Run `/speckit-analyze` and confirm it reports convergence across `spec.md`, `plan.md`, and
@@ -110,5 +131,7 @@ CRITICAL findings freeze the change until resolved.
 
 - Steps 1–5 pass with zero blocking defects
 - Step 6 passes across the tools tested
+- Step 6B passes: version consistent, one marker pair, no project-local region, catalog reconciled,
+  all three refusal cases honored
 - Step 7 reports converged
 - Step 8 recorded in the run log

@@ -106,6 +106,37 @@ returns the right rule without reading unrelated sections.
 
 ---
 
+---
+
+### User Story 5 - The instruction set can update itself in installed tools (Priority: P2)
+
+The operator says "update my AI Jedi instructions" and any agent — in any installed tool — can
+state which version is currently in place, locate the managed region in that tool's global
+configuration, replace exactly that span, and confirm nothing else moved.
+
+**Why this priority**: This is what makes the instruction set genuinely global rather than a file
+the operator copies by hand. Ranked below US1/US2 because the rules must first be correct and
+lossless before propagating them is worth automating.
+
+**Independent Test**: In a tool whose global config already carries the region, ask an agent to
+refresh it; verify only the marked span changed, the version advanced, and no project-local file
+was written.
+
+**Acceptance Scenarios**:
+
+1. **Given** a file carrying the marker pair, **When** an agent is asked to refresh it, **Then**
+   only the span between markers changes and the start marker's version matches the source.
+2. **Given** a file whose marker version already equals the source, **When** a refresh is asked,
+   **Then** the agent reports it is current and writes nothing.
+3. **Given** a file with only one marker, **When** a refresh is asked, **Then** the agent reports
+   corruption and refuses partial replacement.
+4. **Given** a resolved path inside a project working tree, **When** a refresh is asked, **Then**
+   the agent refuses and reports, rather than writing a project-local copy.
+5. **Given** a catalogued skill that is unavailable in the active harness, **When** its phase is
+   reached, **Then** the agent follows the phase's obligations manually rather than skipping it.
+
+---
+
 ### Edge Cases
 
 - A target tool imposes a size limit smaller than the revised file: content must be summarized
@@ -147,6 +178,21 @@ returns the right rule without reading unrelated sections.
   missing obligation, not restate an existing rule.
 - **FR-012**: The revision MUST NOT introduce secrets, operator-identifying data, or
   machine-local absolute paths.
+- **FR-013**: The file's title MUST carry an explicit `MAJOR.MINOR.PATCH` version, baselined at
+  `4.0.0`, so any agent can state which instruction version it is operating under.
+- **FR-014**: The file MUST contain a provisioning section telling an agent how to detect,
+  install, and verify the orchestrated skills in whatever harness it is running in — a named
+  skill the agent cannot invoke is a dead reference.
+- **FR-015**: Invocation syntax MUST be derived from the active integration's configured
+  separator rather than written as a literal, and the skill catalog MUST agree with what is
+  actually installed: no catalogued skill that is unavailable, no available skill left
+  uncatalogued.
+- **FR-016**: The instruction content MUST be enclosed in an explicitly named start/end marker
+  pair, with the start marker carrying the version, so an agent can locate and replace exactly
+  that span without reading or disturbing operator-authored content.
+- **FR-017**: Guidance for updating installed tools MUST target each tool's global, user-level
+  configuration and MUST prohibit writing the managed region into any project-local
+  configuration file.
 
 ### Key Entities
 
@@ -175,6 +221,13 @@ returns the right rule without reading unrelated sections.
 - **SC-006**: The file stays within the stated file-length ceiling and opens with compliant
   frontmatter.
 - **SC-007**: Zero conflicting rule pairs remain without a stated precedence.
+- **SC-008**: An agent asked "which instruction version are you operating under" answers with a
+  full three-part version, correct on the first attempt.
+- **SC-009**: Every skill named in the catalog is confirmed available in the active harness, and
+  every available skill appears in the catalog — zero discrepancies in either direction.
+- **SC-010**: An agent asked to refresh the instructions in an installed tool replaces only the
+  marked span, leaves all content outside it byte-identical, and writes to a global configuration
+  path in 3 of 3 trials.
 
 ## Assumptions
 

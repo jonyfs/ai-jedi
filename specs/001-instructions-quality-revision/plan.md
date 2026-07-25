@@ -62,6 +62,23 @@ explicitly out of scope.
 | VI. Automated Post-Implementation Review | Review chain runs after the implementation unit | PASS — quickstart records the chain; no git remote yet, so the local-diff degradation applies and the shepherd step is logged pending |
 | Authoring constraints | Frontmatter, wiki links, ≤800 lines, no secrets | PASS — FR-007 and FR-012 |
 
+| VII. Versioned Instruction Surface | Title carries MAJOR.MINOR.PATCH; bump declared before implementation | PASS — see the bump declaration below |
+| VIII. Executable Agent Provisioning | Provisioning section present; invocation syntax derived; catalog agrees with manifests | PASS — sections 12–14 of the target order |
+| IX. Delimited Managed Region | Marker pair present; projections target global config only | PASS — source carries the pair and is exempt from the global-path rule |
+
+**Instruction Version Bump**
+
+- Current version: none — the title carries the bare marker `V4`, which Principle VII rejects
+- Declared bump: **MINOR** → `4.1.0`
+- Justification: no existing directive is removed, and no obligation is redefined so that
+  previously compliant behavior becomes non-compliant — FR-001 forbids exactly that. The revision
+  adds directives (precedence ladder, review chain, degradation paths, provisioning, markers) and
+  materially expands existing guidance, which is the MINOR case. The baseline is established as
+  `4.0.0` per Principle VII, representing the pre-revision content, so the shipped file is
+  `4.1.0`.
+- Not MAJOR: reordering sections and rewording rules into trigger/obligation/exception form does
+  not change any obligation's force. Not PATCH: new directives are added.
+
 Post-Phase 1 re-check: PASS. No new violations; no Complexity Tracking entries required.
 
 ## Project Structure
@@ -112,11 +129,22 @@ verification is document-level and lives in `quickstart.md`.
 9. **File Architecture** — frontmatter, atomic files, wiki links, inbox triage
 10. **Path-Scoped Rules** — frontend / backend-data / config-infra globs
 11. **Orchestration** — activation triggers, technical-director protocol, guardrails
-12. **Tool-Scoped Values** — model identifiers and slash-command syntax, isolated (FR-004)
-13. **Degradation Paths** — no sub-agents / no slash commands / no git remote (FR-006)
+12. **Tool-Scoped Values** — model identifiers and the derived invocation separator, isolated (FR-004, FR-015)
+13. **Agent Provisioning** — detect / install / verify the skill catalog per harness (FR-014)
+14. **Degradation Paths** — no sub-agents / no skills available / no git remote (FR-006)
 
-Every one of the 41 registered directives maps into exactly one of sections 2–13. See
+The whole file is wrapped in the `AI-JEDI:INSTRUCTIONS` marker pair (FR-016), with the start
+marker carrying `v4.1.0`. The title itself carries the same version (FR-013).
+
+Every one of the 41 registered directives maps into exactly one of sections 2–14. See
 [[data-model]] for the register and its mapping column.
+
+**Resolution of `/speckit-analyze` findings F1 and F2**: slash-command syntax is treated as
+vendor-scoped and lives in section 12, derived from the active integration's separator. Invariant
+I5 in the contract is therefore read as covering command syntax as well as model identifiers, and
+T022's byte-identical preservation rule explicitly exempts command names — the retired dot form
+(`/speckit.plan`) MUST NOT be frozen. Shared content refers to phases by name, never by literal
+command.
 
 ## Phase 0: Research
 

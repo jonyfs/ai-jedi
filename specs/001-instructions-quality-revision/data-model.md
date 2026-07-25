@@ -20,16 +20,19 @@ One enforceable rule. The atomic unit that FR-001 protects.
 | `obligation` | Required behavior | MUST / MUST NOT / SHOULD; non-empty |
 | `exception` | Termination or suspension condition | May be `none`, but never blank/undefined |
 | `origin_section` | Section in the pre-revision file | Non-empty |
-| `destination_section` | Target section number in the revised file | Exactly one of sections 2–13 (FR-008) |
+| `destination_section` | Target section number(s) in the revised file | A non-empty list of sections drawn from 2–14 (FR-008). Usually one; a directive that has both a tool-neutral role and a vendor-specific value is split across two, and each part is a separate register row |
 | `precedence_level` | Position on the ladder | 1 safety · 2 clarity · 3 lifecycle · 4 density |
 
 ### Section
 
 Grouped directives under a stable heading.
 
-- `number` — 1–13, ordered by decision urgency, immutable once published
+- `number` — 2–14, ordered by decision urgency, immutable once published. Section 1 is
+  frontmatter: it holds metadata, not directives, and is exempt from the rules below (resolves
+  `/speckit-analyze` finding F8)
 - `heading` — stable text; renaming is a breaking change for tools that cite it
-- `directives` — one or more; a section with zero directives MUST be removed, not left empty
+- `directives` — one or more; a section with zero directives MUST be removed, not left empty. The
+  empty bodies created by task T005 are transient scaffolding and MUST NOT survive the change set
 
 ### Tool-scoped block
 
@@ -122,6 +125,15 @@ New entries extend the register; they do not replace anything above.
 | D52 | Degradation: no run-log directory → report state inline, declare resumption unrecoverable | 13 | FR-006 |
 | D53 | Conversational language mirrors the operator; every persisted artifact is English | 2 | Principle III |
 | D54 | Never emit secrets, operator-identifying data, or machine-local absolute paths | 3 | FR-012, authoring constraints |
+| D55 | Title carries an explicit MAJOR.MINOR.PATCH version, baseline 4.0.0 | 1 + 2 | FR-013, Principle VII |
+| D56 | Instruction content is wrapped in the `AI-JEDI:INSTRUCTIONS` marker pair; start marker carries the version, end marker does not | 1 | FR-016, Principle IX |
+| D57 | Updating an installed tool replaces only the marked span; content outside is never read for decisions, moved, or rewritten | 2 | FR-016, Principle IX |
+| D58 | Projections target each tool's global user-level config; writing the region into project-local config is prohibited | 13 | FR-017, Principle IX |
+| D59 | Provisioning: detect installed skills by reading the integration manifests, not by guessing filesystem layout | 13 | FR-014, Principle VIII |
+| D60 | Provisioning: install with the SpecKit version pinned to the recorded value; verify against the manifest SHA256 and report drift | 13 | FR-014, Principle VIII |
+| D61 | Invocation syntax is derived from the active integration's configured separator, never written as a literal in shared content | 12 | FR-015, Principle VIII |
+| D62 | Catalog and manifests must agree — no catalogued-but-unavailable skill, no available-but-uncatalogued skill; verify before dispatching a phase | 11 + 13 | FR-015, Principle VIII |
+| D63 | A skill unavailable in the active harness resolves to its degradation path; the phase is followed manually, never dropped | 14 | FR-006, Principle VIII |
 
 ## State transitions
 
