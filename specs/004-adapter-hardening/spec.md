@@ -116,10 +116,8 @@ findings; run it without and confirm the group reports skipped, not passed.
 - **FR-006**: The test suite MUST include a static-analysis group that executes when the linter is
   present and reports SKIPPED, never PASSED, when it is absent.
 - **FR-007**: Suppressing a lint finding MUST be inline and justified at the site, never a global
-  disabling of the rule. **Deferred, with reason**: the linter is not installed on this machine, so no
-  task in this feature can produce a finding to suppress. The rule is stated now so it governs whoever
-  first runs the linter; a task that pretended to triage findings it could not generate would be worse
-  than an honest deferral.
+  disabling of the rule. **Discharged**: the linter was installed and the findings triaged. One
+  suppression exists, inline and justified — `SC2329` on the trap handler, a genuine false positive.
 - **FR-008**: The suite MUST record which linter version produced a result, so a differing result on
   another machine is attributable.
 
@@ -146,8 +144,7 @@ findings; run it without and confirm the group reports skipped, not passed.
 - **SC-005**: With the linter absent, the lint group reports SKIPPED and the suite's pass count does not
   include it.
 - **SC-006**: Zero lint findings remain unaddressed — each is either fixed or suppressed inline with a
-  stated reason. **Deferred alongside FR-007**: unmeasurable until the linter runs. Tracked in
-  `specs/BACKLOG.md` rather than left as a success criterion no task can satisfy.
+  stated reason. **Met**: shellcheck 0.11.0 reports zero findings across both shell files.
 
 ## Assumptions
 

@@ -100,3 +100,24 @@ Suite 61 passed, 0 failed, 1 skipped. FR-005 byte-identity intact — cksum `219
 through both the hardening and its review fixes.
 
 **Round 2 verdict: approve — 0 findings.** Rounds used: 2 of 3.
+
+## Phase 8 — Lint triage (FR-007, SC-006, unblocked)
+
+The operator installed shellcheck 0.11.0, so the group switched from SKIPPED to executing — and
+immediately failed, which is what a real assertion does.
+
+| Finding | Count | Disposition |
+|---|---|---|
+| SC2015 — `A && B \|\| C` is not if-then-else | 31 | **Fixed.** Safe today only because `ok()` always returns 0 — an accidental property. If it ever changed, every assertion would report pass AND fail. Converted to `if/then/else`. |
+| SC2012 / SC2010 — parsing `ls` | 7 | **Fixed** with glob enumeration. |
+| SC2181 — checking `$?` indirectly | 1 | **Fixed.** |
+| SC2329 — function never invoked | 1 | **Suppressed inline** with justification: `cleanup()` is invoked by the `trap` on the following line. A genuine false positive. |
+| SC2012 on the unreadable-file fallback | 1 | **Suppressed inline** with justification: a `chmod 000` file cannot be read, so `wc -c` is unavailable; `ls -ln` is the portable way to get its size without reading. Single known path, no glob expansion. |
+
+**SC2012 is the one worth recording.** It flagged exactly the `ls`-parsing weakness I raised as N2 in my
+own PR #7 review and then dismissed as "not reachable through this adapter's own naming". The linter
+disagreed and was right: robustness should not depend on nobody creating an awkward filename. A reviewer
+talked himself out of a finding a tool then caught — an argument for running the tool.
+
+Result: **64 passed, 0 failed, 0 skipped**. Zero shellcheck findings. FR-005 byte-identity still intact
+at cksum `2195510091 25097`.

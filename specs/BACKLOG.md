@@ -45,12 +45,10 @@ rather than a same-loop patch:
   markers and version would be present. A pre-write length assertion now catches the truncation case;
   converting the whole script to `set -e` is riskier than the defect in a script this branch-heavy and
   needs its own test pass.
-- **`shellcheck` findings triage (FR-007, SC-006 of feature 004).** Feature 004 adds a lint group with a
-  real SKIPPED state, so the absent-linter case is handled honestly. What it cannot do is triage findings
-  that do not exist: the linter is not installed here, so no task in that feature can produce one. The
-  rule that suppressions be inline and justified is stated so it governs whoever first runs the linter,
-  and the criterion "zero unaddressed findings" is unmeasurable until then. Whoever installs `shellcheck`
-  discharges both.
+- ~~**`shellcheck` findings triage.**~~ **DISCHARGED.** The operator installed shellcheck 0.11.0; the
+  lint group switched from SKIPPED to executing and all findings were triaged. Notable: `SC2012` flagged
+  the exact `ls`-parsing weakness recorded as N2 in the PR #7 review and dismissed there as unreachable.
+  The linter was right — robustness should not depend on nobody creating an awkward filename.
 
 ### Feature 001 — 12 open tasks
 
