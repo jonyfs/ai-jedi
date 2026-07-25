@@ -1,5 +1,5 @@
 ---
-Summary: Implementation plan generalizing the adapter to per-target declarations and shipping four verified targets, with two installed tools excluded for a stated reason.
+Summary: Implementation plan generalizing the adapter to per-target declarations and shipping five declared targets, four of which have an existing file, with two installed tools excluded for a stated reason.
 Tags: [#plan #adapter #multi-target]
 ---
 
@@ -35,7 +35,8 @@ success path for the Claude Code target must stay byte-identical — the same di
 different requirement from this feature's FR-005, which is why it is qualified — now with more ways to
 break it.
 
-**Scale/Scope**: one script generalized, four declarations, one shared test harness run per target.
+**Scale/Scope**: one script generalized, five declared targets (four with an existing file), one shared
+test harness run per target.
 
 ## Survey — what is actually on this machine
 
@@ -55,14 +56,14 @@ Verified by inspection, not assumed:
 
 | Principle | Gate | Status |
 |---|---|---|
-| I. Single Source of Truth | Projections generated, never hand-edited | PASS — four more generated projections |
+| I. Single Source of Truth | Projections generated, never hand-edited | PASS — four more generated projections, bringing the total to five |
 | II. Multi-Tool Portability | Adding a tool = adding an adapter, not rewriting content | PASS — this is the principle's first real test. FR-002 makes it structural: a new tool is a declaration |
 | III. Language Duality | English artifacts | PASS |
 | IV. Token Density | N/A to code | PASS |
 | V. Spec-Driven Change | Full lifecycle | PASS |
 | VI. Review Chain | Loop, limit 3, check gate | PASS — governs this PR |
 | VII. Versioned Instruction Surface | Bump declared | PASS — **N/A**, no instruction content edited |
-| VIII. Executable Agent Provisioning | Per-adapter declaration completeness | PASS — each new declaration carries the required fields |
+| VIII. Executable Agent Provisioning | Per-adapter declaration completeness; invocation syntax derived, never hardcoded | PASS **with a declared degradation**. The four new targets have no SpecKit integration to derive from, so each records `speckit_integration: none` and points at Principle VIII's manual-execution fallback. Hardcoding a separator would have been the defect the Authoring Constraints name; fabricating a manifest would have been worse |
 | IX. Delimited Managed Region | Markers, global-only, foreign untouched | PASS — FR-003 generalizes foreign-marker recognition, which the hardcoded `SPECKIT` pair could not cover |
 | X. Capability Tiers | Tier vocabulary | PASS — each declaration carries its own tier map |
 | XI. Isolated Parallel Execution | Worktree, merge order, PR granularity | PASS — see below |
@@ -73,7 +74,7 @@ Verified by inspection, not assumed:
 
 **Parallel Execution Plan** (Principle XI)
 
-- Eligible for parallel dispatch: the four declarations are genuinely independent files. In practice the
+- Eligible for parallel dispatch: the four NEW declarations are genuinely independent files. In practice the
   generalization of `project.sh` must land first, so they serialize behind it rather than by contention.
 - PR granularity: one pull request. The stories describe one mechanism and cannot merge independently —
   the Principle XI exception.
@@ -93,6 +94,20 @@ overwriting a working tool's configuration.
 `agents/*.md` placed by unrelated tooling, and neither exposes a global instruction file this survey
 could find. Inventing a plausible path would produce an adapter that writes somewhere the tool never
 reads — worse than no adapter, because the README would then claim coverage that does not exist.
+
+**The new targets have no SpecKit integration, and the declarations say so.** `integration.json` lists
+`claude` alone, and `integrations/` holds one manifest. There is nothing for opencode, gemini, copilot or
+codex to derive an invocation separator FROM, and no skill manifest to verify against.
+
+Two ways out, and only one is honest. Fabricating `integration_settings` entries and manifests for skill
+sets that are not installed would invent data — the same defect as inventing an adapter path for a tool
+with no instruction surface. So instead each new declaration records `speckit_integration: none`, and its
+provisioning fields resolve to the degradation Principle VIII already defines: the phase's obligations are
+followed manually, in order, and the absence is reported. Never silently skipped.
+
+This is why the Constitution Check row for Principle VIII below is qualified rather than a bare PASS. An
+earlier draft marked it PASS on the grounds that "each new declaration carries the required fields" —
+fields can be present and unbacked, which is precisely the gap.
 
 **Codex is included despite its file being absent.** The path is a documented convention and the adapter
 creates missing targets by design. This is the difference between "no file yet" and "no mechanism" —

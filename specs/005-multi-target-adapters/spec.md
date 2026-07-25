@@ -29,7 +29,7 @@ The operator installs their instructions once and every tool with a global instr
 same content, each wrapped in its own marked region.
 
 **Why this priority**: this is the whole point of a single source of truth. One tool configured is a
-proof of concept; four is the product.
+proof of concept; five declared targets is the product.
 
 **Independent Test**: run each adapter, then confirm every target carries a region with the current
 version and identical content between markers.
@@ -93,6 +93,8 @@ whose README claims coverage it does not have is worse than one that covers less
 - Two targets share a filename convention (`AGENTS.md` for both Codex and OpenCode) but different
   directories: each adapter resolves its own path and neither writes the other's.
 - A target's directory does not exist: created, or refused with a clear reason — never silently skipped.
+  Which of the two is a declared policy, not a silent choice, mirroring the rule that the
+  summarize-versus-refuse decision must be recorded in the declaration.
 - A foreign region's markers are not the pair this project uses: recognised from the target's own
   declaration rather than from a global constant.
 
