@@ -93,3 +93,43 @@ drifted two versions behind.
 README corrected: the claim "No adapter has been written for any tool yet" became false on merge.
 Frontmatter re-evaluated per the authoring constraints. Codex, Copilot and OpenCode remain stated as
 unexercised, because they are.
+## Phase 8 — Review-to-merge loop
+
+**Round limit: 3** (constitutional default). Target: PR #5.
+
+### Round 1 — reviewer
+
+Scope: 14 files, +1743/-14, of which ~430 lines are the deliverable. Deliverable reviewed in depth;
+feature artifacts skimmed after five analyze passes. `shellcheck` is not installed here, so neither
+shell file was linted — recorded as N1 rather than left unstated.
+
+**Verdict: comment — 0 blocking, 2 high, 3 medium, 2 nits.**
+
+| ID | Severity | Finding |
+|---|---|---|
+| H1 | High | `project.sh` had two `mktemp` calls and zero `trap`. Every `die()` between a mktemp and its `rm -f` leaked, and the `$NEW` leak would leave a full copy of the projected instruction set in the temp directory. |
+| H2 | High | `stat -f '%z %m'` is BSD-only. On GNU coreutils `-f` means FILESYSTEM stat and that format is invalid, so both fingerprints fell through to the same fallback string, compared EQUAL, and all seven refusal mutation-checks passed vacuously. Seven assertions reporting green while verifying nothing — worse than a failing test. |
+| M1 | Medium | Backups accumulate with no retention policy; the declaration acknowledges the load hazard but not unbounded growth. |
+| M2 | Medium | Seconds-granularity backup names collide when two runs land in the same second, and the second `cp` overwrites the first. |
+| M3 | Medium | No `set -e`; the compose block's `head`/`tail`/`sed`/`awk` are unchecked, and a truncated `$NEW` would still pass FR-015 verification because markers and version would be present. |
+| N1 | Nit | `shellcheck` never run. |
+| N2 | Nit | `decl()` used once. |
+
+### Round 1 — shepherd
+
+- H1: cleanup trap added, both temp variables pre-initialized.
+- H2: replaced with a portable `fingerprint()` using `cksum` plus `wc -c`, with `ls -ln` for the
+  unreadable case. Verified independently that it detects a same-length content change, is stable
+  across identical content, and returns non-empty for a `chmod 000` file — a fix that did not actually
+  detect mutation would have been cosmetic.
+- M2: `$$` appended to the backup name.
+- M3: **partially** fixed. Added a pre-write assertion that the composed file is not shorter than the
+  source content, which catches the truncation case FR-015 cannot see. Adding `set -e` to a script this
+  branch-heavy was rejected as riskier than the defect.
+- M1 and the rest of M3: deferred to the backlog rather than fixed here. Retention policy is a design
+  decision, not a review finding, and `set -e` conversion needs its own verification.
+- N1: deferred — adding a linter the machine lacks would be a green group that never runs.
+
+Suite after the fixes: 49 passed, 0 failed. Real config still projects idempotently. Zero temp files
+leaked.
+

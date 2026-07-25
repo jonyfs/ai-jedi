@@ -30,6 +30,19 @@ fresh_work() {
   WORK=$(mktemp -d) || { echo "cannot create temp dir"; exit 1; }
 }
 
+# H2: stat -f is BSD-only. On GNU coreutils -f means FILESYSTEM stat and the format is
+# invalid, so both fingerprints fell through to the same fallback string, became equal, and
+# every mutation check passed vacuously — seven assertions reporting green while verifying
+# nothing. cksum plus wc -c is portable and actually content-sensitive.
+fingerprint() {
+  if [ -r "$1" ]; then
+    printf '%s %s' "$(cksum < "$1" 2>/dev/null)" "$(wc -c < "$1" 2>/dev/null)"
+  else
+    # Unreadable: fall back to inode metadata via ls, which both BSD and GNU provide.
+    ls -ln "$1" 2>/dev/null | awk '{print $5}'
+  fi
+}
+
 ok()   { PASS=$((PASS+1)); printf '  PASS  %s\n' "$1"; }
 bad()  { FAIL=$((FAIL+1)); printf '  FAIL  %s\n' "$1"; }
 
@@ -40,10 +53,10 @@ assert_refused() {
   label=$1; fixture=$2; shift 3
   # Fingerprint by size+mtime rather than by copying: an unreadable fixture (chmod 000)
   # cannot be cp'd, and a failed copy would make every comparison report a false mutation.
-  before=$(stat -f '%z %m' "$fixture" 2>/dev/null || echo unreadable)
+  before=$(fingerprint "$fixture")
   AIJEDI_TARGET="$fixture" sh "$SCRIPT" "$@" >/dev/null 2>&1
   rc=$?
-  after=$(stat -f '%z %m' "$fixture" 2>/dev/null || echo unreadable)
+  after=$(fingerprint "$fixture")
   if [ "$rc" -eq 0 ]; then
     bad "$label (exited 0; expected refusal)"
   elif [ "$before" != "$after" ]; then

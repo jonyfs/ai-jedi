@@ -22,6 +22,13 @@ DECL="$HERE/adapter.yml"
 REPO=$(cd "$HERE/../../.." && pwd)
 SOURCE="$REPO/instructions.md"
 
+OUTSIDE=""
+NEW=""
+# H1: every die() between a mktemp and its rm would otherwise leak, and the $NEW leak
+# would leave a full copy of the projected instruction set in the temp directory.
+cleanup() { [ -n "$OUTSIDE" ] && rm -f "$OUTSIDE"; [ -n "$NEW" ] && rm -f "$NEW"; return 0; }
+trap cleanup EXIT INT TERM
+
 die()  { printf 'REFUSED: %s\n' "$1" >&2; exit 1; }
 note() { printf '%s\n' "$1"; }
 
@@ -206,10 +213,21 @@ if [ -n "$LIMIT_LINES" ] && [ "$LIMIT_SCOPE" = resulting-file-total ]; then
   fi
 fi
 
+# M3 (partial): the compose block's head/tail/sed/awk are unchecked, and a truncated $NEW
+# would still pass FR-015 verification, since markers and version would be present. Assert
+# the composed file actually carries the projected content before touching the target.
+COMPOSED_LINES=$(wc -l < "$NEW" | tr -d ' ')
+SRC_LINES=$(printf '%s\n' "$SRC_CONTENT" | wc -l | tr -d ' ')
+if [ "$COMPOSED_LINES" -lt "$SRC_LINES" ]; then
+  die "composed output is $COMPOSED_LINES lines, shorter than the $SRC_LINES lines of source content — compose step failed"
+fi
+
 # --- FR-011: backup, then write ---------------------------------------------
 BACKUP=""
 if [ -f "$TARGET" ]; then
-  BACKUP="${TARGET}${BACKUP_SUFFIX}-$(date +%Y%m%d%H%M%S).bak"
+  # M2: seconds-granularity alone collides when two runs land in the same second, and the
+  # second cp would overwrite the first backup. $$ disambiguates.
+  BACKUP="${TARGET}${BACKUP_SUFFIX}-$(date +%Y%m%d%H%M%S)-$$.bak"
   cp "$TARGET" "$BACKUP" || { rm -f "$NEW"; die "could not back up $TARGET"; }
 fi
 
