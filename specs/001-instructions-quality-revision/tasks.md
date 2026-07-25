@@ -74,7 +74,7 @@ lifecycle routing, frontmatter — pass in a fresh session of each installed too
 - [ ] T013 [US1] Write section 9 "File Architecture" in `instructions.md`: mandatory frontmatter, atomic focused files with the size ceiling, `[[Wiki Links]]` for dependencies, `/inbox` triage for unformatted input (D18–D21)
 - [ ] T014 [US1] Write section 10 "Path-Scoped Rules" in `instructions.md`: frontend, backend/data, and config/infra globs with their obligations, preserving each glob pattern verbatim (D22–D24)
 - [ ] T015 [US1] Write section 11 "Orchestration" in `instructions.md`: activation triggers, technical-director delegation protocol, and the four guardrails — parallelization, the analyze-must-report-converged gate, isolated sub-agent context, run-log persistence (D26, D27, D38–D41)
-- [ ] T016 [US1] Write the skill catalog into section 11 of `instructions.md` using tier-neutral model roles (deepest-reasoning / primary-coding / lightweight) plus effort and color ID for all ten lifecycle skills, deferring concrete identifiers to section 12 (D28–D37)
+- [ ] T016 [US1] Write the skill catalog into section 11 of `instructions.md` using the closed tier vocabulary from Principle X (`deep-reasoning` / `balanced-coding` / `fast-lightweight`) plus effort and color ID for all ten lifecycle skills, deferring concrete identifiers to section 12 (D28–D37)
 - [ ] T017 [US1] Audit every directive written in T009–T016 in `instructions.md` against the trigger/obligation/exception form, filling `Exception: none` where no exception exists (FR-002, invariant I4)
 - [ ] T018 [US1] Run Quickstart Step 6 probes against one installed tool and record outcomes in `.specify/workflows/runs/001-instructions-quality-revision.md`
 
@@ -130,8 +130,8 @@ targeting, so an agent can refresh the instructions in any installed tool safely
 **Independent Test**: Quickstart Step 6B — refresh trial replaces only the marked span, advances
 the version, and writes to a global path.
 
-- [ ] T032c [US5] Rewrite the `instructions.md` H1 title to carry `v4.1.0` per the bump declared in `specs/001-instructions-quality-revision/plan.md`, and mirror the version in the frontmatter `Summary:` without contradiction (D55, FR-013)
-- [ ] T032d [US5] Wrap the instruction content in `instructions.md` with `<!-- AI-JEDI:INSTRUCTIONS:START v4.1.0 -->` and `<!-- AI-JEDI:INSTRUCTIONS:END -->` (D56, FR-016)
+- [ ] T032c [US5] Rewrite the `instructions.md` H1 title to carry `v0.0.1` per the bump declared in `specs/001-instructions-quality-revision/plan.md`, retiring the `V4` marker, and mirror the version in the frontmatter `Summary:` without contradiction (D55, FR-013)
+- [ ] T032d [US5] Wrap the instruction content in `instructions.md` with `<!-- AI-JEDI:INSTRUCTIONS:START v0.0.1 -->` and `<!-- AI-JEDI:INSTRUCTIONS:END -->` (D56, FR-016)
 - [ ] T032e [US5] Write the update protocol into section 2 of `instructions.md`: resolve the global path, refuse if it falls inside a project working tree, compare marker version, replace only the marked span, verify outside-region byte-identity (D57, D58, FR-016, FR-017)
 - [ ] T032f [US5] Write section 13 "Agent Provisioning" in `instructions.md`: detection via the integration manifests, installation with the SpecKit version pinned to `.specify/integration.json`, verification against the manifest SHA256 with drift reported (D59, D60, FR-014)
 - [ ] T032g [US5] Add the unavailable-skill degradation row to section 14 of `instructions.md`: the phase's obligations are followed manually, never dropped (D63, FR-006)

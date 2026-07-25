@@ -125,7 +125,7 @@ New entries extend the register; they do not replace anything above.
 | D52 | Degradation: no run-log directory → report state inline, declare resumption unrecoverable | 13 | FR-006 |
 | D53 | Conversational language mirrors the operator; every persisted artifact is English | 2 | Principle III |
 | D54 | Never emit secrets, operator-identifying data, or machine-local absolute paths | 3 | FR-012, authoring constraints |
-| D55 | Title carries an explicit MAJOR.MINOR.PATCH version, baseline 4.0.0 | 1 + 2 | FR-013, Principle VII |
+| D55 | Title carries an explicit MAJOR.MINOR.PATCH version; first versioned release is 0.0.1 and the `V4` marker is retired | 1 + 2 | FR-013, Principle VII |
 | D56 | Instruction content is wrapped in the `AI-JEDI:INSTRUCTIONS` marker pair; start marker carries the version, end marker does not | 1 | FR-016, Principle IX |
 | D57 | Updating an installed tool replaces only the marked span; content outside is never read for decisions, moved, or rewritten | 2 | FR-016, Principle IX |
 | D58 | Projections target each tool's global user-level config; writing the region into project-local config is prohibited | 13 | FR-017, Principle IX |

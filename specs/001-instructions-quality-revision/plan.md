@@ -68,16 +68,15 @@ explicitly out of scope.
 
 **Instruction Version Bump**
 
-- Current version: none — the title carries the bare marker `V4`, which Principle VII rejects
-- Declared bump: **MINOR** → `4.1.0`
-- Justification: no existing directive is removed, and no obligation is redefined so that
-  previously compliant behavior becomes non-compliant — FR-001 forbids exactly that. The revision
-  adds directives (precedence ladder, review chain, degradation paths, provisioning, markers) and
-  materially expands existing guidance, which is the MINOR case. The baseline is established as
-  `4.0.0` per Principle VII, representing the pre-revision content, so the shipped file is
-  `4.1.0`.
-- Not MAJOR: reordering sections and rewording rules into trigger/obligation/exception form does
-  not change any obligation's force. Not PATCH: new directives are added.
+- Current version: none — the title carries the bare marker `V4`, which is a generation marker, not
+  a semantic version. Principle VII retires it.
+- Declared bump: **initial release** → `0.0.1`
+- Justification: per Principle VII, `0.0.1` is the first versioned release. There is no prior
+  semantic version to bump from, so this is not a MINOR or PATCH increment — it establishes the
+  counter. `0.y.z` also states honestly that the instruction surface is in initial development and
+  any directive may still change.
+- `1.0.0` is deliberately NOT declared here. That requires the operator to state the surface is
+  stable, which is itself a constitutional amendment.
 
 **Parallel Execution Plan** (Principle XI)
 
@@ -149,7 +148,7 @@ verification is document-level and lives in `quickstart.md`.
 14. **Degradation Paths** — no sub-agents / no skills available / no git remote (FR-006)
 
 The whole file is wrapped in the `AI-JEDI:INSTRUCTIONS` marker pair (FR-016), with the start
-marker carrying `v4.1.0`. The title itself carries the same version (FR-013).
+marker carrying `v0.0.1`. The title itself carries the same version (FR-013).
 
 Every one of the 41 registered directives maps into exactly one of sections 2–14. See
 [[data-model]] for the register and its mapping column.

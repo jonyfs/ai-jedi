@@ -1,10 +1,16 @@
 <!--
 Sync Impact Report
-- Version change: 1.6.0 → 1.7.0
+- Version change: 1.7.0 → 1.8.0
 - Ratification date unchanged: 2026-07-24
-- Modified principles: none renamed or redefined
-- Added sections:
-  - Principle XI. Isolated Parallel Execution
+- Modified principles:
+  - Principle VII. Versioned Instruction Surface — the instruction baseline changes
+    from `4.0.0` to `0.0.1`. The `V4` generation marker is retired rather than
+    mapped onto MAJOR. Adds the `0.y.z` initial-development semantics and requires
+    an explicit amendment before `1.0.0` may be declared. Bump is MINOR, not MAJOR:
+    no instruction file has shipped under the old baseline, so nothing previously
+    compliant becomes non-compliant — only feature 001's undelivered plan needed
+    correcting.
+- Added sections: none
 - Removed sections: none
 - Templates requiring updates:
   - ✅ .specify/templates/spec-template.md (no constitution-mandated section added)
@@ -31,7 +37,8 @@ Sync Impact Report
     merging, worktree cleanup, and PR-per-story organization,
     (b) Execution Guardrails do not yet mention the Principle VI review chain,
     (c) title carries the unversioned marker `V4`; Principle VII requires a
-    full MAJOR.MINOR.PATCH version in the title, with `4.0.0` as the baseline,
+    full MAJOR.MINOR.PATCH version in the title, with `0.0.1` as the first
+    versioned release and the `V4` marker retired,
     (d) no provisioning section exists at all; Principle VIII requires detection,
     installation, and manifest verification guidance for the skill catalog,
     (e) catalog uses a hardcoded dot separator (`/speckit.plan`) while the
@@ -62,7 +69,8 @@ Sync Impact Report
     the tier-vocabulary, agent-materialization, and parallel-rule checks.
   - Detail of the v1.5.0 reconciliation: spec.md gained FR-013…FR-017,
     SC-008…SC-010, and User Story 5;
-    plan.md gained the Instruction Version Bump declaration (MINOR → 4.1.0) and
+    plan.md gained the Instruction Version Bump declaration (corrected at v1.8.0
+    to the initial release 0.0.1) and
     sections 13–14 of the target order; data-model.md gained directives D55–D63;
     tasks.md gained Phase 5B (US5) plus the catalog-migration and
     finding-resolution tasks; quickstart.md gained Step 6B.
@@ -73,6 +81,7 @@ Sync Impact Report
   fallback no longer applies to work pushed to that remote.
 
 Prior version history
+- 1.7.0 (2026-07-25): added Principle XI. Isolated Parallel Execution.
 - 1.6.0 (2026-07-24): added Principle X. Capability-Tiered Agent Materialization.
 - 1.5.0 (2026-07-24): Principle IX scope expanded — projections target global
   user-level config only; project-local writes prohibited.
@@ -180,8 +189,15 @@ under, and two agents reading different revisions MUST be able to tell that they
 - The frontmatter `Summary:` MUST NOT contradict the title's version. Where a projection format
   cannot carry an H1, the adapter MUST surface the same version string in that format's
   equivalent header region.
-- The baseline is `4.0.0`, preserving the existing `V4` generation as the MAJOR component. No
-  prior history is retroactively renumbered.
+- **The first versioned release is `0.0.1`.** The pre-revision content never carried a semantic
+  version — `V4` was a generation marker, not a version — so there is nothing to bump from and
+  nothing to renumber. The `V4` marker is retired rather than mapped onto the MAJOR component.
+- A `0.y.z` version is a deliberate statement under semantic versioning: the instruction set is in
+  initial development and any directive may change. `1.0.0` MUST NOT be declared until the operator
+  states the instruction surface is stable, at which point the declaration is itself an amendment
+  to this constitution.
+- While MAJOR is `0`, the bump semantics below still apply to MINOR and PATCH, and a
+  directive-removing change increments MINOR rather than MAJOR — the standard `0.y.z` convention.
 
 Bump semantics are the same as this constitution's, applied to instruction content:
 
@@ -503,4 +519,4 @@ Compliance review: every pull request MUST verify adherence to Principles I–XI
 that violates a principle MUST be justified in the plan's Complexity Tracking section or
 removed. Runtime development guidance lives in `instructions.md`.
 
-**Version**: 1.7.0 | **Ratified**: 2026-07-24 | **Last Amended**: 2026-07-25
+**Version**: 1.8.0 | **Ratified**: 2026-07-24 | **Last Amended**: 2026-07-25

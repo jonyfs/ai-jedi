@@ -20,7 +20,7 @@ Walk the register. For each of `D01`…`D41`, locate the surviving directive in 
 record its destination section.
 
 ```bash
-grep -n '^#\{1,3\} ' instructions.md   # confirm the 13 sections exist in order
+grep -n '^#\{1,3\} ' instructions.md   # confirm sections 2-14 exist in order
 ```
 
 **Expected**: 41 of 41 register entries located, each in the destination section named in
@@ -52,7 +52,7 @@ machine-local absolute paths and no credential-shaped strings (invariants I8, I9
 
 ## Step 4 — Governance coverage (SC-003, FR-005)
 
-For each constitutional principle that imposes runtime behavior (I, II, III, IV, V, VI), confirm at
+For each constitutional principle that imposes runtime behavior (I through XI), confirm at
 least one directive in the revised file carries the obligation. Principle VI specifically requires
 the reviewer-then-shepherd ordering, the CRITICAL-freezes-branch rule, and the
 silence-is-consent rule to be stated.
@@ -95,7 +95,7 @@ attempt for at least 5 sampled situations (SC-005).
 ## Step 6B — Version, region, and provisioning (SC-008, SC-009, SC-010)
 
 ```bash
-head -1 instructions.md | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+'   # esperado: v4.1.0
+head -1 instructions.md | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+'   # esperado: v0.0.1
 grep -c 'AI-JEDI:INSTRUCTIONS:START\|AI-JEDI:INSTRUCTIONS:END' instructions.md   # esperado: 2
 grep -n 'AI-JEDI' CLAUDE.md   # esperado: sem saída — região proibida em config local
 grep -oE '/speckit\.[a-z]+' instructions.md   # esperado: sem saída — forma com ponto foi migrada
@@ -148,8 +148,8 @@ Run `/speckit-analyze` and confirm it reports convergence across `spec.md`, `pla
 
 After the revision lands, the chain runs automatically:
 
-1. `/pr-reviewer` — against the local diff, since this repository has no git remote yet.
-2. `/pr-shepherd` — deferred, and recorded as pending under `.specify/workflows/runs/`.
+1. `/pr-reviewer` — against the pull request, since the repository now has a remote.
+2. `/pr-shepherd` — only after the review closes; resolves comments, conflicts, and checks.
 
 CRITICAL findings freeze the change until resolved.
 

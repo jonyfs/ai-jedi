@@ -179,7 +179,8 @@ was written.
 - **FR-012**: The revision MUST NOT introduce secrets, operator-identifying data, or
   machine-local absolute paths.
 - **FR-013**: The file's title MUST carry an explicit `MAJOR.MINOR.PATCH` version, baselined at
-  `4.0.0`, so any agent can state which instruction version it is operating under.
+  `0.0.1` as the first versioned release, so any agent can state which instruction version it is
+  operating under.
 - **FR-014**: The file MUST contain a provisioning section telling an agent how to detect,
   install, and verify the orchestrated skills in whatever harness it is running in — a named
   skill the agent cannot invoke is a dead reference.
