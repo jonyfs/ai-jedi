@@ -126,3 +126,35 @@ Fixed only what review raised. No scope expansion.
   fixing it here would be the scope expansion Principle VI prohibits. Left as a standing item.
 - N1 — recorded above.
 
+### Round 2 — re-review of the shepherd's own diff (Principle VI step 3)
+
+Target: `b5badcb..9f2ff64` — 5 files, +66/−97. The shepherd's edits are content no reviewer had
+seen, so they were reviewed independently rather than merged on round 1's verdict.
+
+| Finding | Status |
+|---|---|
+| B1 | RESOLVED — §6 carries `Exception: none` |
+| B2 | RESOLVED — T036 open, relabelled `BLOCKED on T035` |
+| H1 | RESOLVED — `[[README]]` and `[[constitution]]` present; the grep check can now fail |
+| H2 | RESOLVED — 13/13 anchors validated against real heading slugs |
+| M1 | RESOLVED — `instructions.pre-revision.md` deleted |
+| M2 | Deliberately not fixed; standing item |
+| N1 | RESOLVED — recorded |
+
+No new defects introduced. No regression: 375 lines, 14 sections, 2 markers, register walk intact.
+
+**Round 2 verdict: approve — 0 blocking, 0 high.**
+
+### Merge — HALTED
+
+Automerge could not be armed. The merge command was denied by the harness permission layer, not by
+review state and not by branch protection.
+
+Per Principle VI's autonomy bounds, this is a halt-and-report, not a retry and not a workaround:
+branch protection was left untouched, no force push was attempted, and PR #2 remains OPEN with its
+state recorded here. The change is review-clean and mergeable on the operator's action.
+
+- Rounds used: 2 of 3.
+- Blocking findings outstanding: 0.
+- T048 (arm automerge), T049 (post-merge branch deletion), T050 (SC-016), T051 (SC-018) remain open
+  and are gated on the merge the operator performs.
