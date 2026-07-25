@@ -23,8 +23,10 @@ Two further installed tools excluded because no global instruction surface was f
 
 **Storage**: files.
 
-**Testing**: TDD. The existing **13** groups and 64 assertions must pass for EVERY target, not only the
-first — that is the real assertion this feature makes. An earlier draft said ten, which was a guess.
+**Testing**: TDD. The existing **13** groups must pass for EVERY target, not only the first — that is the
+real assertion this feature makes. The group count is derivable from the script; the assertion count is
+not, since assertions are emitted inside loops, so T007 records the observed number rather than
+restating one. An earlier draft said ten groups, which was a guess.
 
 **Target Platform**: the operator's machine.
 
@@ -105,9 +107,12 @@ with no instruction surface. So instead each new declaration records `speckit_in
 provisioning fields resolve to the degradation Principle VIII already defines: the phase's obligations are
 followed manually, in order, and the absence is reported. Never silently skipped.
 
-This is why the Constitution Check row for Principle VIII below is qualified rather than a bare PASS. An
-earlier draft marked it PASS on the grounds that "each new declaration carries the required fields" —
-fields can be present and unbacked, which is precisely the gap.
+The Constitution Check row for Principle VIII above is a bare PASS, backed by constitution v1.17.0 which
+added the no-integration case to the Authoring Constraints. Two earlier drafts got this wrong in
+different ways: the first marked it PASS on the grounds that "each new declaration carries the required
+fields" — fields can be present and unbacked, which was the gap — and the second qualified the MUST
+inside the table cell, which `/speckit-analyze` correctly called a CRITICAL. Amending the rule was the
+resolution; this paragraph now describes the row as it actually reads.
 
 **Codex is included despite its file being absent.** The path is a documented convention and the adapter
 creates missing targets by design. This is the difference between "no file yet" and "no mechanism" —
