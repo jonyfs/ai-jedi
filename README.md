@@ -182,3 +182,6 @@ Honest current state rather than an aspirational one:
 - Behavioral verification: not yet performed. The projections exist and are verified byte-for-byte, but
   nobody has yet opened a fresh session in Codex, Copilot, Gemini or OpenCode to confirm each actually
   applies the rules it now carries.
+- Model identifiers: verified for Claude Code only. The other four declarations carry
+  `tier_map_verified: false` — their identifiers were written from plausibility, not from a vendor
+  document, and each should be resolved before anything dispatches against it.

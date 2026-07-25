@@ -56,6 +56,13 @@ agent_definition:
   format: markdown
   required_fields: [name, description]
 
+# NOT VERIFIED. These identifiers were written from plausibility, not from a vendor
+# document this project consulted — only the claude-code target's map came from a source
+# it actually knows. Presenting an invented identifier as fact is the defect this file
+# otherwise guards against, so the status is stated rather than implied by
+# tier_map_verify_before_use alone. Resolve each against the vendor before dispatch; a
+# wrong identifier either fails the call or falls back silently, and the second is worse.
+tier_map_verified: false
 tier_map:
   deep-reasoning: gpt-5
   balanced-coding: gpt-5-mini

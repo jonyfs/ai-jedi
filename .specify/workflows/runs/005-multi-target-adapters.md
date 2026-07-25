@@ -71,3 +71,49 @@ All five targets projected and reporting `current (v0.1.0)`.
 README tool table lists all seven surveyed tools: five projected, two not covered with the reason
 stated. The Status block was corrected — under a heading promising "honest current state" it had said
 constitution v1.16.0, "Ten test groups, 49 assertions", and "the other three tools", all three wrong.
+
+## Phase 7 — Review-to-merge loop
+
+**Round limit: 3.** Target: PR #10.
+
+### Round 1 — reviewer
+
+Verified independently: 320 assertions across five targets, zero failures, zero shellcheck findings,
+five targets reporting current, real idempotency confirmed against all five live files, OpenCode's
+caveman region byte-identical.
+
+Checked and found NOT to be a defect: claude-code carries 19 declaration fields against the others' 15.
+The four extras are `skill_install`, `skill_verify`, `skill_version_source` and
+`invoke_separator_source`, which exist only because that target has a real SpecKit integration. Exactly
+what constitution v1.17.0 sanctions.
+
+**Verdict: comment — 0 blocking, 1 high, 1 nit.**
+
+| ID | Severity | Finding |
+|---|---|---|
+| H1 | High | I wrote twelve model identifiers across four declarations and verified none of them. Only claude-code's map came from a source this project knows; the other nine were written from plausibility. `tier_map_verify_before_use: true` suggests a checkable starting point, but presenting an invented identifier as fact is the same defect as asserting a number without counting it — now in a file another agent reads as truth. A wrong identifier either fails the dispatch or falls back silently, and the second is worse. |
+| N1 | Nit | Codex maps `deep-reasoning` and `balanced-coding` to one identifier. Possibly correct, but indistinguishable from a copy-paste slip without a note. |
+
+### Round 1 — shepherd
+
+H1: every declaration now carries `tier_map_verified`. True for claude-code, **false** for the four
+others, with a comment stating the identifiers came from plausibility rather than a vendor document and
+must be resolved before dispatch. The README Status block says the same, so an operator sees it without
+reading a declaration.
+
+N1: the Codex collapse is annotated as intentional, noting it collapses UPWARD so no phase is
+downgraded.
+
+Suite after the fixes: 64 passed per target across all five, zero shellcheck findings.
+
+### Round 2 — re-review of the shepherd's own diff
+
+Declaration-only changes plus one README paragraph. No logic touched. All five targets still 64/0/0,
+still `current`, shellcheck still clean.
+
+**Round 2 verdict: approve — 0 findings.** Rounds used: 2 of 3.
+
+### Check gate
+
+No workflows configured, no checks reported, `required_status_checks` null — the absent-checks case.
+Merge proceeds on review approval; the absence is recorded here.

@@ -103,6 +103,8 @@ agent_definition:
 
 # Capability tier to concrete model. Re-verify against the vendor before dispatch:
 # identifiers are renamed and retired without notice.
+# Verified against the vendor identifiers this project already uses elsewhere.
+tier_map_verified: true
 tier_map:
   deep-reasoning: claude-opus-5
   balanced-coding: claude-sonnet-5
