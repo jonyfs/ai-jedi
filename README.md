@@ -1,5 +1,5 @@
 ---
-Summary: Operator guide to AI Jedi — what the single global instruction set gives you across every installed AI coding tool, how the Claude Code adapter installs it, and what the project deliberately does not claim.
+Summary: Operator guide to AI Jedi — what the single global instruction set gives you across every installed AI coding tool, how its five adapters install it, and what the project deliberately does not claim.
 Tags: [#readme #onboarding #instructions #operator-guide #adapter #projection]
 ---
 
@@ -149,25 +149,39 @@ rather than a rewrite. Being precise about what has actually been tested:
 
 | Tool | Status |
 |---|---|
-| Claude Code | **Adapter written and exercised.** Projection installed in the global config, verified idempotent |
-| Codex | Not yet exercised — no adapter written |
-| GitHub Copilot | Not yet exercised — no adapter written |
-| OpenCode | Not yet exercised — no adapter written |
+| Claude Code | **Projected** — `~/.claude/CLAUDE.md` |
+| OpenCode | **Projected** — `~/.config/opencode/AGENTS.md`, alongside an untouched caveman region |
+| Gemini | **Projected** — `~/.gemini/GEMINI.md` |
+| GitHub Copilot | **Projected** — `~/.config/github-copilot/intellij/global-copilot-instructions.md` |
+| Codex | **Projected** — `~/.codex/AGENTS.md`, created by the adapter |
+| Cursor | **Not covered** — no global instruction file found; its config directory holds only agent definitions placed by other tooling |
+| Windsurf | **Not covered** — same |
 
-One adapter exists, for Claude Code, at `.specify/adapters/claude-code/`. It projects the instruction set
-into the global configuration, replacing any hand-maintained fork on explicit confirmation, and leaves
-every byte of your own content untouched. Run it with `sh .specify/adapters/claude-code/project.sh`, or
-`--check` to ask whether your projection is current without writing anything.
+Five adapters live at `.specify/adapters/`: one `project.sh` and one declaration per tool under
+`targets/`. Adding a tool means adding a declaration, not copying a script.
 
-The other three tools have no adapter, so nothing projects to them. Their rules are in place; their
-mechanism is not.
+```sh
+sh .specify/adapters/project.sh --target opencode          # project
+sh .specify/adapters/project.sh --target opencode --check  # is it current?
+```
+
+Omit `--target` and it defaults to Claude Code.
+
+Two of your installed tools are listed as not covered rather than omitted. Neither exposes a global
+instruction file this project could find, and inventing a plausible path would produce an adapter writing
+somewhere the tool never reads — a claim of coverage that does not exist.
 
 ## Status
 
 Honest current state rather than an aspirational one:
 
 - Instruction set: `0.1.0`. First release was `0.0.1`.
-- Constitution: 12 principles, v1.16.0.
-- Adapters: one, for Claude Code. Ten test groups, 49 assertions, all passing.
-- Behavioral verification across multiple tools: not yet performed — it needs adapters for the other
-  three, which do not exist.
+- Constitution: 12 principles, v1.17.0.
+- Adapters: five, sharing one script. 13 test groups, 64 assertions, run against every target — 320
+  assertions in total, all passing. Zero `shellcheck` findings.
+- Behavioral verification: not yet performed. The projections exist and are verified byte-for-byte, but
+  nobody has yet opened a fresh session in Codex, Copilot, Gemini or OpenCode to confirm each actually
+  applies the rules it now carries.
+- Model identifiers: verified for Claude Code only. The other four declarations carry
+  `tier_map_verified: false` — their identifiers were written from plausibility, not from a vendor
+  document, and each should be resolved before anything dispatches against it.
