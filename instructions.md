@@ -1,11 +1,11 @@
 ---
-Summary: AI Jedi v0.2.0 — global instruction set governing output compression, engineering lifecycle, file architecture, the autonomous review-to-merge loop with its check gate and its repository-scoped merge authorization, agent orchestration, provisioning, degradation paths, and self-update for every installed AI coding tool.
+Summary: AI Jedi v0.2.1 — global instruction set governing output compression, engineering lifecycle, file architecture, the autonomous review-to-merge loop with its check gate and its repository-scoped merge authorization, agent orchestration, provisioning, degradation paths, and self-update for every installed AI coding tool.
 Tags: [#instructions #precedence #compression #lifecycle #review-chain #check-gate #merge-authorization #merge-scope #authorized-repository #file-architecture #path-scoping #orchestration #skill-catalog #tool-scoped #provisioning #agent-materialization #parallel-execution #pull-requests #degradation #self-update #versioning]
 ---
 
-<!-- AI-JEDI:INSTRUCTIONS:START v0.2.0 -->
+<!-- AI-JEDI:INSTRUCTIONS:START v0.2.1 -->
 
-# ⚡ AI Jedi v0.2.0: Superpowers & Caveman-Enforced LLM Wiki
+# ⚡ AI Jedi v0.2.1: Superpowers & Caveman-Enforced LLM Wiki
 
 ## 1. Frontmatter
 
@@ -17,7 +17,7 @@ authoritative location of the instruction version.
 - **Trigger** — editing this file. **Obligation**: re-evaluate `Summary:` and `Tags:` so the summary
   describes the directives actually carried and the tags cover every capability area present.
   *Exception: none — stale frontmatter is a defect, not a cosmetic issue.*
-- The first versioned release was `0.0.1`; this is `0.2.0`. `0.y.z` states that this surface is in initial development
+- The first versioned release was `0.0.1`; this is `0.2.1`. `0.y.z` states that this surface is in initial development
   and any directive may change. `1.0.0` is declared only when the operator states the surface is
   stable.
 
@@ -195,11 +195,27 @@ which stays individually gated on explicit per-instance consent regardless of th
 **Obligation**: decide whether the authorization applies here by looking at the working tree, then act
 on that answer. *Exception: none.*
 
-A repository is **authorized** when its own `.specify/memory/constitution.md` exists AND records this
-standing merge authorization. Absent that file, or present without the grant, the repository is
+A repository is **authorized** when its own `.specify/memory/constitution.md` exists AND contains the
+literal marker line below. Absent the file, or present without that line, the repository is
 **unauthorized**.
 
-| Repository | Action at the merge step |
+```text
+AI-JEDI:MERGE-AUTHORIZED
+```
+
+**Trigger** — checking authorization. **Obligation**: test for that exact line, not for prose that
+resembles a grant. *Exception: none.* Prose is not a protocol: a constitution mentioning autonomous
+merge in passing would read as a grant, and a real grant reworded by a later amendment would read as
+its absence. Both errors are silent, and one of them merges. The marker is a deliberate opt-in an
+operator types once per repository, which is exactly the per-repository consent this rule requires —
+so the check and the consent are the same act.
+
+**Trigger** — an unauthorized repository, for any reason at all. **Obligation**: never write that
+marker yourself. *Exception: none — this sits at ladder level 1.* Writing it would be granting yourself
+the authorization, which is the single failure this whole rule exists to prevent. Report that the
+repository is unauthorized and let the operator decide.
+
+| State | Action at the merge step |
 | :--- | :--- |
 | Authorized | Complete the merge without requesting confirmation, per the authorization above. |
 | Unauthorized | Run the chain in FULL — reviewer, shepherd, re-review, check gate, run log — then **halt at the merge and report**. The review work is the valuable part and is never withheld; only the final unattended write to a shared branch is. |
