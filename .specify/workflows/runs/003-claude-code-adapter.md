@@ -133,3 +133,43 @@ shell file was linted — recorded as N1 rather than left unstated.
 Suite after the fixes: 49 passed, 0 failed. Real config still projects idempotently. Zero temp files
 leaked.
 
+### Round 2 — re-review of the shepherd's own diff (Principle VI step 3)
+
+Target: 3 files, +74/-3. Reviewed independently rather than merged on round 1's verdict.
+
+| Finding | Status |
+|---|---|
+| H1 | RESOLVED — trap covers both temps; `cleanup()` returns 0 so the EXIT trap does not alter the exit code |
+| H2 | RESOLVED — portable `fingerprint()`; the only remaining `stat -f` occurrence is the comment documenting the bug |
+| M2 | RESOLVED — `$$` in the backup name |
+| M3 | PARTIALLY resolved as stated; remainder deferred |
+
+Exit codes verified unchanged: `--check` returns 0, an unwritable target returns 1 with `REFUSED: write
+failed` rather than silently doing nothing. No regression: 49 passed, 0 failed.
+
+**Round 2 verdict: approve — 0 blocking, 0 high, 0 medium, 0 nits.** Rounds used: 2 of 3.
+
+### Check gate — evaluated
+
+Observed state: no `.github/workflows` directory, `gh pr checks 5` reports none, `required_status_checks`
+is null. This is the **absent-checks case**, not a failure and not a pending state. Merge proceeded on
+review approval, and the absence is recorded here so a later reader can distinguish "checks passed" from
+"no checks existed". **No checks existed.**
+
+### Merge and cleanup
+
+Merged as `5254770`. Remote branch removed by the platform (`delete_branch_on_merge`), local branch
+deleted, remote pruned, one worktree, zero merged branches remaining.
+
+Branch protection on `main` byte-identical before and after: `enforce_admins` true, pull request
+required, conversation resolution required, force pushes and deletions both disabled.
+
+Verified on `main`: suite 49 passed 0 failed, `--check` reports `current (v0.1.0)`.
+
+## Deferred
+
+- **T043** — the cross-tool behavioral probe. A fresh session must confirm it applies a rule present only
+  in v0.1.0. Cannot be self-administered by the session that ran the projection, which still holds the
+  instructions it loaded at start.
+- **M1** backup retention, the rest of **M3** (`set -e` conversion), and **N1** shellcheck. Recorded in
+  `specs/BACKLOG.md` rather than left in a merged review thread.

@@ -32,6 +32,25 @@ as a consequence of projecting the source.
 
 ## Deferred with reasons
 
+### Adapter hardening — from the PR #5 review
+
+Three findings deliberately not fixed inside the review loop, because each needs its own verification
+rather than a same-loop patch:
+
+- **Backup retention.** Every non-current run writes a timestamped full copy into the tool's config
+  directory and nothing prunes them. After a year of version bumps that is a pile of stale instruction
+  sets. Retention is a design decision — keep N, keep by age, or prune on success — not a review finding.
+- **`set -e` conversion.** `project.sh` runs under `set -u` only. The compose block's `head`/`tail`/`sed`
+  /`awk` are unchecked, and a truncated output would still pass the post-write verification because
+  markers and version would be present. A pre-write length assertion now catches the truncation case;
+  converting the whole script to `set -e` is riskier than the defect in a script this branch-heavy and
+  needs its own test pass.
+- **`shellcheck`.** Neither shell file has ever been linted — the tool is not installed on this machine.
+  Adding it as a test group that skips when absent would create a group that always reports green here,
+  which is the vacuous-assertion pattern the PR #5 review already caught once in `stat -f`.
+
+### Feature 001 — 12 open tasks
+
 ### Feature 001 — 12 open tasks
 
 Behavioral probes (SC-004, SC-005) require fresh sessions of Codex, Copilot, or OpenCode loading the

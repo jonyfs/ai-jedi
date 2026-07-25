@@ -143,15 +143,15 @@ constitution forbids and this file calls mandatory.
 
 **Round limit: 3** — constitutional default, not overridden.
 
-- [ ] T034 Open a pull request from `003-claude-code-adapter` to `main` covering `.specify/adapters/claude-code/`, `README.md`, and the feature artifacts, declaring its base and that it ships all four stories together per the plan's PR-granularity exception
-- [ ] T035 Run the reviewer against the pull request and record the severity-ranked verdict, with its round number, in `.specify/workflows/runs/003-claude-code-adapter.md`
-- [ ] T036 If findings exist, run the shepherd only after the review closes, resolving ONLY what review raised in `.specify/adapters/claude-code/` or `README.md` — no scope expansion. If the review closed with no findings, SKIP the shepherd entirely
-- [ ] T037 If the shepherd ran, re-review its own diff and record the round in `.specify/workflows/runs/003-claude-code-adapter.md` — those edits are code no reviewer has seen and MUST NOT merge on the strength of the prior review
-- [ ] T038 Repeat T036–T037 until a review closes with no findings, or until round 3, recording each round in `.specify/workflows/runs/003-claude-code-adapter.md`
-- [ ] T039 Evaluate the check gate and record the OBSERVED state in `.specify/workflows/runs/003-claude-code-adapter.md`; the expected result is the absent-checks case, but record what is actually observed
-- [ ] T040 Complete the merge into `main` without requesting confirmation, per the standing authorization — arming automerge remains the mechanism — and record the outcome in `.specify/workflows/runs/003-claude-code-adapter.md`
-- [ ] T041 AFTER the merge completes, confirm the platform removed the remote ref, delete the LOCAL branch `003-claude-code-adapter`, confirm no worktree remains, and record it in `.specify/workflows/runs/003-claude-code-adapter.md`
-- [ ] T042 Confirm branch protection on `main` is byte-identical to before the loop, recording the comparison in `.specify/workflows/runs/003-claude-code-adapter.md`
+- [X] T034 Open a pull request from `003-claude-code-adapter` to `main` covering `.specify/adapters/claude-code/`, `README.md`, and the feature artifacts, declaring its base and that it ships all four stories together per the plan's PR-granularity exception
+- [X] T035 Run the reviewer against the pull request and record the severity-ranked verdict, with its round number, in `.specify/workflows/runs/003-claude-code-adapter.md`
+- [X] T036 If findings exist, run the shepherd only after the review closes, resolving ONLY what review raised in `.specify/adapters/claude-code/` or `README.md` — no scope expansion. If the review closed with no findings, SKIP the shepherd entirely
+- [X] T037 If the shepherd ran, re-review its own diff and record the round in `.specify/workflows/runs/003-claude-code-adapter.md` — those edits are code no reviewer has seen and MUST NOT merge on the strength of the prior review
+- [X] T038 Repeat T036–T037 until a review closes with no findings, or until round 3, recording each round in `.specify/workflows/runs/003-claude-code-adapter.md`
+- [X] T039 Evaluate the check gate and record the OBSERVED state in `.specify/workflows/runs/003-claude-code-adapter.md`; the expected result is the absent-checks case, but record what is actually observed
+- [X] T040 Complete the merge into `main` without requesting confirmation, per the standing authorization — arming automerge remains the mechanism — and record the outcome in `.specify/workflows/runs/003-claude-code-adapter.md`
+- [X] T041 AFTER the merge completes, confirm the platform removed the remote ref, delete the LOCAL branch `003-claude-code-adapter`, confirm no worktree remains, and record it in `.specify/workflows/runs/003-claude-code-adapter.md`
+- [X] T042 Confirm branch protection on `main` is byte-identical to before the loop, recording the comparison in `.specify/workflows/runs/003-claude-code-adapter.md`
 
 ---
 
