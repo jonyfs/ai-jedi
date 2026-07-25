@@ -32,14 +32,20 @@ as a consequence of projecting the source.
 
 ## Open tasks that remain open, and why
 
-Six tasks across features 001 and 003 are genuinely unfinished. Every other task in every shipped
+Five tasks across features 001 and 003 are genuinely unfinished. Every other task in every shipped
 feature is now marked, after an audit found 44 completed tasks still showing as open — the repository was
 recording finished work as pending, which makes the task lists useless as a signal.
 
 | Task | Feature | Why it cannot be closed here |
 |---|---|---|
-| T018, T035, T038, T039 | 001 | Behavioral probes needing fresh sessions of Codex, Copilot or OpenCode loading the instruction set as their global config. Blocked until feature 005 projects to them. |
+| T018, T035, T039 | 001 | Behavioral probes needing fresh sessions of Codex, Copilot or OpenCode loading the instruction set as their global config. Blocked until feature 005 projects to them. |
 | T036 | 001 | Depends on T035's probe output; nothing to act on until it runs. |
+
+An earlier version of this table listed **T038** among the blocked probes. That was wrong and worth
+recording: T038 runs Quickstart Steps 1–5, which are greps against `instructions.md` and need no other
+tool at all. It was classified as blocked without being read. Run and passed — 14 sections, zero
+`claude-3` identifiers, zero vendor literals outside section 12, 420/800 lines, two wiki links, no
+secrets, every governance area represented, four collision pairs resolved by the ladder alone.
 | T043 | 003 | Cross-tool confirmation that a fresh session applies a v0.1.0-only rule. Cannot be self-administered by the session that ran the projection, which still holds the instructions it loaded at start. |
 
 ## Deferred with reasons

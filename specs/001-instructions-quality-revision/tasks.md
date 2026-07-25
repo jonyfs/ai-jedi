@@ -176,7 +176,7 @@ section on the first attempt (SC-005).
 ## Phase 7: Polish & Cross-Cutting Concerns
 
 - [X] T037 Remove from `instructions.md` any content added during the revision that restates an existing rule without removing ambiguity (FR-011)
-- [ ] T038 Run the full Quickstart Steps 1–5 sweep against `instructions.md` and record every result in `.specify/workflows/runs/001-instructions-quality-revision.md`
+- [X] T038 Run the full Quickstart Steps 1–5 sweep against `instructions.md` and record every result in `.specify/workflows/runs/001-instructions-quality-revision.md`
 - [ ] T039 Run Quickstart Step 6 probes across all installed tools against `instructions.md`, requiring 100% of the tools exercised to pass with at least 3 exercised, and record outcomes in `.specify/workflows/runs/001-instructions-quality-revision.md` (SC-004)
 - [X] T040 [P] Delete `specs/001-instructions-quality-revision/instructions.pre-revision.md` once the register walk has passed, so no stale fork of the source survives (Principle I)
 - [X] T041 Confirm `CLAUDE.md` managed SPECKIT region still points at `specs/001-instructions-quality-revision/plan.md` and contains no hand-edited instruction content (Principle I)
