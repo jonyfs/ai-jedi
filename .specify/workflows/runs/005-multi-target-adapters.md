@@ -117,3 +117,35 @@ still `current`, shellcheck still clean.
 
 No workflows configured, no checks reported, `required_status_checks` null — the absent-checks case.
 Merge proceeds on review approval; the absence is recorded here.
+
+## Phase 8 — T008/T010, completed after the merge
+
+T024–T031 were done during the loop but left unmarked; T009 landed inside T006. T008 and T010 were
+genuinely open, and the reason is worth recording: the `foreign` group tested the literal
+`<!-- SPECKIT START -->` pair and nothing else. Only one declaration actually uses that pair, so the
+group was passing **vacuously** for the other four — the same defect class as the `stat -f`
+fingerprints, caught the same way.
+
+New `foreignmulti` group, reading the pair out of the declaration under test:
+
+| Case | What it asserts |
+|---|---|
+| All-foreign file | A file that is entirely a foreign region in the DECLARED syntax keeps it byte-identical and gains the instruction region alongside |
+| Foreign interior | A heading inside the foreign region does not trigger fork detection, and survives |
+| Two syntaxes | A second, undeclared foreign syntax is ordinary operator content and survives byte-identical |
+| No pair declared | SKIP, plus a substitute assertion that the adapter invents no markers |
+
+Two of my own defects in writing it, both the vacuous-assertion pattern again:
+
+- The first fork fixture used the heading `# AI Jedi Instructions v0.0.9`. The declared fork pattern
+  requires a trailing colon, so nothing matched and the case could never fail.
+- Confirmed by mutation, not by inspection: hardcoding the SPECKIT pair back into `project.sh` left
+  the group fully green. After the fixture fix the same mutation produces 1 failure. The group is now
+  known non-vacuous rather than assumed so.
+
+Gemini, Copilot and Codex declare `foreign_markers: []`. That is correct — no other tool writes those
+files — so the group SKIPs for them and says why. A PASS there would have been the exact claim this
+group exists to stop making.
+
+Suite: 72/0/0 for Claude Code and OpenCode, 65/0/1 for the other three. 339 assertions. Zero
+shellcheck findings. All five live targets still `current (v0.1.0)`; OpenCode's caveman region intact.
