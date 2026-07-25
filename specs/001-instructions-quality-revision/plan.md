@@ -62,6 +62,37 @@ explicitly out of scope.
 | VI. Automated Post-Implementation Review | Review chain runs after the implementation unit | PASS — quickstart records the chain; no git remote yet, so the local-diff degradation applies and the shepherd step is logged pending |
 | Authoring constraints | Frontmatter, wiki links, ≤800 lines, no secrets | PASS — FR-007 and FR-012 |
 
+| VII. Versioned Instruction Surface | Title carries MAJOR.MINOR.PATCH; bump declared before implementation | PASS — see the bump declaration below |
+| VIII. Executable Agent Provisioning | Provisioning section present; invocation syntax derived; catalog agrees with manifests | PASS — sections 12–14 of the target order |
+| IX. Delimited Managed Region | Marker pair present; projections target global config only | PASS — source carries the pair and is exempt from the global-path rule |
+
+**Instruction Version Bump**
+
+- Current version: none — the title carries the bare marker `V4`, which is a generation marker, not
+  a semantic version. Principle VII retires it.
+- Declared bump: **initial release** → `0.0.1`
+- Justification: per Principle VII, `0.0.1` is the first versioned release. There is no prior
+  semantic version to bump from, so this is not a MINOR or PATCH increment — it establishes the
+  counter. `0.y.z` also states honestly that the instruction surface is in initial development and
+  any directive may still change.
+- `1.0.0` is deliberately NOT declared here. That requires the operator to state the surface is
+  stable, which is itself a constitutional amendment.
+
+**Parallel Execution Plan** (Principle XI)
+
+- Units eligible for parallel dispatch: **none for the implementation phases**. The deliverable is a
+  single file, `instructions.md`, so every writing unit contends for it. Per Principle XI, isolation
+  does not manufacture parallelism here, and marking these `[P]` would be a false promise.
+- Worktree/branch per unit: not applicable — no parallel implementation units exist. This feature
+  runs on the single branch `001-instructions-quality-revision`.
+- Serialization justification: write contention on `instructions.md`. Only T002/T003 (distinct
+  files) and T040/T041 (distinct files) are genuinely parallel, and only the probe tasks (T018,
+  T035, T039) fan out — across tools, not across files.
+- Merge order: single branch, so dependency order is the task order in `tasks.md`.
+- PR granularity: one PR for this feature. The user stories all mutate the same artifact and cannot
+  be independently merged, which is the documented exception to PR-per-story — stated here rather
+  than left for a reviewer to infer.
+
 Post-Phase 1 re-check: PASS. No new violations; no Complexity Tracking entries required.
 
 ## Project Structure
@@ -112,11 +143,22 @@ verification is document-level and lives in `quickstart.md`.
 9. **File Architecture** — frontmatter, atomic files, wiki links, inbox triage
 10. **Path-Scoped Rules** — frontend / backend-data / config-infra globs
 11. **Orchestration** — activation triggers, technical-director protocol, guardrails
-12. **Tool-Scoped Values** — model identifiers and slash-command syntax, isolated (FR-004)
-13. **Degradation Paths** — no sub-agents / no slash commands / no git remote (FR-006)
+12. **Tool-Scoped Values** — model identifiers and the derived invocation separator, isolated (FR-004, FR-015)
+13. **Agent Provisioning** — detect / install / verify the skill catalog per harness (FR-014)
+14. **Degradation Paths** — no sub-agents / no skills available / no git remote (FR-006)
 
-Every one of the 41 registered directives maps into exactly one of sections 2–13. See
+The whole file is wrapped in the `AI-JEDI:INSTRUCTIONS` marker pair (FR-016), with the start
+marker carrying `v0.0.1`. The title itself carries the same version (FR-013).
+
+Every one of the 41 registered directives maps into exactly one of sections 2–14. See
 [[data-model]] for the register and its mapping column.
+
+**Resolution of `/speckit-analyze` findings F1 and F2**: slash-command syntax is treated as
+vendor-scoped and lives in section 12, derived from the active integration's separator. Invariant
+I5 in the contract is therefore read as covering command syntax as well as model identifiers, and
+T022's byte-identical preservation rule explicitly exempts command names — the retired dot form
+(`/speckit.plan`) MUST NOT be frozen. Shared content refers to phases by name, never by literal
+command.
 
 ## Phase 0: Research
 

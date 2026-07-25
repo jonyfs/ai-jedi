@@ -20,16 +20,19 @@ One enforceable rule. The atomic unit that FR-001 protects.
 | `obligation` | Required behavior | MUST / MUST NOT / SHOULD; non-empty |
 | `exception` | Termination or suspension condition | May be `none`, but never blank/undefined |
 | `origin_section` | Section in the pre-revision file | Non-empty |
-| `destination_section` | Target section number in the revised file | Exactly one of sections 2–13 (FR-008) |
+| `destination_section` | Target section number(s) in the revised file | A non-empty list of sections drawn from 2–14 (FR-008). Usually one; a directive that has both a tool-neutral role and a vendor-specific value is split across two, and each part is a separate register row |
 | `precedence_level` | Position on the ladder | 1 safety · 2 clarity · 3 lifecycle · 4 density |
 
 ### Section
 
 Grouped directives under a stable heading.
 
-- `number` — 1–13, ordered by decision urgency, immutable once published
+- `number` — 2–14, ordered by decision urgency, immutable once published. Section 1 is
+  frontmatter: it holds metadata, not directives, and is exempt from the rules below (resolves
+  `/speckit-analyze` finding F8)
 - `heading` — stable text; renaming is a breaking change for tools that cite it
-- `directives` — one or more; a section with zero directives MUST be removed, not left empty
+- `directives` — one or more; a section with zero directives MUST be removed, not left empty. The
+  empty bodies created by task T005 are transient scaffolding and MUST NOT survive the change set
 
 ### Tool-scoped block
 
@@ -122,6 +125,38 @@ New entries extend the register; they do not replace anything above.
 | D52 | Degradation: no run-log directory → report state inline, declare resumption unrecoverable | 13 | FR-006 |
 | D53 | Conversational language mirrors the operator; every persisted artifact is English | 2 | Principle III |
 | D54 | Never emit secrets, operator-identifying data, or machine-local absolute paths | 3 | FR-012, authoring constraints |
+| D55 | Title carries an explicit MAJOR.MINOR.PATCH version; first versioned release is 0.0.1 and the `V4` marker is retired | 1 + 2 | FR-013, Principle VII |
+| D56 | Instruction content is wrapped in the `AI-JEDI:INSTRUCTIONS` marker pair; start marker carries the version, end marker does not | 1 | FR-016, Principle IX |
+| D57 | Updating an installed tool replaces only the marked span; content outside is never read for decisions, moved, or rewritten | 2 | FR-016, Principle IX |
+| D58 | Projections target each tool's global user-level config; writing the region into project-local config is prohibited | 13 | FR-017, Principle IX |
+| D59 | Provisioning: detect installed skills by reading the integration manifests, not by guessing filesystem layout | 13 | FR-014, Principle VIII |
+| D60 | Provisioning: install with the SpecKit version pinned to the recorded value; verify against the manifest SHA256 and report drift | 13 | FR-014, Principle VIII |
+| D61 | Invocation syntax is derived from the active integration's configured separator, never written as a literal in shared content | 12 | FR-015, Principle VIII |
+| D62 | Catalog and manifests must agree — no catalogued-but-unavailable skill, no available-but-uncatalogued skill; verify before dispatching a phase | 11 + 13 | FR-015, Principle VIII |
+| D63 | A skill unavailable in the active harness resolves to its degradation path; the phase is followed manually, never dropped | 14 | FR-006, Principle VIII |
+| D64 | Catalog model column holds only `deep-reasoning` / `balanced-coding` / `fast-lightweight`; vendor names are a defect | 11 | FR-018, Principle X |
+| D65 | Tier-to-model mapping lives in the tool-scoped section, one mapping per integration | 12 | FR-018, Principle X |
+| D66 | A harness with fewer tiers collapses upward; downgrading a `deep-reasoning` phase is prohibited | 12 + 14 | FR-018, Principle X |
+| D67 | Agent-definition location, format, and required fields are stated per harness, in tool-scoped content | 12 + 13 | FR-019, Principle X |
+| D68 | Agent creation is idempotent — unchanged catalog yields byte-identical definitions, never duplicates | 13 | FR-019, Principle X |
+| D69 | Name collision with an operator-authored agent is reported, never resolved by overwriting | 13 | FR-019, Principle X |
+| D70 | No agent is created for a skill absent from the active integration's manifest | 13 | FR-019, Principles VIII and X |
+| D71 | Every materialized agent carries the tier, effort, and scope of its catalog row, traceable back to it | 13 | FR-019, Principle X |
+| D72 | Harness with no sub-agent concept: phase obligations are followed in the main session, in order, and the absence is reported | 14 | FR-019, Principle X |
+| D73 | Parallel is the default for independent units; serial execution requires a stated dependency or write-contention reason | 11 | FR-020, Principle XI |
+| D74 | One worktree and one branch per parallel unit; two agents never share a working copy | 11 | FR-020, Principle XI |
+| D75 | Isolation does not create parallelism when units contend for the same artifact — such units are marked serial | 11 | FR-020, Principle XI |
+| D76 | Merge order follows the declared dependency graph, never completion order | 11 | FR-020, Principle XI |
+| D77 | Worktree removed after its branch merges, or immediately if it produced no change | 11 | FR-020, Principle XI |
+| D78 | Run log records unit, worktree, branch, and status for every dispatched agent | 11 | FR-020, Principle XI |
+| D79 | One pull request per independently testable story, each declaring base and dependency position | 8 | FR-021, Principle XI |
+| D80 | Review chain applies per pull request, not per parallel batch | 8 | FR-021, Principles VI and XI |
+| D81 | No pull request from a branch sharing no ancestor with its declared base | 8 | FR-021, Principle XI |
+| D82 | Stacked work declares its parent pull request explicitly | 8 | FR-021, Principle XI |
+| D83 | Degradation: no repository → serial in one tree and report; no remote → local branches, local review, shepherd pending; no parallel dispatch → sequential in dependency order and report | 14 | FR-020, FR-021, Principle XI |
+| D84 | README explains benefits in operator terms, never restating directive text | n/a — README obligation | FR-022, Principle XII |
+| D85 | No README benefit claim without a backing directive; no implied tool coverage that was not exercised | n/a — README obligation | FR-022, Principle XII |
+| D86 | README states the current instruction version and links into sections rather than duplicating them | n/a — README obligation | FR-022, Principle XII |
 
 ## State transitions
 

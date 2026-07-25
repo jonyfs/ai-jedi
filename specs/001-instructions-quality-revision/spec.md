@@ -106,6 +106,37 @@ returns the right rule without reading unrelated sections.
 
 ---
 
+---
+
+### User Story 5 - The instruction set can update itself in installed tools (Priority: P2)
+
+The operator says "update my AI Jedi instructions" and any agent — in any installed tool — can
+state which version is currently in place, locate the managed region in that tool's global
+configuration, replace exactly that span, and confirm nothing else moved.
+
+**Why this priority**: This is what makes the instruction set genuinely global rather than a file
+the operator copies by hand. Ranked below US1/US2 because the rules must first be correct and
+lossless before propagating them is worth automating.
+
+**Independent Test**: In a tool whose global config already carries the region, ask an agent to
+refresh it; verify only the marked span changed, the version advanced, and no project-local file
+was written.
+
+**Acceptance Scenarios**:
+
+1. **Given** a file carrying the marker pair, **When** an agent is asked to refresh it, **Then**
+   only the span between markers changes and the start marker's version matches the source.
+2. **Given** a file whose marker version already equals the source, **When** a refresh is asked,
+   **Then** the agent reports it is current and writes nothing.
+3. **Given** a file with only one marker, **When** a refresh is asked, **Then** the agent reports
+   corruption and refuses partial replacement.
+4. **Given** a resolved path inside a project working tree, **When** a refresh is asked, **Then**
+   the agent refuses and reports, rather than writing a project-local copy.
+5. **Given** a catalogued skill that is unavailable in the active harness, **When** its phase is
+   reached, **Then** the agent follows the phase's obligations manually rather than skipping it.
+
+---
+
 ### Edge Cases
 
 - A target tool imposes a size limit smaller than the revised file: content must be summarized
@@ -147,6 +178,44 @@ returns the right rule without reading unrelated sections.
   missing obligation, not restate an existing rule.
 - **FR-012**: The revision MUST NOT introduce secrets, operator-identifying data, or
   machine-local absolute paths.
+- **FR-013**: The file's title MUST carry an explicit `MAJOR.MINOR.PATCH` version, baselined at
+  `0.0.1` as the first versioned release, so any agent can state which instruction version it is
+  operating under.
+- **FR-014**: The file MUST contain a provisioning section telling an agent how to detect,
+  install, and verify the orchestrated skills in whatever harness it is running in — a named
+  skill the agent cannot invoke is a dead reference.
+- **FR-015**: Invocation syntax MUST be derived from the active integration's configured
+  separator rather than written as a literal, and the skill catalog MUST agree with what is
+  actually installed: no catalogued skill that is unavailable, no available skill left
+  uncatalogued.
+- **FR-016**: The instruction content MUST be enclosed in an explicitly named start/end marker
+  pair, with the start marker carrying the version, so an agent can locate and replace exactly
+  that span without reading or disturbing operator-authored content.
+- **FR-017**: Guidance for updating installed tools MUST target each tool's global, user-level
+  configuration and MUST prohibit writing the managed region into any project-local
+  configuration file.
+- **FR-018**: The catalog's model column MUST express a capability tier drawn from a closed
+  three-token vocabulary rather than any vendor model name, and the tier-to-concrete-model mapping
+  MUST live in the tool-scoped section. A harness offering fewer tiers MUST collapse them upward,
+  never downward.
+- **FR-019**: The file MUST describe how to select, configure, and automatically create an agent
+  definition for every catalogued skill in the active harness — including where definitions live,
+  what fields they require, that creation is idempotent, that name collisions with
+  operator-authored agents are reported rather than overwritten, and that no agent is created for
+  a skill unavailable in that harness.
+- **FR-020**: The file MUST state that independent work is dispatched in parallel by default, that
+  every parallel implementation unit runs in its own isolated working copy on its own branch, that
+  two agents never share a working copy, and that merging follows the declared dependency order
+  rather than completion order. It MUST also state that isolation does not create parallelism when
+  units contend for the same artifact.
+- **FR-021**: The file MUST state how to organize pull requests when version control and a remote
+  are configured — one per independently testable story, each declaring its base and its position in
+  the dependency graph — and MUST state the fallbacks when no repository or no remote exists.
+- **FR-022**: A `README.md` MUST exist at the repository root explaining, in operator-facing terms,
+  every capability the instruction set provides and what the operator gains from it. It MUST state
+  the current instruction version, MUST link into the instruction sections rather than duplicating
+  them, MUST NOT claim a benefit no directive backs, and MUST NOT imply coverage of tools the set has
+  not been exercised against.
 
 ### Key Entities
 
@@ -175,6 +244,25 @@ returns the right rule without reading unrelated sections.
 - **SC-006**: The file stays within the stated file-length ceiling and opens with compliant
   frontmatter.
 - **SC-007**: Zero conflicting rule pairs remain without a stated precedence.
+- **SC-008**: An agent asked "which instruction version are you operating under" answers with a
+  full three-part version, correct on the first attempt.
+- **SC-009**: Every skill named in the catalog is confirmed available in the active harness, and
+  every available skill appears in the catalog — zero discrepancies in either direction.
+- **SC-010**: An agent asked to refresh the instructions in an installed tool replaces only the
+  marked span, leaves all content outside it byte-identical, and writes to a global configuration
+  path in 3 of 3 trials.
+- **SC-011**: Zero vendor model names appear in the catalog; every row's model column holds one of
+  the three tier tokens.
+- **SC-012**: An agent asked to set up the tooling produces one agent definition per available
+  catalogued skill, with tier, effort, and scope traceable to its catalog row; a second run changes
+  nothing, and a pre-existing operator-authored agent of the same name is reported, not replaced.
+- **SC-013**: In a multi-unit run, every unit works in its own isolated copy, no two units share
+  one, merges occur in declared dependency order, and zero isolated copies remain after completion.
+- **SC-014**: Every task marked parallel writes a distinct artifact — zero parallel markings on
+  units that contend for the same file.
+- **SC-015**: Every capability in the shipped instruction set is represented in the README, every
+  README benefit claim traces to a directive, and the README's stated version matches the title —
+  zero unbacked claims, zero missing capabilities, zero version mismatch.
 
 ## Assumptions
 

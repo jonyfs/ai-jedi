@@ -42,6 +42,25 @@
 
 [Gates determined based on constitution file]
 
+**Instruction Version Bump** *(required if this feature edits `instructions.md` or any adapter
+projection; state "N/A — no instruction content touched" otherwise)*
+
+- Current version: [MAJOR.MINOR.PATCH from the `instructions.md` title]
+- Declared bump: [MAJOR | MINOR | PATCH] → [resulting version]
+- Justification: [which directives are removed/redefined (MAJOR), added/expanded (MINOR), or
+  merely clarified (PATCH)]
+
+Per Constitution Principle VII, `/speckit-analyze` verifies this declared bump against the
+actual diff, and `/speckit-converge` verifies the shipped title matches it.
+
+**Parallel Execution Plan** *(Principle XI)*
+
+- Units eligible for parallel dispatch: [list, or "none — single-artifact deliverable"]
+- Worktree/branch per unit: [naming scheme derived from the feature directory]
+- Serialization justification: [for each serial unit, the dependency or write-contention reason]
+- Merge order: [dependency order from tasks.md, NOT completion order]
+- PR granularity: [one per independently testable user story, or "N/A — no remote configured"]
+
 ## Project Structure
 
 ### Documentation (this feature)

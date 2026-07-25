@@ -160,6 +160,42 @@ Examples of foundational tasks (adjust based on your project):
 
 ---
 
+## Phase N+1: Instruction Version, Catalog & Region Integrity (Principles VII, VIII, IX)
+
+**Purpose**: Required ONLY for change sets that edit instruction content (`instructions.md` or
+an adapter projection). Omit this phase entirely for features that touch neither.
+
+- [ ] TXXX Bump the `instructions.md` H1 title version to the MAJOR.MINOR.PATCH value declared in plan.md, in the SAME change set as the content edit
+- [ ] TXXX Verify no adapter projection carries a version string differing from the source title version
+- [ ] TXXX Reconcile the instruction skill catalog against `.specify/integrations/*.manifest.json` — no catalogued skill without manifest backing, no installed skill missing from the catalog (Principle VIII)
+- [ ] TXXX Verify invocation syntax is derived from `integration_settings.<integration>.invoke_separator` in `.specify/integration.json`, not hardcoded (Principle VIII)
+- [ ] TXXX Verify the `AI-JEDI:INSTRUCTIONS:START` / `:END` marker pair is present and in order, and that the start marker's version matches the source title version (Principle IX)
+- [ ] TXXX Verify content outside the marker region is byte-identical to before the change, and that any `SPECKIT` region was left untouched (Principle IX)
+- [ ] TXXX Verify every projection was written to its tool's user-level (global) config path, and that NO project-local config file received an `AI-JEDI:INSTRUCTIONS` region (Principle IX)
+- [ ] TXXX Verify the catalog's Model Selection column holds ONLY `deep-reasoning` / `balanced-coding` / `fast-lightweight`, with the concrete mapping confined to the tool-scoped section (Principle X)
+- [ ] TXXX Regenerate agent definitions for every catalog row whose tier, effort, or scope changed, confirming idempotency and that no operator-authored agent was overwritten (Principle X)
+- [ ] TXXX Verify every `[P]` task genuinely writes a distinct file — a `[P]` on units contending for the same artifact is a false promise and MUST be downgraded to serial (Principle XI)
+- [ ] TXXX Confirm each parallel unit ran in its own worktree and branch, merged in dependency order, and had its worktree removed after merge (Principle XI)
+- [ ] TXXX Update `README.md` for every operator-visible benefit this change set adds or alters, verifying each claim is backed by a directive and the stated version matches the instruction title — or record the reviewed no-change decision (Principle XII)
+
+---
+
+## Phase N+2: Mandatory Post-Implementation Review (Constitution Principle VI)
+
+**Purpose**: Implementation is complete only when review has closed and the change is
+mergeable. This phase MUST run automatically at the end of the implementation unit — the
+operator does not have to ask for it.
+
+- [ ] TXXX Run `/pr-reviewer` and record the severity-ranked verdict in `.specify/workflows/runs/`
+- [ ] TXXX Resolve every CRITICAL finding; CRITICAL findings freeze the branch
+- [ ] TXXX Run `/pr-shepherd` ONLY after the review has closed — resolve comments, conflicts, and failing checks, then arm automerge
+
+**Ordering constraint**: running the shepherd before the review closes is prohibited. When no
+pull request exists, `/pr-reviewer` runs against the local diff and the shepherd step is
+recorded as pending in the run log.
+
+---
+
 ## Dependencies & Execution Order
 
 ### Phase Dependencies
