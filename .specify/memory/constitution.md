@@ -1,8 +1,19 @@
 <!--
 Sync Impact Report
-- Version change: 1.12.0 → 1.13.0
+- Version change: 1.13.0 → 1.14.0
 - Ratification date unchanged: 2026-07-24
 - Modified principles:
+  - Principle VI. Automated Post-Implementation Review — records the operator's
+    STANDING merge authorization: when every gate is clear (review closed with no
+    blocking findings, check gate satisfied, branch protection intact) the loop
+    completes the merge without asking. Requesting per-merge confirmation is now
+    prohibited — asking each time converts the automation into a prompt, the exact
+    failure mode this principle exists to prevent. The consent is scoped to the
+    merge step ONLY: weakening branch protection, force pushing, deleting an
+    unmerged branch, and merging over a blocking finding all remain gated on
+    explicit per-instance consent. Bump is MINOR: authorization recorded, no
+    existing rule redefined.
+- Superseded report for v1.13.0 — modified principles:
   - Principle VI. Automated Post-Implementation Review — two additions. (a) A review
     closing with NO findings now skips the shepherd entirely rather than invoking it
     to do nothing, since a no-op invocation wastes a round and produces a diff that
@@ -134,6 +145,8 @@ Sync Impact Report
   fallback no longer applies to work pushed to that remote.
 
 Prior version history
+- 1.13.0 (2026-07-25): Principle VI gained the merge check gate; clean review skips
+  the shepherd.
 - 1.12.0 (2026-07-25): Principle VI round limit given a concrete default of 3.
 - 1.11.0 (2026-07-25): frontmatter fidelity and post-merge branch cleanup folded
   into existing sections.
@@ -248,6 +261,16 @@ the branch is what the merge consumes. An approved-but-unmerged branch MUST surv
 - A branch that failed to merge MUST be preserved along with its pull request, so the work is
   recoverable.
 - `main`, and any long-lived branch the operator designates, MUST NEVER be deleted by this step.
+
+**Standing merge authorization.** The operator has granted standing consent for the loop to complete
+the merge whenever every gate is clear — review closed with no blocking findings, the check gate
+satisfied, and branch protection intact. No per-merge confirmation is required or MUST be requested.
+Asking again each time converts an automation into a prompt, which is the failure mode this principle
+exists to prevent.
+
+The consent covers the merge step only. It does NOT extend to: weakening branch protection, force
+pushing, deleting an unmerged branch, or merging with a blocking finding open. Those remain gated on
+explicit per-instance consent regardless of this authorization.
 
 Running the shepherd before the review has closed is prohibited — it would shepherd an unreviewed
 change. CRITICAL findings freeze the branch: automerge MUST NOT be armed until they are resolved.
@@ -701,4 +724,4 @@ Compliance review: every pull request MUST verify adherence to Principles I–XI
 that violates a principle MUST be justified in the plan's Complexity Tracking section or
 removed. Runtime development guidance lives in `instructions.md`.
 
-**Version**: 1.13.0 | **Ratified**: 2026-07-24 | **Last Amended**: 2026-07-25
+**Version**: 1.14.0 | **Ratified**: 2026-07-24 | **Last Amended**: 2026-07-25
