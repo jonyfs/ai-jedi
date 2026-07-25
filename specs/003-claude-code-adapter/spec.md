@@ -156,6 +156,12 @@ without reading the projected content.
   bounded by exactly one heading matching the title pattern recorded in the adapter declaration and
   extending to end-of-file. That pattern MUST be a literal expression in the declaration, not a
   description — "the title's shape" is not a testable predicate.
+- **FR-017**: Fork detection MUST scan only content OUTSIDE every managed region — its own and any
+  foreign one. The projected content carries its own title heading, which matches the same pattern, so a
+  scan that included region interiors would detect the adapter's own output as a fork on the second run
+  and break the idempotency FR-008 requires.
+- **FR-018**: When a matching heading does NOT extend to end-of-file — operator content follows an
+  unmarked fork — the adapter MUST refuse and report rather than guessing where the fork ends.
 - **FR-002**: The adapter MUST refuse to write when the resolved target path falls inside a project
   working tree, and MUST report the refusal.
 - **FR-003**: The adapter MUST create the target file at the documented location when it does not exist,
@@ -188,8 +194,11 @@ without reading the projected content.
 
 ### Key Entities
 
-- **Adapter declaration**: target tool, user-level path, format, size limit. The contract a projection
-  makes with its tool.
+- **Adapter declaration**: target tool, user-level path pattern, format, size limit and its scope, skill
+  install/verify procedure, invocation separator, agent-definition location and format, capability-tier to
+  model mapping, the fork/title patterns, the backup filename pattern, and whether the adapter summarizes
+  or refuses over-limit content. The contract a projection makes with its tool — and the single source the
+  script and its fixtures both read.
 - **Managed region**: the marked span the adapter owns, delimited by a start marker carrying the version
   and an end marker carrying none.
 - **Operator-authored content**: everything outside the region. Read-only to the adapter, always.
@@ -208,9 +217,11 @@ without reading the projected content.
   exactly one marked region, with zero duplicated instruction content.
 - **SC-004**: Running the adapter twice with unchanged source produces byte-identical output and exactly
   one region.
-- **SC-005**: The adapter refuses in 6 of 6 hostile cases: target inside a project tree, single marker,
-  markers reversed, unreadable target, a fork span bounded by two or more title-shaped headings, and a
-  fork migration without explicit operator confirmation.
+- **SC-005**: The adapter refuses in 7 of 7 hostile cases: target inside a project tree, single marker,
+  markers reversed, unreadable target, a fork span bounded by two or more title-shaped headings, a fork
+  migration without explicit operator confirmation, and a matching heading that does NOT reach
+  end-of-file — operator content after an unmarked fork means the span cannot be bounded, so the adapter
+  refuses rather than guessing where the fork stops.
 - **SC-006**: The drift check correctly reports current, stale, and not-installed across all three
   states, using version strings alone.
 - **SC-007**: A backup of the prior configuration exists after any run that wrote, and the target is

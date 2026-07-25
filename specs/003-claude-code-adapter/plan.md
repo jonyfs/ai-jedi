@@ -46,7 +46,7 @@ else serves. No secrets, no operator-identifying data, no machine-local paths co
 authoring constraints) — the target path is resolved at runtime from the home directory, never hardcoded
 into a committed file.
 
-**Scale/Scope**: One adapter, one tool. Seven implementation tasks plus refusals and ten test groups — the line count is not estimated here, because an early guess of ~150 was already outgrown by the requirements and a stale estimate is worse than none. Other tools' adapters are out of
+**Scale/Scope**: One adapter, one tool. Thirteen implementation tasks across four phases and ten test groups — the line count is not estimated here, because an early guess of ~150 was already outgrown by the requirements and a stale estimate is worse than none. Other tools' adapters are out of
 scope and follow the same declaration shape.
 
 ## Constitution Check
@@ -89,7 +89,7 @@ scope and follow the same declaration shape.
 - Merge order: single branch; dependency order is task order.
 - PR granularity: one pull request. The four stories describe one script's behavior and cannot ship
   independently. This invokes the PR-per-story exception in Principle XI — which `instructions.md` line
-  216 already carried but the constitution did not sanction until v1.15.0. That governance inversion was
+  216 already carried but the constitution did not sanction until v1.15.0 (current: v1.16.0). That governance inversion was
   caught by `/speckit-analyze` and fixed in the constitution, not papered over here.
 
 Post-Phase 1 re-check: PASS. No violations; no Complexity Tracking entries required.
@@ -137,7 +137,15 @@ a fork.
 its global configuration file, so declaring one from the vendor is impossible. The limit that actually
 applies is the project's own: the authoring constraints cap any file at 800 lines. `adapter.yml` therefore
 declares `size_limit: 800` sourced from those constraints rather than from a vendor document, and the
-declaration says so. A limit declared as unbounded would make FR-001b's refusal branch unreachable and
+declaration says so — **and declares that the limit applies to the RESULTING FILE TOTAL, not to the
+projected content alone**. The two differ by however much operator content the target already holds, and
+comparing projected content against a file-derived cap would measure a different quantity than the limit's
+source. Today the target would land near 418 lines, so the check is benign; it would still be wrong by
+construction.
+
+This choice is sanctioned by constitution v1.16.0, which permits an adapter to refuse rather than
+summarize and requires the declaration to record which — see the amendment raised by the pass-4 analyze
+finding. A limit declared as unbounded would make FR-001b's refusal branch unreachable and
 T018's size case vacuously green — the check would test nothing.
 
 **Backup before write, always.** FR-011. The target is a file the operator owns and did not expect a

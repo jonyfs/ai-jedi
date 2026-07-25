@@ -36,7 +36,7 @@ grep -c '/Users/\|/home/' .specify/adapters/claude-code/adapter.yml   # expected
 
 ## Step 2 — Refusals (FR-002, FR-007, SC-005)
 
-Six hostile cases, each must refuse and write nothing:
+Seven hostile cases, each must refuse and write nothing:
 
 ```bash
 cd .specify/adapters/claude-code/tests && ./run-tests.sh refusals
@@ -50,8 +50,9 @@ cd .specify/adapters/claude-code/tests && ./run-tests.sh refusals
 | Unreadable target | Report, no write |
 | Fork span bounded by two title-shaped headings | Refuse — cannot tell which is the fork |
 | Fork migration without operator confirmation | Refuse — the exception is confirmation-gated |
+| Matching heading NOT reaching end-of-file | Refuse — the span cannot be bounded |
 
-**Expected**: 6 of 6 refuse. A single case that writes is a blocking defect — each represents a way to
+**Expected**: 7 of 7 refuse. A single case that writes is a blocking defect — each represents a way to
 corrupt a file the operator owns.
 
 ## Step 3 — Creation and idempotency (FR-003, FR-008, SC-004)
@@ -151,6 +152,7 @@ grep -c 'SYSTEM SPECIFICATION V4' ~/.claude/CLAUDE.md     # expected: 0 — fork
 grep -c '^@RTK.md' ~/.claude/CLAUDE.md                     # expected: 1 — operator import survived
 grep -c '^# graphify' ~/.claude/CLAUDE.md                  # expected: 1 — operator section survived
 ls ~/.claude/CLAUDE.md.bak* 2>/dev/null | wc -l            # expected: >= 1 — backup taken
+sh .specify/adapters/claude-code/project.sh --check         # expected: reports current, writes nothing
 ```
 
 **Expected**: region present carrying the source version, the pre-revision fork gone, both pieces of
