@@ -26,6 +26,7 @@ OUTSIDE=""
 NEW=""
 # H1: every die() between a mktemp and its rm would otherwise leak, and the $NEW leak
 # would leave a full copy of the projected instruction set in the temp directory.
+# shellcheck disable=SC2329  # invoked indirectly by the trap on the next line.
 cleanup() { [ -n "$OUTSIDE" ] && rm -f "$OUTSIDE"; [ -n "$NEW" ] && rm -f "$NEW"; return 0; }
 trap cleanup EXIT INT TERM
 
@@ -297,12 +298,22 @@ prune_backups() {
   [ "${AIJEDI_PRUNE_FAIL:-0}" = "1" ] && { printf 'WARNING: pruning failed (injected)\n' >&2; return 0; }
   # Glob derived from the declared suffix, so only this adapter's own backups are
   # candidates — never the live target, never another tool's files.
-  count=$(ls -1 "${TARGET}${BACKUP_SUFFIX}-"*.bak 2>/dev/null | wc -l | tr -d ' ')
+  # Enumerate by glob, not by parsing ls: ls output is not a safe list format, and a
+  # filename containing a newline would corrupt a line count (SC2012). This also closes
+  # N2 from the PR #7 review, which I had dismissed as unreachable — shellcheck disagreed,
+  # and robustness should not depend on nobody creating an awkward filename.
+  count=0
+  for b in "${TARGET}${BACKUP_SUFFIX}-"*.bak; do [ -e "$b" ] && count=$((count+1)); done
   [ "$count" -le "$BACKUP_RETAIN" ] && return 0
   excess=$((count - BACKUP_RETAIN))
-  # Oldest first. Names carry a sortable timestamp, so lexical order is chronological.
-  ls -1 "${TARGET}${BACKUP_SUFFIX}-"*.bak 2>/dev/null | sort | head -n "$excess" | while IFS= read -r old; do
+  # Oldest first. Names carry a sortable timestamp, so lexical order is chronological,
+  # and glob expansion is already sorted.
+  removed=0
+  for old in "${TARGET}${BACKUP_SUFFIX}-"*.bak; do
+    [ "$removed" -ge "$excess" ] && break
+    [ -e "$old" ] || continue
     rm -f "$old" 2>/dev/null || printf 'WARNING: could not remove %s\n' "$old" >&2
+    removed=$((removed+1))
   done
   return 0
 }

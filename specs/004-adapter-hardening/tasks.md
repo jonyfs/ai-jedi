@@ -95,6 +95,14 @@ live in the operator's global config, so an accidental write there is worse than
 
 ---
 
+## Phase 8: Lint Triage (FR-007, SC-006 — unblocked by installing the linter)
+
+- [X] T025 Install `shellcheck` and confirm the `lint` group switches from SKIPPED to executing
+- [X] T026 Triage every finding in `.specify/adapters/claude-code/project.sh` and `tests/run-tests.sh`: fix on merit, or suppress inline with a stated justification — never by disabling a rule globally (FR-007)
+- [X] T027 Confirm `shellcheck -s sh` reports zero findings across both files and the suite reports 0 skipped (SC-006)
+
+---
+
 ## Dependencies & Execution Order
 
 **Phase order**: 1 → 2 (blocking) → 3 → 4 → 5 → 6 → 7.
