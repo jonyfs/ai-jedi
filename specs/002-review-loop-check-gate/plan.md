@@ -1,5 +1,5 @@
 ---
-Summary: Implementation plan adding the merge check gate, standing merge authorization, and skip-fixer rule to instructions.md section 8, bumping the instruction surface to 0.1.0.
+Summary: Implementation plan adding the merge check gate, standing merge authorization, and skip-shepherd rule to instructions.md section 8, bumping the instruction surface to 0.1.0.
 Tags: [#plan #instructions #review-loop #check-gate]
 ---
 
@@ -13,7 +13,7 @@ Tags: [#plan #instructions #review-loop #check-gate]
 
 Extend section 8 of `instructions.md` with the three rules the constitution mandates but the file
 never states: the five-state check gate, the operator's standing merge authorization with its
-exclusion list, and the rule that a finding-free review skips the fixer. Bump the instruction title
+exclusion list, and the rule that a finding-free review skips the shepherd. Bump the instruction title
 to `0.1.0` and re-evaluate the frontmatter in the same change set. No existing directive is touched.
 
 ## Technical Context
@@ -48,7 +48,7 @@ scope — none exists.
 | Principle | Gate | Status |
 |---|---|---|
 | I. Single Source of Truth | Change made in `instructions.md` first; no projection hand-edited | PASS — no projections exist |
-| II. Multi-Tool Portability | Content tool-neutral; vendor values isolated | PASS — added rules name no vendor and no literal command; the reviewer and fixer are referred to by role |
+| II. Multi-Tool Portability | Content tool-neutral; vendor values isolated | PASS — added rules name no vendor and no literal command form; the reviewer and shepherd are referred to by role noun, which Principle II does not constrain |
 | III. Language Duality | Artifacts in English | PASS |
 | IV. Token Density with Auto-Clarity | Additions earn their tokens | PASS — each added directive closes a stated gap; none restates an existing rule |
 | V. Spec-Driven Change | specify → plan → tasks → implement → converge | PASS — spec exists, this is the plan step, analyze runs before implementation |
@@ -92,11 +92,23 @@ Post-Phase 1 re-check: PASS. No violations; no Complexity Tracking entries requi
 becomes a subsection between the loop steps and the autonomy bounds, matching the constitution's own
 ordering so a reader comparing the two documents finds them in the same sequence.
 
-**How the skills are named — a deliberate divergence.** The constitution names `/pr-reviewer` and
-`/pr-shepherd` literally. `instructions.md` MUST NOT, because Principle II forbids literal command
-forms in shared content and Principle VIII requires invocation syntax to be derived from the
-integration separator. Section 8 therefore refers to **the reviewer** and **the fixer** by role. This
-is recorded here so a later reader does not "correct" it back into a portability defect.
+**How the roles are named.** The constitution names `/pr-reviewer` and `/pr-shepherd`.
+`instructions.md` MUST NOT carry those literal command forms — Principle II forbids them in shared
+content and Principle VIII requires invocation syntax derived from the integration separator. But the
+BAN IS ON THE COMMAND FORM, NOT THE ROLE NOUN. Section 8 already says **the reviewer** and **the
+shepherd**, and this feature keeps exactly those words.
+
+An earlier draft of this plan claimed the file said "the fixer" and proposed standardizing on it. That
+was wrong on both counts: the file says "shepherd" (5 occurrences, zero of "fixer"), and Principle II
+never constrained the noun. Introducing "fixer" would have put a second name for one role into a single
+section — a readability defect invented out of a misreading. Recorded here so the mistake is not
+repeated.
+
+**Standing consent removes the confirmation, not the mechanism.** Section 8 step 4 already says "arm
+automerge and let the change land through the pull request". FR-009 forbids weakening an existing
+directive, so the standing authorization MUST NOT replace that mechanism with a direct merge. It
+removes the *request for confirmation* before arming it. Tasks and quickstart wording follow this
+reading.
 
 **Five states, not four.** The constitution's prose describes four check states plus the absent case.
 The file states five explicitly, because absent is the state this repository is actually in, and

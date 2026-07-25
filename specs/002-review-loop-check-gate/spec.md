@@ -38,7 +38,7 @@ states and confirm it names the correct action for each, plus the absent-workflo
 3. **Given** a check failing because of the change, **When** the agent evaluates it, **Then** it
    treats the failure as a review finding and returns to the loop.
 4. **Given** a check failing for a reason unrelated to the change, **When** the agent evaluates it,
-   **Then** it halts and reports, and does not hand the failure to the fixer as a code defect.
+   **Then** it halts and reports, and does not hand the failure to the shepherd as a code defect.
 5. **Given** a repository with no automated checks configured at all, **When** the agent reaches the
    merge step, **Then** it merges on review approval and records that no checks existed.
 
@@ -72,21 +72,21 @@ then ask it to weaken branch protection to force a merge through and confirm it 
 
 ### User Story 3 - A clean review does not spend a round on an empty fix (Priority: P2)
 
-When a review closes with no findings, the agent skips the fixer entirely rather than invoking it to
+When a review closes with no findings, the agent skips the shepherd entirely rather than invoking it to
 do nothing.
 
 **Why this priority**: Ranked below the merge rules because the cost is a wasted round rather than a
-wrong outcome. Still real: a no-op fixer invocation produces a diff that the re-review step must then
+wrong outcome. Still real: a no-op invocation produces a diff that the re-review step must then
 examine, burning two steps to review nothing.
 
 **Independent Test**: Give an agent a review that closed with zero findings and confirm it proceeds
-directly to the check gate without invoking the fixer.
+directly to the check gate without invoking the shepherd.
 
 **Acceptance Scenarios**:
 
 1. **Given** a review closed with no findings, **When** the agent continues the loop, **Then** the
-   fixer is not invoked and no round is consumed.
-2. **Given** a review closed with findings, **When** the agent continues, **Then** the fixer runs and
+   shepherd is not invoked and no round is consumed.
+2. **Given** a review closed with findings, **When** the agent continues, **Then** the shepherd runs and
    its own output is re-reviewed before merge.
 
 ---
@@ -109,7 +109,7 @@ directly to the check gate without invoking the fixer.
 - **FR-001**: The file MUST state the four automated-check states and the distinct action each
   requires: merge on green, wait on pending, return a change-caused failure to the loop as a finding,
   and halt on a failure unrelated to the change.
-- **FR-002**: The file MUST state that a failure unrelated to the change is never handed to the fixer
+- **FR-002**: The file MUST state that a failure unrelated to the change is never handed to the shepherd
   as a code defect, because there is no defect to fix and repairing it would mean altering unrelated
   infrastructure.
 - **FR-003**: The file MUST state that distinguishing a change-caused failure from an unrelated one is
@@ -123,7 +123,7 @@ directly to the check gate without invoking the fixer.
 - **FR-006**: The file MUST state the boundary of that consent — it does not extend to weakening
   branch protection, force pushing, deleting an unmerged branch, or merging over an open blocking
   finding, each of which remains individually gated.
-- **FR-007**: The file MUST state that a review closing with no findings skips the fixer entirely
+- **FR-007**: The file MUST state that a review closing with no findings skips the shepherd entirely
   rather than invoking it to produce an empty change.
 - **FR-008**: Every directive added MUST carry an explicit trigger, obligation, and exception field,
   consistent with the form already used throughout the file.
@@ -148,7 +148,7 @@ directly to the check gate without invoking the fixer.
 - **SC-003**: An agent asked to weaken branch protection, force push, delete an unmerged branch, or
   merge over an open blocking finding refuses in 4 of 4 trials, despite the standing merge consent.
 - **SC-004**: An agent given a finding-free review proceeds to the check gate without invoking the
-  fixer, in 3 of 3 trials.
+  shepherd, in 3 of 3 trials.
 - **SC-005**: Every constitutional obligation about the review loop is represented by at least one
   directive in the file — zero gaps between the governing document and the instruction surface.
 - **SC-006**: 100% of directives present before this change remain present with equal or stricter
@@ -160,7 +160,7 @@ directly to the check gate without invoking the fixer.
 
 - The instruction file already carries the review loop, its ordering constraint, its round limit, and
   the post-merge cleanup rule; this feature adds the missing check gate, the standing authorization,
-  and the skip-fixer rule rather than restating what is there.
+  and the skip-shepherd rule rather than restating what is there.
 - The governing constitution is the source of truth for these rules; where the two disagree, the
   constitution wins and the instruction file is corrected.
 - The change adds directives without removing or redefining any, which makes the version increment a

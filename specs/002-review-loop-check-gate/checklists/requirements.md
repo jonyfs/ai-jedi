@@ -36,6 +36,6 @@ Tags: [#checklist #spec-quality]
 
 ## Notes
 
-- Deliberately written without naming the reviewer/fixer skills or the version number: the spec states
+- Deliberately written without the literal reviewer/shepherd command forms or the version number: the spec states
   WHAT must be true, and the plan resolves the concrete skill names, section number, and version.
 - Items marked incomplete require spec updates before `/speckit-clarify` or `/speckit-plan`.

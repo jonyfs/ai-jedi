@@ -5,7 +5,7 @@ Tags: [#readme #onboarding #instructions #operator-guide]
 
 # AI Jedi
 
-**Instruction version: `0.0.1`**
+**Instruction version: `0.1.0`**
 
 One file — [`instructions.md`](instructions.md) — configures every AI coding tool on your machine.
 Write a rule once; every tool that loads the file behaves the same way.
@@ -49,12 +49,24 @@ rewritten. Review findings are severity-ranked, and CRITICAL findings freeze the
 ### Review runs itself, all the way to merge
 
 Open a pull request and the chain starts without being asked: review, fix, then **re-review the
-fixer's own changes** — because those edits are content no reviewer has seen. It loops until a review
-closes clean, then merges and deletes the branch.
+shepherd's own changes** — because those edits are content no reviewer has seen. It loops until a
+review closes clean, then merges and deletes the branch. A review that finds nothing skips the fix
+step entirely, so a clean change does not burn a round on an empty diff.
 
-The autonomy is bounded on purpose. Three rounds maximum. Fixes stay inside what review raised.
-Branch protection is never weakened to get a merge through — a blocked merge halts and reports rather
-than routing around the guardrail. An unconverged change is left open, never merged.
+**It does not stop to ask.** When every gate is clear the merge completes without a confirmation
+prompt — an automation that asks each time is just a prompt with extra steps. The grant covers merging
+and nothing else: weakening branch protection, force pushing, deleting an unmerged branch, and merging
+over an open blocking finding each still require your explicit say-so.
+
+**Automated checks are read, not guessed at.** Five states, five actions: green merges, pending waits
+(never counted as passing), a failure caused by your change goes back through the loop, and a failure
+caused by something else — an outage, expired credentials, a runner that never started — halts and
+reports instead of being handed to the shepherd as a phantom bug. A repository with no checks configured
+is not treated as broken: the merge proceeds on review approval and the absence is recorded, so later
+you can tell "checks passed" from "there were no checks".
+
+The autonomy is bounded on purpose. Three rounds maximum. Fixes stay inside what review raised. An
+unconverged change is left open, never merged.
 
 → [Post-Implementation Review Chain](instructions.md#8-post-implementation-review-chain)
 
@@ -149,7 +161,7 @@ automated. The rules governing them are in place; the mechanism is not.
 
 Honest current state rather than an aspirational one:
 
-- Instruction set: `0.0.1`, first versioned release.
-- Constitution: 12 principles, ratified.
+- Instruction set: `0.1.0`. First release was `0.0.1`.
+- Constitution: 12 principles, v1.14.0.
 - Adapters: none written yet.
 - Behavioral verification across multiple tools: not yet performed.

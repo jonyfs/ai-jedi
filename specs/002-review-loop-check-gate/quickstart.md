@@ -1,5 +1,5 @@
 ---
-Summary: Validation guide proving instructions.md v0.1.0 states the check gate, standing merge authorization, and skip-fixer rule without losing prior directives.
+Summary: Validation guide proving instructions.md v0.1.0 states the check gate, standing merge authorization, and skip-shepherd rule without losing prior directives.
 Tags: [#quickstart #validation #review-loop]
 ---
 
@@ -39,7 +39,7 @@ Read the check-gate subsection and confirm each of the five states maps to exact
 | Green | Merge |
 | Pending or queued | Wait; never treated as passing |
 | Failing from the change | Return to the loop as a finding |
-| Failing unrelated to the change | Halt and report; never handed to the fixer |
+| Failing unrelated to the change | Halt and report; never handed to the shepherd |
 | No checks configured | Not a blocker; merge on review approval; absence recorded |
 
 **Expected**: all five present, each with one unambiguous action, and the judgment-call rule (FR-003)
@@ -63,13 +63,13 @@ Confirm the exclusion list is explicit and complete — the consent must NOT cov
 named. A missing exclusion is a blocking defect: it would let a standing grant leak into a
 destructive action.
 
-## Step 4 — Skip-fixer rule (SC-004, FR-007)
+## Step 4 — Skip-shepherd rule (SC-004, FR-007)
 
 ```bash
 sed -n '/^## 8\./,/^## 9\./p' instructions.md | grep -ci 'no findings'
 ```
 
-**Expected**: the file states that a review closing with no findings skips the fixer entirely, and
+**Expected**: the file states that a review closing with no findings skips the shepherd entirely, and
 says why — a no-op invocation produces a diff the re-review step must then examine.
 
 ## Step 5 — Directive form (FR-008)
@@ -87,8 +87,12 @@ non-zero and consistent.
 
 ```bash
 git show main:instructions.md > /tmp/pre.md
-diff <(grep -oE '^\s*- \*\*[A-Za-z-]+\.\*\*' /tmp/pre.md) \
-     <(grep -oE '^\s*- \*\*[A-Za-z-]+\.\*\*' instructions.md)
+diff <(grep -oE '^\s*[-*] \*\*[^*]+\*\*' /tmp/pre.md) \
+     <(grep -oE '^\s*[-*] \*\*[^*]+\*\*' instructions.md)
+# the narrow class '[A-Za-z-]+\.' matched only 9 of 30 bolded directives - it excluded
+# every '**Trigger**' line and '**Round limit: 3.**'. Counts below are the cross-check:
+grep -c '\*\*Trigger\*\*' instructions.md
+grep -c '\*\*Obligation\*\*' instructions.md
 wc -l instructions.md    # expected: under 800
 ```
 
@@ -102,9 +106,9 @@ blocking defect.
 Compare section 8 against Principle VI in `.specify/memory/constitution.md`. Every constitutional
 obligation about the review loop must have a corresponding directive.
 
-Known and accepted divergence: the constitution names the reviewer and fixer skills literally; the
-instruction file refers to them by role, because Principle II forbids literal command forms in shared
-content. This is intentional — see the Design Decisions in [[plan]].
+Known and accepted divergence: the constitution names the reviewer and shepherd skills by their literal
+command forms; the instruction file uses the role nouns only, because Principle II forbids literal
+command forms in shared content. The NOUNS match both documents — see Design Decisions in [[plan]].
 
 **Expected**: zero gaps other than that recorded divergence.
 

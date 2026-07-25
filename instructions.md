@@ -1,11 +1,11 @@
 ---
-Summary: AI Jedi v0.0.1 — global instruction set governing output compression, engineering lifecycle, file architecture, agent orchestration, provisioning, and self-update for every installed AI coding tool.
-Tags: [#instructions #precedence #compression #lifecycle #review-chain #file-architecture #path-scoping #orchestration #skill-catalog #tool-scoped #provisioning #agent-materialization #parallel-execution #pull-requests #degradation #self-update #versioning]
+Summary: AI Jedi v0.1.0 — global instruction set governing output compression, engineering lifecycle, file architecture, the autonomous review-to-merge loop with its check gate and standing merge authorization, agent orchestration, provisioning, and self-update for every installed AI coding tool.
+Tags: [#instructions #precedence #compression #lifecycle #review-chain #check-gate #merge-authorization #file-architecture #path-scoping #orchestration #skill-catalog #tool-scoped #provisioning #agent-materialization #parallel-execution #pull-requests #degradation #self-update #versioning]
 ---
 
-<!-- AI-JEDI:INSTRUCTIONS:START v0.0.1 -->
+<!-- AI-JEDI:INSTRUCTIONS:START v0.1.0 -->
 
-# ⚡ AI Jedi v0.0.1: Superpowers & Caveman-Enforced LLM Wiki
+# ⚡ AI Jedi v0.1.0: Superpowers & Caveman-Enforced LLM Wiki
 
 ## 1. Frontmatter
 
@@ -17,7 +17,7 @@ authoritative location of the instruction version.
 - **Trigger** — editing this file. **Obligation**: re-evaluate `Summary:` and `Tags:` so the summary
   describes the directives actually carried and the tags cover every capability area present.
   *Exception: none — stale frontmatter is a defect, not a cosmetic issue.*
-- The first versioned release is `0.0.1`. `0.y.z` states that this surface is in initial development
+- The first versioned release was `0.0.1`; this is `0.1.0`. `0.y.z` states that this surface is in initial development
   and any directive may change. `1.0.0` is declared only when the operator states the surface is
   stable.
 
@@ -134,17 +134,60 @@ Implementation is not complete when code is written. It is complete when the cha
 
 1. Run the reviewer. It produces a severity-ranked, evidence-based verdict.
 2. If findings exist, run the shepherd — **only after the review closes** — to resolve review
-   comments, merge conflicts, and failing checks.
+   comments, merge conflicts, and failing checks. **If the review closed with NO findings, skip the
+   shepherd entirely.** It has nothing to resolve, and invoking it anyway costs twice: a wasted round,
+   plus an empty diff that step 3 must then examine. *Exception: none.*
 3. **Re-review the shepherd's own diff.** Its edits are content no reviewer has seen; merging them on
    the strength of the previous review would defeat the chain.
 4. When a review closes with no findings and no failing checks, arm automerge and let the change land
-   through the pull request.
+   through the pull request, subject to the check gate below.
 5. **After the merge completes**, delete the pull request's branch — remote first, then local — and
    remove its worktree.
 
 Running the shepherd before the review closes is prohibited: it would shepherd an unreviewed change.
 CRITICAL findings freeze the branch and block automerge until resolved. The operator may skip the
 chain only by saying so explicitly for that specific change — silence is consent to run it.
+
+**Check gate.** **Trigger** — reaching the merge step. **Obligation**: resolve the repository's
+automated-check state to exactly one of the five below and take that action. The five mean different
+things and MUST NOT be collapsed. *Exception: none — no sixth reading is permitted.*
+
+| State | Action |
+| :--- | :--- |
+| All required checks green | Merge. |
+| Any check pending or queued | **Wait.** Never treat pending as passing — a merge armed before checks settle is a merge that never saw them. |
+| A check failing **because of the change** | That is a finding. Return it to the loop: the shepherd fixes it, and the fix is re-reviewed per step 3. |
+| A check failing for reasons **unrelated to the change** | **Halt and report.** |
+| **No checks configured at all** | **Not a blocker.** Nothing to wait for, so merge on review approval alone. |
+
+**Trigger** — a check fails for reasons unrelated to the change: an infrastructure outage, expired
+credentials, a runner that never started, a workflow already broken before this change existed.
+**Obligation**: halt and report. Never merge past it, and never hand it to the shepherd as a code
+defect — there is no code defect, and "fixing" it would mean editing unrelated infrastructure, exactly
+the scope expansion the bounds below prohibit. *Exception: none.*
+
+**Trigger** — telling a change-caused failure from an unrelated one. **Obligation**: state the judgment
+explicitly in the run log with the evidence behind it. Guessing permissively merges an unverified
+change; guessing restrictively costs only a halt, so bias toward the halt. *Exception: none.*
+
+**Trigger** — no checks are configured. **Obligation**: record the absence in the run log, so a later
+reader can distinguish "checks passed" from "no checks existed". Treating an absent workflow as a
+blocker is prohibited: it would leave the loop permanently unable to merge in any repository that has
+none. *Exception: none.*
+
+**Standing merge authorization.** **Trigger** — every gate clear: review closed with no blocking
+findings, check gate satisfied, branch protection intact. **Obligation**: complete the merge without
+requesting confirmation. Asking anyway is prohibited — it converts the automation into a prompt, which
+is the failure this chain exists to eliminate. This removes the *confirmation*, not the mechanism:
+arming automerge per step 4 remains how the change lands. *Exception: none.*
+
+The authorization covers the merge step ONLY. It does **NOT** extend to any of the following, each of
+which stays individually gated on explicit per-instance consent regardless of the standing grant:
+
+- weakening branch protection
+- force pushing
+- deleting an unmerged branch
+- merging over an open blocking finding
 
 **Autonomy bounds.** Autonomous merge is a real delegation, so it is bounded:
 
