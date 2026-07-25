@@ -134,6 +134,15 @@ New entries extend the register; they do not replace anything above.
 | D61 | Invocation syntax is derived from the active integration's configured separator, never written as a literal in shared content | 12 | FR-015, Principle VIII |
 | D62 | Catalog and manifests must agree — no catalogued-but-unavailable skill, no available-but-uncatalogued skill; verify before dispatching a phase | 11 + 13 | FR-015, Principle VIII |
 | D63 | A skill unavailable in the active harness resolves to its degradation path; the phase is followed manually, never dropped | 14 | FR-006, Principle VIII |
+| D64 | Catalog model column holds only `deep-reasoning` / `balanced-coding` / `fast-lightweight`; vendor names are a defect | 11 | FR-018, Principle X |
+| D65 | Tier-to-model mapping lives in the tool-scoped section, one mapping per integration | 12 | FR-018, Principle X |
+| D66 | A harness with fewer tiers collapses upward; downgrading a `deep-reasoning` phase is prohibited | 12 + 14 | FR-018, Principle X |
+| D67 | Agent-definition location, format, and required fields are stated per harness, in tool-scoped content | 12 + 13 | FR-019, Principle X |
+| D68 | Agent creation is idempotent — unchanged catalog yields byte-identical definitions, never duplicates | 13 | FR-019, Principle X |
+| D69 | Name collision with an operator-authored agent is reported, never resolved by overwriting | 13 | FR-019, Principle X |
+| D70 | No agent is created for a skill absent from the active integration's manifest | 13 | FR-019, Principles VIII and X |
+| D71 | Every materialized agent carries the tier, effort, and scope of its catalog row, traceable back to it | 13 | FR-019, Principle X |
+| D72 | Harness with no sub-agent concept: phase obligations are followed in the main session, in order, and the absence is reported | 14 | FR-019, Principle X |
 
 ## State transitions
 

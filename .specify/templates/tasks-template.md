@@ -172,6 +172,8 @@ an adapter projection). Omit this phase entirely for features that touch neither
 - [ ] TXXX Verify the `AI-JEDI:INSTRUCTIONS:START` / `:END` marker pair is present and in order, and that the start marker's version matches the source title version (Principle IX)
 - [ ] TXXX Verify content outside the marker region is byte-identical to before the change, and that any `SPECKIT` region was left untouched (Principle IX)
 - [ ] TXXX Verify every projection was written to its tool's user-level (global) config path, and that NO project-local config file received an `AI-JEDI:INSTRUCTIONS` region (Principle IX)
+- [ ] TXXX Verify the catalog's Model Selection column holds ONLY `deep-reasoning` / `balanced-coding` / `fast-lightweight`, with the concrete mapping confined to the tool-scoped section (Principle X)
+- [ ] TXXX Regenerate agent definitions for every catalog row whose tier, effort, or scope changed, confirming idempotency and that no operator-authored agent was overwritten (Principle X)
 
 ---
 

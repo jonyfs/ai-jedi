@@ -110,8 +110,21 @@ agent to refresh it, then confirm only the marked span changed, the start marker
 advanced, and content outside the region is byte-identical. Repeat the three failure cases: version
 already current (no write), single marker (refuses), path inside a project tree (refuses).
 
+Tier vocabulary (SC-011):
+
+```bash
+grep -cE 'deep-reasoning|balanced-coding|fast-lightweight' instructions.md   # esperado: >= 10
+grep -nE 'claude-[a-z0-9.-]+' instructions.md   # esperado: apenas dentro da seção 12
+```
+
+Agent materialization (SC-012): ask an agent to set up the tooling, then confirm one definition per
+available catalogued skill, each carrying the tier, effort, and scope of its catalog row. Run it a
+second time — nothing changes. Plant an operator-authored agent sharing a catalogued name and
+confirm the collision is reported, not overwritten.
+
 **Expected**: version present and consistent, exactly one marker pair, no region in project-local
-config, zero dot-form command references, catalog reconciled, all three refusal cases honored.
+config, zero dot-form command references, catalog reconciled, all three refusal cases honored, tier
+tokens only outside section 12, agent set idempotent and collision-safe.
 
 ## Step 7 — Constitution gate before implementation (Principle V)
 

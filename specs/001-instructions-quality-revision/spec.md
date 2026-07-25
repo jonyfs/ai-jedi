@@ -193,6 +193,15 @@ was written.
 - **FR-017**: Guidance for updating installed tools MUST target each tool's global, user-level
   configuration and MUST prohibit writing the managed region into any project-local
   configuration file.
+- **FR-018**: The catalog's model column MUST express a capability tier drawn from a closed
+  three-token vocabulary rather than any vendor model name, and the tier-to-concrete-model mapping
+  MUST live in the tool-scoped section. A harness offering fewer tiers MUST collapse them upward,
+  never downward.
+- **FR-019**: The file MUST describe how to select, configure, and automatically create an agent
+  definition for every catalogued skill in the active harness — including where definitions live,
+  what fields they require, that creation is idempotent, that name collisions with
+  operator-authored agents are reported rather than overwritten, and that no agent is created for
+  a skill unavailable in that harness.
 
 ### Key Entities
 
@@ -228,6 +237,11 @@ was written.
 - **SC-010**: An agent asked to refresh the instructions in an installed tool replaces only the
   marked span, leaves all content outside it byte-identical, and writes to a global configuration
   path in 3 of 3 trials.
+- **SC-011**: Zero vendor model names appear in the catalog; every row's model column holds one of
+  the three tier tokens.
+- **SC-012**: An agent asked to set up the tooling produces one agent definition per available
+  catalogued skill, with tier, effort, and scope traceable to its catalog row; a second run changes
+  nothing, and a pre-existing operator-authored agent of the same name is reported, not replaced.
 
 ## Assumptions
 

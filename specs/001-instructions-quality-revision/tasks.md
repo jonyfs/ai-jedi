@@ -136,8 +136,13 @@ the version, and writes to a global path.
 - [ ] T032f [US5] Write section 13 "Agent Provisioning" in `instructions.md`: detection via the integration manifests, installation with the SpecKit version pinned to `.specify/integration.json`, verification against the manifest SHA256 with drift reported (D59, D60, FR-014)
 - [ ] T032g [US5] Add the unavailable-skill degradation row to section 14 of `instructions.md`: the phase's obligations are followed manually, never dropped (D63, FR-006)
 - [ ] T032h [US5] Confirm no project-local file in this repository carries an `AI-JEDI:INSTRUCTIONS` region, and that `CLAUDE.md` retains only its `SPECKIT` pointer region (FR-017, Principle IX)
+- [ ] T032i [US5] Replace the Model Selection column in the section 11 catalog of `instructions.md` with the closed tier vocabulary — `deep-reasoning`, `balanced-coding`, `fast-lightweight` — mapping the ten existing rows from their current values (D64, FR-018)
+- [ ] T032j [US5] Write the tier-to-concrete-model mapping into section 12 of `instructions.md`, one mapping per integration, plus the collapse-upward rule for harnesses offering fewer tiers (D65, D66, FR-018)
+- [ ] T032k [US5] Write the agent-materialization guidance into section 13 of `instructions.md`: per-harness definition location and format, required fields, idempotent creation, collision reporting, and the no-agent-without-manifest rule (D67–D71, FR-019)
+- [ ] T032l [US5] Add the no-sub-agent-concept degradation row to section 14 of `instructions.md`: phase obligations followed in the main session, in order, with the absence reported (D72, FR-019)
 
-**Checkpoint**: US5 delivers a self-describing, self-updating instruction surface.
+**Checkpoint**: US5 delivers a self-describing, self-updating instruction surface that can
+materialize its own agent set.
 
 ---
 

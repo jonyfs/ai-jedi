@@ -1,14 +1,10 @@
 <!--
 Sync Impact Report
-- Version change: 1.4.0 → 1.5.0
+- Version change: 1.5.0 → 1.6.0
 - Ratification date unchanged: 2026-07-24
-- Modified principles:
-  - Principle IX. Delimited Managed Region — scope materially expanded (not
-    renamed): projections now MUST target each tool's user-level (global)
-    configuration, and writing the managed region into any project-local config
-    is prohibited. Bump is MINOR rather than MAJOR because no adapter exists
-    yet, so no previously compliant artifact becomes non-compliant.
-- Added sections: none
+- Modified principles: none renamed or redefined
+- Added sections:
+  - Principle X. Capability-Tiered Agent Materialization
 - Removed sections: none
 - Templates requiring updates:
   - ✅ .specify/templates/spec-template.md (no constitution-mandated section added)
@@ -22,8 +18,14 @@ Sync Impact Report
     /speckit-converge to audit against (added at v1.2.0; no change needed for
     Principle VIII, whose gate is task-level rather than plan-level)
   - ✅ .specify/templates/checklist-template.md (no change required)
-  - ⚠ instructions.md — (a) model IDs in the SpecKit Skill Catalog reference
-    retired `claude-3-*` names; Principle II requires vendor-current identifiers,
+  - ⚠ instructions.md — (a) the Model Selection column carries retired
+    `claude-3-*` identifiers. Principle X now fixes the remedy: the column MUST
+    hold one of `deep-reasoning` / `balanced-coding` / `fast-lightweight`, with
+    the concrete mapping moved to the tool-scoped section. Existing tasks T016
+    and T024 already implement this shape,
+    (h) no agent-materialization guidance exists; Principle X requires per-harness
+    agent-definition location, format, idempotent creation, and collision
+    reporting,
     (b) Execution Guardrails do not yet mention the Principle VI review chain,
     (c) title carries the unversioned marker `V4`; Principle VII requires a
     full MAJOR.MINOR.PATCH version in the title, with `4.0.0` as the baseline,
@@ -49,8 +51,12 @@ Sync Impact Report
     (exists), `~/.config/github-copilot/` (exists),
     `~/.cursor/` (exists), `~/.codex/AGENTS.md` (absent — adapter must create
     or report unconfigured, never fall back to project-local).
-  - ✅ specs/001-instructions-quality-revision/ — reconciled against Principles
-    VII–IX: spec.md gained FR-013…FR-017, SC-008…SC-010, and User Story 5;
+  - ✅ specs/001-instructions-quality-revision/ — reconciled against Principle X
+    as well: spec.md gained FR-018/FR-019 and SC-011/SC-012; data-model.md gained
+    directives D64…D72; tasks.md gained T032i…T032l in Phase 5B; quickstart.md
+    Step 6B gained the tier-vocabulary and agent-materialization checks.
+  - Detail of the v1.5.0 reconciliation: spec.md gained FR-013…FR-017,
+    SC-008…SC-010, and User Story 5;
     plan.md gained the Instruction Version Bump declaration (MINOR → 4.1.0) and
     sections 13–14 of the target order; data-model.md gained directives D55–D63;
     tasks.md gained Phase 5B (US5) plus the catalog-migration and
@@ -62,6 +68,8 @@ Sync Impact Report
   fallback no longer applies to work pushed to that remote.
 
 Prior version history
+- 1.5.0 (2026-07-24): Principle IX scope expanded — projections target global
+  user-level config only; project-local writes prohibited.
 - 1.4.0 (2026-07-24): added Principle IX. Delimited Managed Region.
 - 1.3.0 (2026-07-24): added Principle VIII. Executable Agent Provisioning.
 - 1.2.0 (2026-07-24): added Principle VII. Versioned Instruction Surface.
@@ -302,6 +310,55 @@ a risky "find my instructions somewhere in this file" heuristic into a mechanica
 idempotent replacement. Targeting the global config is what makes the instruction set global at
 all — a per-project copy is the exact duplication Principle I exists to prevent.
 
+### X. Capability-Tiered Agent Materialization
+
+`instructions.md` MUST describe how to select, configure, and automatically create an agent
+definition for every skill in its catalog, in whatever harness the operator is running. A catalog
+that lists a skill and a model but leaves the operator to hand-build the agent is documentation,
+not a control plane.
+
+**The Model Selection column MUST express a capability tier, never a vendor model name.** The
+tier vocabulary is fixed and closed:
+
+- `deep-reasoning` — hardest analysis, architecture, and governance judgment. Highest capability
+  tier the harness offers.
+- `balanced-coding` — primary implementation and orchestration work. The harness's default
+  general-purpose coding tier.
+- `fast-lightweight` — high-frequency, low-judgment work. The cheapest tier that still completes
+  the task.
+
+Rules on the vocabulary:
+
+- Shared instruction content MUST use only these three tokens. A vendor model identifier appearing
+  in the catalog is a defect (Principle II).
+- The tier → concrete model mapping MUST live in the tool-scoped section (Principle VIII), one
+  mapping per integration, so a vendor rename touches one block.
+- A harness exposing fewer than three tiers MUST collapse them upward, never downward: an absent
+  `fast-lightweight` resolves to `balanced-coding`, and an absent `deep-reasoning` resolves to the
+  highest tier available. Silently downgrading a `deep-reasoning` phase is prohibited.
+- The Effort column is already harness-neutral and MUST remain so.
+
+Agent materialization requirements:
+
+- The file MUST state, per harness, where agent definitions live, what format they take, and which
+  fields are required. That location and format are vendor-specific and therefore tool-scoped.
+- Creation MUST be idempotent: re-running it with an unchanged catalog MUST produce byte-identical
+  definitions and MUST NOT duplicate an existing agent.
+- Creation MUST NOT overwrite an operator-authored agent that happens to share a name. Collision
+  MUST be reported, not resolved by clobbering.
+- An agent MUST NOT be created for a skill absent from the active integration's manifest
+  (Principle VIII). Materializing an agent that dispatches to an uninstallable skill produces a
+  phase that fails at run time rather than at setup time.
+- Every materialized agent MUST carry the tier, the effort, and the scope statement recorded for
+  its skill in the catalog, so the definition is traceable back to a catalog row.
+- Where the harness has no sub-agent concept at all, materialization resolves to the Principle
+  VIII degradation path: the phase's obligations are followed in the main session, in order, and
+  the absence is reported. It MUST NOT be silently skipped.
+
+Rationale: Tier names survive vendor churn; model identifiers do not. And an agent set the
+operator must assemble by hand will drift from the catalog immediately, which reintroduces exactly
+the divergence Principle I exists to eliminate.
+
 ## Tool Adapter & Authoring Constraints
 
 - Every adapter MUST declare: target tool, output path, format, and any tool-imposed size or
@@ -321,6 +378,9 @@ all — a per-project copy is the exact duplication Principle I exists to preven
 - Every adapter MUST declare how its target harness installs and verifies the SpecKit skill set,
   and MUST derive invocation syntax from that integration's `invoke_separator` (Principle VIII).
   An adapter that emits a hardcoded slash-command form is defective.
+- Every adapter MUST declare its harness's agent-definition location and format, and MUST carry the
+  capability-tier → concrete-model mapping for that harness (Principle X). An adapter that emits a
+  vendor model identifier into shared content, or that collapses a tier downward, is defective.
 - Every persisted Markdown artifact MUST open with frontmatter carrying `Summary:` (one
   sentence) and `Tags:`.
 - Files MUST stay atomic and focused: 200–400 lines typical, 800 lines maximum. Split rather
@@ -350,6 +410,9 @@ all — a per-project copy is the exact duplication Principle I exists to preven
   reconcile it against `.specify/integrations/*.manifest.json` in the same change set
   (Principle VIII). A catalog entry with no manifest backing, or an installed skill with no
   catalog entry, is a defect.
+- Any change set that alters a catalog row's tier, effort, or scope MUST regenerate the
+  corresponding agent definitions in the same change set (Principle X). A materialized agent whose
+  tier no longer matches its catalog row is drifted.
 - Any change set that bumps the instruction version MUST also update the version carried by every
   `AI-JEDI:INSTRUCTIONS:START` marker in the repository and in generated projections
   (Principle IX). A projection whose marker version trails the source title is stale by
@@ -373,8 +436,8 @@ This constitution's version and the `instructions.md` version (Principle VII) ar
 counters and MUST NOT be conflated. Amending this file does not bump the instruction version,
 and vice versa.
 
-Compliance review: every pull request MUST verify adherence to Principles I–IX. Complexity
+Compliance review: every pull request MUST verify adherence to Principles I–X. Complexity
 that violates a principle MUST be justified in the plan's Complexity Tracking section or
 removed. Runtime development guidance lives in `instructions.md`.
 
-**Version**: 1.5.0 | **Ratified**: 2026-07-24 | **Last Amended**: 2026-07-24
+**Version**: 1.6.0 | **Ratified**: 2026-07-24 | **Last Amended**: 2026-07-24
