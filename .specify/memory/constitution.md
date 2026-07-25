@@ -1,8 +1,22 @@
 <!--
 Sync Impact Report
-- Version change: 1.11.0 → 1.12.0
+- Version change: 1.12.0 → 1.13.0
 - Ratification date unchanged: 2026-07-24
 - Modified principles:
+  - Principle VI. Automated Post-Implementation Review — two additions. (a) A review
+    closing with NO findings now skips the shepherd entirely rather than invoking it
+    to do nothing, since a no-op invocation wastes a round and produces a diff that
+    step 3 would have to re-review. (b) A Check gate conditions the merge on the
+    repository's automated checks, distinguishing four states: green (merge),
+    pending (wait, never treat as passing), failing because of the change (a
+    finding, back into the loop), and failing for reasons unrelated to the change
+    (halt and report — not a code defect, and "fixing" it would mean editing
+    unrelated infrastructure, the scope expansion these bounds prohibit). Absent
+    workflows are explicitly NOT a blocker: nothing to wait for, so the merge
+    proceeds on review approval, with the absence recorded so a reader can tell
+    "checks passed" from "no checks existed". Bump is MINOR — guidance materially
+    expanded; no existing rule redefined.
+- Superseded report for v1.12.0 — modified principles:
   - Principle VI. Automated Post-Implementation Review — the review-shepherd round
     limit now has a concrete default of 3, overridable per feature in plan.md.
     Previously the principle required "a stated maximum" without stating one,
@@ -42,9 +56,7 @@ Sync Impact Report
     non-compliant.
 - Added sections: none
 - Removed sections: none
-- Standing violation carried from v1.9.0: no `README.md` exists at the repository
-  root and the repository is public. Principle XII remains violated; remedy is
-  task-tracked as T041d…T041f in feature 001.
+- Standing violation from v1.9.0 CLOSED: `README.md` was created at `b5badcb`.
 - Templates requiring updates:
   - ✅ .specify/templates/spec-template.md (no constitution-mandated section added)
   - ✅ .specify/templates/tasks-template.md — Phase N+1 renamed to "Instruction
@@ -57,34 +69,24 @@ Sync Impact Report
     /speckit-converge to audit against (added at v1.2.0; no change needed for
     Principle VIII, whose gate is task-level rather than plan-level)
   - ✅ .specify/templates/checklist-template.md (no change required)
-  - ⚠ instructions.md — 10 open items, each task-tracked in feature 001:
-    (a) the Model Selection column carries retired `claude-3-*` identifiers.
-    Principle X fixes the remedy: the column MUST hold one of `deep-reasoning` /
-    `balanced-coding` / `fast-lightweight`, with the concrete mapping moved to the
-    tool-scoped section,
-    (b) Execution Guardrails do not yet mention the Principle VI review chain,
-    (c) title carries the unversioned marker `V4`; Principle VII requires a
-    full MAJOR.MINOR.PATCH version in the title, with `0.0.1` as the first
-    versioned release and the `V4` marker retired,
-    (d) no provisioning section exists at all; Principle VIII requires detection,
-    installation, and manifest verification guidance for the skill catalog,
-    (e) catalog uses a hardcoded dot separator (`/speckit.plan`) while the
-    installed integration declares `invoke_separator: "-"`; Principle VIII
-    requires the form be derived, not literal,
-    (f) catalog/manifest disagreement: `baseline` is catalogued but installed in
-    no manifest, and installed `taskstoissues` is absent from the catalog,
-    (g) no `AI-JEDI:INSTRUCTIONS` marker pair exists; Principle IX requires the
-    managed region to be explicitly delimited in the source itself,
-    (h) no agent-materialization guidance exists; Principle X requires per-harness
-    agent-definition location, format, idempotent creation, and collision
-    reporting,
-    (i) the Parallelization guardrail says only "dispatch multiple implement
-    sessions"; Principle XI requires per-unit worktree isolation, dependency-order
-    merging, worktree cleanup, and PR-per-story organization,
-    (j) no README.md exists at all; Principle XII requires one explaining every
-    capability's operator benefit
-  - ⚠ README.md — ABSENT. Principle XII is violated as of ratification in a public
-    repository. Remedy task-tracked as T041d…T041f in feature 001.
+  - ✅ instructions.md — RESOLVED at v0.0.1 (commit `b5badcb`). All 10 previously
+    open items closed: tier vocabulary replaces the retired `claude-3-*` identifiers
+    (and section 12 now states resolution RULES rather than naming models at all),
+    the Principle VI review chain is section 8, the title carries `v0.0.1` with the
+    `V4` marker retired, section 13 carries provisioning, invocation syntax is
+    derived from `invoke_separator`, the catalog is reconciled against the
+    availability source of record with `baseline` formally retired and
+    `taskstoissues` plus `agent-context-update` added, the
+    `AI-JEDI:INSTRUCTIONS` marker pair wraps the content, section 13 covers agent
+    materialization, and section 11 carries worktree isolation and PR organization.
+  - ⚠ instructions.md — ONE new pending item from v1.13.0: the check gate added to
+    Principle VI is not yet reflected in section 8. Deferred deliberately rather
+    than edited now: PR #2 is mid-review-loop and Principle VI prohibits scope
+    expansion during it. Carry into a follow-up feature, which will bump the
+    instruction version to `0.1.0` (a directive added → MINOR).
+  - ✅ README.md — CREATED at `b5badcb`. The Principle XII violation standing since
+    v1.9.0 is closed: 155 lines, all 14 capability areas covered, every claim traced
+    to a directive, and the untested tools stated as untested.
   - ✅ CLAUDE.md — correctly carries ONLY the `SPECKIT START`/`SPECKIT END`
     pointer region. Principle IX as amended at v1.5.0 prohibits an
     `AI-JEDI:INSTRUCTIONS` region in project-local config, so no change is
@@ -118,6 +120,10 @@ Sync Impact Report
     tasks.md gained Phase 5B (US5) plus the catalog-migration and
     finding-resolution tasks; quickstart.md gained Step 6B.
 - Deferred TODOs: none
+- Operational note: this repository has NO GitHub workflows configured and
+  `required_status_checks` on `main` is null. Under the v1.13.0 check gate that is
+  the absent-workflows case: not a blocker, merge proceeds on review approval, and
+  the absence is recorded in the run log.
 - Operational note: `delete_branch_on_merge` is now enabled on the GitHub
   repository, so the remote branch is removed by the platform at merge time.
   Principle VI step 5 still governs the LOCAL branch and the worktree, which the
@@ -128,6 +134,7 @@ Sync Impact Report
   fallback no longer applies to work pushed to that remote.
 
 Prior version history
+- 1.12.0 (2026-07-25): Principle VI round limit given a concrete default of 3.
 - 1.11.0 (2026-07-25): frontmatter fidelity and post-merge branch cleanup folded
   into existing sections.
 - 1.10.0 (2026-07-25): Principle VI became an autonomous review-to-merge loop with
@@ -226,8 +233,10 @@ when no pull request exists yet. Both entry points are automatic.
    comments, merge conflicts, and failing checks.
 3. **The shepherd's own diff MUST be re-reviewed.** Its edits are code no reviewer has seen; merging
    them on the strength of the previous review would defeat the chain. Return to step 1.
-4. When a review closes with no findings and no failing checks, the shepherd arms automerge and the
-   change lands on `main` through the pull request.
+4. When a review closes with **no findings**, the shepherd has nothing to resolve and MUST be
+   skipped entirely — invoking it to do nothing wastes a round and produces a diff to re-review. The
+   merge is armed directly, and the change lands on `main` through the pull request, subject to the
+   check gate below.
 5. **After the merge completes**, the pull request's branch MUST be deleted — remote first, then any
    local copy — and its worktree removed per Principle XI.
 
@@ -244,6 +253,30 @@ Running the shepherd before the review has closed is prohibited — it would she
 change. CRITICAL findings freeze the branch: automerge MUST NOT be armed until they are resolved.
 The operator MAY skip the chain only by saying so explicitly for that specific change; silence is
 consent to run it.
+
+**Check gate.** The merge is conditioned on the repository's automated checks. The four states mean
+different things and MUST be treated differently:
+
+- **All required checks green** — merge proceeds. Normal path.
+- **Any check pending or queued** — WAIT. Do not merge; do not treat pending as passing. A merge armed
+  before checks settle is a merge that never saw them.
+- **A check failing because of the change** — that is a finding. It returns to the loop: the shepherd
+  fixes it, and the fix is re-reviewed per step 3.
+- **A check failing or erroring for reasons unrelated to the change** — infrastructure outage, expired
+  credentials, a runner that never started, a workflow already broken on `main`. This MUST halt and
+  report. It MUST NOT be merged past, and it MUST NOT be handed to the shepherd as a code defect:
+  there is no code defect to fix, and "fixing" it would mean editing unrelated infrastructure, which
+  is exactly the scope expansion these bounds prohibit.
+
+Distinguishing the last two is a judgment call. It MUST be stated explicitly in the run log with the
+evidence behind it. Guessing wrong permissively merges an unverified change; guessing wrong
+restrictively only costs a halt.
+
+**No workflows configured at all** is a distinct case and MUST NOT be treated as a blocker: there is
+nothing to wait for, so the merge proceeds on review approval alone. The absence MUST be recorded in
+the run log, because a reader must be able to distinguish "checks passed" from "no checks existed".
+Treating an absent workflow as a blocker would leave the loop permanently unable to merge in any
+repository that has none.
 
 **Autonomy bounds.** Autonomous merge is a real delegation, so it is bounded rather than open-ended:
 
@@ -668,4 +701,4 @@ Compliance review: every pull request MUST verify adherence to Principles I–XI
 that violates a principle MUST be justified in the plan's Complexity Tracking section or
 removed. Runtime development guidance lives in `instructions.md`.
 
-**Version**: 1.12.0 | **Ratified**: 2026-07-24 | **Last Amended**: 2026-07-25
+**Version**: 1.13.0 | **Ratified**: 2026-07-24 | **Last Amended**: 2026-07-25
