@@ -52,7 +52,7 @@ machine-local absolute paths and no credential-shaped strings (invariants I8, I9
 
 ## Step 4 — Governance coverage (SC-003, FR-005)
 
-For each constitutional principle that imposes runtime behavior (I through XI), confirm at
+For each constitutional principle that imposes runtime behavior (I through XII), confirm at
 least one directive in the revised file carries the obligation. Principle VI specifically requires
 the reviewer-then-shepherd ordering, the CRITICAL-freezes-branch rule, and the
 silence-is-consent rule to be stated.
@@ -139,6 +139,24 @@ config, zero dot-form command references, catalog reconciled, all three refusal 
 tokens only outside section 12, agent set idempotent and collision-safe, parallel and PR rules
 stated, zero orphaned worktrees, zero false `[P]` markings.
 
+## Step 6C — README coverage and honesty (SC-015)
+
+```bash
+head -4 README.md                     # esperado: frontmatter com Summary e Tags
+grep -oE 'v?0\.0\.1' README.md        # esperado: versão presente e igual ao título
+grep -nE '/Users/|/home/|ghp_|sk-' README.md   # esperado: sem saída
+```
+
+Coverage: list every capability in the shipped `instructions.md` and confirm each is represented in
+the README. A capability absent from the README is a capability the operator will not find.
+
+Honesty: for each benefit claim in the README, name the directive in [[data-model]] that backs it. A
+claim with no backing directive MUST be removed — not softened. Confirm the tools listed are only
+those actually exercised in Step 6.
+
+**Expected**: zero missing capabilities, zero unbacked claims, zero version mismatch, zero implied
+coverage of untested tools.
+
 ## Step 7 — Constitution gate before implementation (Principle V)
 
 Run `/speckit-analyze` and confirm it reports convergence across `spec.md`, `plan.md`, and
@@ -159,5 +177,6 @@ CRITICAL findings freeze the change until resolved.
 - Step 6 passes across the tools tested
 - Step 6B passes: version consistent, one marker pair, no project-local region, catalog reconciled,
   all three refusal cases honored
+- Step 6C passes: README covers every capability, every claim is directive-backed, version matches
 - Step 7 reports converged
 - Step 8 recorded in the run log

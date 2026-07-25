@@ -176,6 +176,9 @@ section on the first attempt (SC-005).
 - [ ] T041a Record in `.specify/workflows/runs/001-instructions-quality-revision.md` that zero adapters exist today, so the constitutional "regenerate all adapter outputs" gate has no targets in this change set (resolves finding F3)
 - [ ] T041b Cross-walk every directive in `instructions.md` that assumes a harness capability against section 14, confirming each names a fallback — invariant I6 requires total coverage, not four fixed rows (resolves finding F5)
 - [ ] T041c Verify `instructions.md` is loadable as a single artifact with no includes, no companion file, and no tool-specific preprocessing (FR-009, resolves finding F7)
+- [ ] T041d Create `README.md` at the repository root with compliant frontmatter, stating the instruction version `0.0.1` and explaining in operator-facing terms what each capability of `instructions.md` gives the operator (D84, D86, FR-022, Principle XII)
+- [ ] T041e Audit every benefit claim in `README.md` against the directive register in `specs/001-instructions-quality-revision/data-model.md`, removing any claim no directive backs, and confirming the tools listed are only those actually exercised (D85, FR-022, SC-015)
+- [ ] T041f Verify `README.md` links into `instructions.md` sections rather than duplicating directive text, and contains no secrets, operator-identifying data, or machine-local paths (D86, FR-022, Principle I)
 
 ---
 

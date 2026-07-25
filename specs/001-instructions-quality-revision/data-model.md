@@ -154,6 +154,9 @@ New entries extend the register; they do not replace anything above.
 | D81 | No pull request from a branch sharing no ancestor with its declared base | 8 | FR-021, Principle XI |
 | D82 | Stacked work declares its parent pull request explicitly | 8 | FR-021, Principle XI |
 | D83 | Degradation: no repository → serial in one tree and report; no remote → local branches, local review, shepherd pending; no parallel dispatch → sequential in dependency order and report | 14 | FR-020, FR-021, Principle XI |
+| D84 | README explains benefits in operator terms, never restating directive text | n/a — README obligation | FR-022, Principle XII |
+| D85 | No README benefit claim without a backing directive; no implied tool coverage that was not exercised | n/a — README obligation | FR-022, Principle XII |
+| D86 | README states the current instruction version and links into sections rather than duplicating them | n/a — README obligation | FR-022, Principle XII |
 
 ## State transitions
 

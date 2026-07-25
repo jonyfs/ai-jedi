@@ -1,17 +1,14 @@
 <!--
 Sync Impact Report
-- Version change: 1.7.0 → 1.8.0
+- Version change: 1.8.0 → 1.9.0
 - Ratification date unchanged: 2026-07-24
-- Modified principles:
-  - Principle VII. Versioned Instruction Surface — the instruction baseline changes
-    from `4.0.0` to `0.0.1`. The `V4` generation marker is retired rather than
-    mapped onto MAJOR. Adds the `0.y.z` initial-development semantics and requires
-    an explicit amendment before `1.0.0` may be declared. Bump is MINOR, not MAJOR:
-    no instruction file has shipped under the old baseline, so nothing previously
-    compliant becomes non-compliant — only feature 001's undelivered plan needed
-    correcting.
-- Added sections: none
+- Modified principles: none renamed or redefined
+- Added sections:
+  - Principle XII. Operator-Facing README
 - Removed sections: none
+- IMMEDIATE VIOLATION: no `README.md` exists at the repository root, and the
+  repository is public. Principle XII is violated as of ratification. This is
+  recorded rather than hidden; the remedy is task-tracked in feature 001.
 - Templates requiring updates:
   - ✅ .specify/templates/spec-template.md (no constitution-mandated section added)
   - ✅ .specify/templates/tasks-template.md — Phase N+1 renamed to "Instruction
@@ -24,17 +21,11 @@ Sync Impact Report
     /speckit-converge to audit against (added at v1.2.0; no change needed for
     Principle VIII, whose gate is task-level rather than plan-level)
   - ✅ .specify/templates/checklist-template.md (no change required)
-  - ⚠ instructions.md — (a) the Model Selection column carries retired
-    `claude-3-*` identifiers. Principle X now fixes the remedy: the column MUST
-    hold one of `deep-reasoning` / `balanced-coding` / `fast-lightweight`, with
-    the concrete mapping moved to the tool-scoped section. Existing tasks T016
-    and T024 already implement this shape,
-    (h) no agent-materialization guidance exists; Principle X requires per-harness
-    agent-definition location, format, idempotent creation, and collision
-    reporting,
-    (i) the Parallelization guardrail says only "dispatch multiple implement
-    sessions"; Principle XI requires per-unit worktree isolation, dependency-order
-    merging, worktree cleanup, and PR-per-story organization,
+  - ⚠ instructions.md — 10 open items, each task-tracked in feature 001:
+    (a) the Model Selection column carries retired `claude-3-*` identifiers.
+    Principle X fixes the remedy: the column MUST hold one of `deep-reasoning` /
+    `balanced-coding` / `fast-lightweight`, with the concrete mapping moved to the
+    tool-scoped section,
     (b) Execution Guardrails do not yet mention the Principle VI review chain,
     (c) title carries the unversioned marker `V4`; Principle VII requires a
     full MAJOR.MINOR.PATCH version in the title, with `0.0.1` as the first
@@ -47,7 +38,17 @@ Sync Impact Report
     (f) catalog/manifest disagreement: `baseline` is catalogued but installed in
     no manifest, and installed `taskstoissues` is absent from the catalog,
     (g) no `AI-JEDI:INSTRUCTIONS` marker pair exists; Principle IX requires the
-    managed region to be explicitly delimited in the source itself
+    managed region to be explicitly delimited in the source itself,
+    (h) no agent-materialization guidance exists; Principle X requires per-harness
+    agent-definition location, format, idempotent creation, and collision
+    reporting,
+    (i) the Parallelization guardrail says only "dispatch multiple implement
+    sessions"; Principle XI requires per-unit worktree isolation, dependency-order
+    merging, worktree cleanup, and PR-per-story organization,
+    (j) no README.md exists at all; Principle XII requires one explaining every
+    capability's operator benefit
+  - ⚠ README.md — ABSENT. Principle XII is violated as of ratification in a public
+    repository. Remedy task-tracked as T041d…T041f in feature 001.
   - ✅ CLAUDE.md — correctly carries ONLY the `SPECKIT START`/`SPECKIT END`
     pointer region. Principle IX as amended at v1.5.0 prohibits an
     `AI-JEDI:INSTRUCTIONS` region in project-local config, so no change is
@@ -61,7 +62,10 @@ Sync Impact Report
     (exists), `~/.config/github-copilot/` (exists),
     `~/.cursor/` (exists), `~/.codex/AGENTS.md` (absent — adapter must create
     or report unconfigured, never fall back to project-local).
-  - ✅ specs/001-instructions-quality-revision/ — reconciled against Principles X
+  - ✅ specs/001-instructions-quality-revision/ — reconciled against Principle XII
+    as well: spec.md gained FR-022 and SC-015; data-model.md gained D84…D86;
+    tasks.md gained T041d…T041f creating and auditing the README; quickstart.md
+    gained Step 6C. Earlier reconciliation against Principles X
     and XI: spec.md gained FR-018…FR-021 and SC-011…SC-014; data-model.md gained
     directives D64…D83; tasks.md gained T032i…T032p in Phase 5B; plan.md gained the
     Parallel Execution Plan (declaring zero parallel implementation units, since
@@ -81,6 +85,8 @@ Sync Impact Report
   fallback no longer applies to work pushed to that remote.
 
 Prior version history
+- 1.8.0 (2026-07-25): Principle VII baseline corrected — first instruction release
+  is 0.0.1; the `V4` generation marker retired.
 - 1.7.0 (2026-07-25): added Principle XI. Isolated Parallel Execution.
 - 1.6.0 (2026-07-24): added Principle X. Capability-Tiered Agent Materialization.
 - 1.5.0 (2026-07-24): Principle IX scope expanded — projections target global
@@ -435,6 +441,37 @@ Rationale: Parallelism is the only lever that changes wall-clock time on multi-u
 worktrees are what make it safe. Without isolation, concurrency is not speed — it is data loss with
 a progress bar.
 
+### XII. Operator-Facing README
+
+`README.md` MUST exist at the repository root and MUST explain, in operator-facing terms, every
+capability `instructions.md` provides and what the operator gains from it. It is the only artifact
+written for a human deciding whether to adopt the instruction set, and it MUST be updated in the
+same change set as any instruction content change.
+
+- The README MUST state **benefits**, not restate directives. `instructions.md` says what an agent
+  MUST do; the README says what the operator gets. Copying directive text into the README creates a
+  second source of truth and violates Principle I.
+- Every capability in the instruction set MUST be represented. A capability the operator cannot
+  discover from the README is a capability they will not use.
+- **No benefit may be claimed that no directive backs.** The README MUST NOT describe behavior the
+  instruction set does not actually mandate. Aspirational claims are prohibited — a reader adopting
+  the set on the strength of a benefit that does not exist has been misled.
+- The README MUST state the current instruction version, matching the `instructions.md` title
+  (Principle VII). A README quoting a stale version misrepresents what the reader is getting.
+- The README MUST link into `instructions.md` sections rather than duplicating them, so detail lives
+  in one place and the README stays short enough to be read.
+- The README MUST state which tools the instruction set has actually been exercised against, and
+  MUST NOT imply coverage of tools it has not been tested on.
+- The README is a persisted artifact and therefore English (Principle III), free of secrets,
+  operator-identifying data, and machine-local paths (Principle IX's authoring constraints), and
+  carries frontmatter like every other Markdown artifact.
+- When instruction content changes but no operator-visible benefit changes, the README MUST still be
+  reviewed and the no-change decision recorded. Skipping the review is how drift starts.
+
+Rationale: An instruction set nobody can evaluate is an instruction set nobody adopts. The README is
+the adoption surface, and an adoption surface that overstates or lags the product costs more trust
+than having no README at all.
+
 ## Tool Adapter & Authoring Constraints
 
 - Every adapter MUST declare: target tool, output path, format, and any tool-imposed size or
@@ -496,6 +533,9 @@ a progress bar.
   `AI-JEDI:INSTRUCTIONS:START` marker in the repository and in generated projections
   (Principle IX). A projection whose marker version trails the source title is stale by
   definition.
+- Any change set that edits instruction content MUST update `README.md` in the same change set, or
+  record the reviewed no-change decision (Principle XII). Review MUST verify that every README
+  benefit claim is still backed by a directive and that the stated version matches the title.
 
 ## Governance
 
@@ -515,8 +555,8 @@ This constitution's version and the `instructions.md` version (Principle VII) ar
 counters and MUST NOT be conflated. Amending this file does not bump the instruction version,
 and vice versa.
 
-Compliance review: every pull request MUST verify adherence to Principles I–XI. Complexity
+Compliance review: every pull request MUST verify adherence to Principles I–XII. Complexity
 that violates a principle MUST be justified in the plan's Complexity Tracking section or
 removed. Runtime development guidance lives in `instructions.md`.
 
-**Version**: 1.8.0 | **Ratified**: 2026-07-24 | **Last Amended**: 2026-07-25
+**Version**: 1.9.0 | **Ratified**: 2026-07-24 | **Last Amended**: 2026-07-25

@@ -176,6 +176,7 @@ an adapter projection). Omit this phase entirely for features that touch neither
 - [ ] TXXX Regenerate agent definitions for every catalog row whose tier, effort, or scope changed, confirming idempotency and that no operator-authored agent was overwritten (Principle X)
 - [ ] TXXX Verify every `[P]` task genuinely writes a distinct file — a `[P]` on units contending for the same artifact is a false promise and MUST be downgraded to serial (Principle XI)
 - [ ] TXXX Confirm each parallel unit ran in its own worktree and branch, merged in dependency order, and had its worktree removed after merge (Principle XI)
+- [ ] TXXX Update `README.md` for every operator-visible benefit this change set adds or alters, verifying each claim is backed by a directive and the stated version matches the instruction title — or record the reviewed no-change decision (Principle XII)
 
 ---
 

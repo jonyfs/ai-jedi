@@ -211,6 +211,11 @@ was written.
 - **FR-021**: The file MUST state how to organize pull requests when version control and a remote
   are configured — one per independently testable story, each declaring its base and its position in
   the dependency graph — and MUST state the fallbacks when no repository or no remote exists.
+- **FR-022**: A `README.md` MUST exist at the repository root explaining, in operator-facing terms,
+  every capability the instruction set provides and what the operator gains from it. It MUST state
+  the current instruction version, MUST link into the instruction sections rather than duplicating
+  them, MUST NOT claim a benefit no directive backs, and MUST NOT imply coverage of tools the set has
+  not been exercised against.
 
 ### Key Entities
 
@@ -255,6 +260,9 @@ was written.
   one, merges occur in declared dependency order, and zero isolated copies remain after completion.
 - **SC-014**: Every task marked parallel writes a distinct artifact — zero parallel markings on
   units that contend for the same file.
+- **SC-015**: Every capability in the shipped instruction set is represented in the README, every
+  README benefit claim traces to a directive, and the README's stated version matches the title —
+  zero unbacked claims, zero missing capabilities, zero version mismatch.
 
 ## Assumptions
 
