@@ -287,6 +287,13 @@ WV=$(sed -n "${LS}p" "$TARGET" | sed 's/.*START v//;s/ -->.*//')
 # would be the wrong trade.
 prune_backups() {
   [ -n "$BACKUP_RETAIN" ] || return 0
+  # M1: retain comes from an operator-editable declaration. A non-numeric value would
+  # reach the comparison and the arithmetic below and error noisily on every run, which
+  # disturbs the projection FR-003 says housekeeping must not disturb. Skip cleanly and
+  # say why instead.
+  case "$BACKUP_RETAIN" in
+    ''|*[!0-9]*) printf 'WARNING: backup.retain is not a number (%s) — skipping pruning\n' "$BACKUP_RETAIN" >&2; return 0 ;;
+  esac
   [ "${AIJEDI_PRUNE_FAIL:-0}" = "1" ] && { printf 'WARNING: pruning failed (injected)\n' >&2; return 0; }
   # Glob derived from the declared suffix, so only this adapter's own backups are
   # candidates — never the live target, never another tool's files.
@@ -299,7 +306,10 @@ prune_backups() {
   done
   return 0
 }
-prune_backups || printf 'WARNING: pruning step failed; projection is unaffected\n' >&2
+# prune_backups always returns 0 by design (FR-003): every internal failure is warned
+# about, never propagated. An `|| ...` here would be unreachable and would read as
+# protection that does not exist.
+prune_backups
 
 # --- report ------------------------------------------------------------------
 note "Projected instructions v$SRC_VERSION into $TARGET"

@@ -62,3 +62,41 @@ worked because nothing it examined ever matched.
 **T015 — README no-change decision, reviewed and recorded.** Retention limits and static linting are not
 operator-visible benefits: the README describes what the adapter does for the operator, and neither
 changes that. No claim in it became false. Frontmatter re-evaluated and left as is.
+
+## Phase 7 — Review-to-merge loop
+
+**Round limit: 3.** Target: PR #7.
+
+### Round 1 — reviewer
+
+Several things checked and found NOT to be defects, recorded so a later reader does not re-litigate
+them: the `while` loop runs in a subshell but sets no variables, so nothing is lost; `cksum` of empty
+output (`4294967295 0`) differs from a bare newline, so the empty-composition case is genuinely caught;
+the injection branch is inert when unset, and FR-005 proves it byte-for-byte.
+
+**Verdict: comment — 0 blocking, 0 high, 2 medium, 2 nits.**
+
+| ID | Severity | Finding |
+|---|---|---|
+| M1 | Medium | `retain` comes from an operator-editable declaration. A non-numeric value reached both the comparison and the arithmetic, erroring noisily on every run — disturbing the projection that FR-003 says housekeeping must not disturb. |
+| M2 | Medium | `prune_backups \|\| printf ...` was unreachable: the function ends in `return 0` by design, so the `\|\|` branch read as protection that does not exist. |
+| N1 | Nit | A test-only branch lives in production code. Inert and FR-005-verified, but a real cost — the alternative was making each compose step individually checkable, which is larger. Named so the trade is visible rather than incidental. |
+| N2 | Nit | `ls \| wc -l` miscounts a filename containing a newline. Not reachable through the adapter's own naming. |
+
+### Round 1 — shepherd
+
+M1: non-numeric `retain` now warns and skips pruning cleanly. Verified behaviourally, not just
+structurally — the warning appears AND the projection still succeeds with exit 0.
+
+M2: the dead `||` removed, with a comment stating that `prune_backups` returns 0 by design so a future
+reader does not re-add it.
+
+N1 and N2 left as recorded observations. N1 is a design trade already made and verified; N2 is not
+reachable through this adapter's own naming.
+
+### Round 2 — re-review of the shepherd's own diff
+
+Suite 61 passed, 0 failed, 1 skipped. FR-005 byte-identity intact — cksum `2195510091 25097` unchanged
+through both the hardening and its review fixes.
+
+**Round 2 verdict: approve — 0 findings.** Rounds used: 2 of 3.
