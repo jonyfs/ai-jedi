@@ -191,7 +191,8 @@ request exists yet. The operator does not have to ask for it.
 - [ ] TXXX Resolve every CRITICAL finding; CRITICAL findings freeze the branch
 - [ ] TXXX Run `/pr-shepherd` ONLY after the review has closed — resolve comments, conflicts, and failing checks, fixing only what review raised
 - [ ] TXXX Re-run `/pr-reviewer` against the shepherd's own diff — its edits are code no reviewer has seen and MUST NOT merge on the strength of the previous review
-- [ ] TXXX Loop review-shepherd-re-review until a review closes clean, then arm automerge so the change lands on `main` through the pull request
+- [ ] TXXX Loop review-shepherd-re-review until a review closes clean. When a review closes with NO findings, SKIP the shepherd entirely — a no-op invocation wastes a round and produces a diff to re-review
+- [ ] TXXX Apply the check gate before merging: green → merge; pending → wait, never treat as passing; failing because of the change → back into the loop as a finding; failing for unrelated reasons → halt and report, never merge past and never hand to the shepherd as a code defect. NO workflows configured is not a blocker — merge on review approval and record the absence (Principle VI)
 - [ ] TXXX Halt and report if the round limit is reached, if scope would have to expand beyond the findings, or if branch protection blocks the merge — leave the pull request open rather than merging an unconverged change
 - [ ] TXXX AFTER the merge completes, delete the pull request's branch (remote then local) and remove its worktree — never on approval alone, and never `main` or a designated long-lived branch
 
