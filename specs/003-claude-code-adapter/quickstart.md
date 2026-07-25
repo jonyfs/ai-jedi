@@ -19,9 +19,12 @@ Plan: [[plan]] · Spec: [[spec]]
 ```bash
 cat .specify/adapters/claude-code/adapter.yml
 grep -cE 'target_tool|path_pattern|format|size_limit' .specify/adapters/claude-code/adapter.yml
+grep -cE 'skill_install|skill_verify|invoke_separator|agent_definition|tier_map' .specify/adapters/claude-code/adapter.yml
 ```
 
-**Expected**: all four fields present. The path is a home-relative PATTERN, not an absolute path — an
+**Expected**: all EIGHT declared fields present — the original four plus the four the authoring constraints
+require of every adapter (skill install/verify, invocation separator, agent-definition location and format,
+tier-to-model mapping). An adapter declaring only its path and format is incomplete. The path is a home-relative PATTERN, not an absolute path — an
 absolute path in a committed file would leak the operator's username into a public repository.
 
 ```bash
@@ -30,7 +33,7 @@ grep -c '/Users/\|/home/' .specify/adapters/claude-code/adapter.yml   # expected
 
 ## Step 2 — Refusals (FR-002, FR-007, SC-005)
 
-Four hostile cases, each must refuse and write nothing:
+Six hostile cases, each must refuse and write nothing:
 
 ```bash
 cd .specify/adapters/claude-code/tests && ./run-tests.sh refusals
@@ -82,6 +85,16 @@ instruction content.
 byte-identically, and the script REPORTS which span it replaced so the operator can audit the judgment.
 Content duplicated, or the fork left alongside the new region, is a blocking defect.
 
+## Step 5b — Size limit (FR-001b)
+
+```bash
+cd .specify/adapters/claude-code/tests && ./run-tests.sh size
+```
+
+**Expected**: content exceeding the declared limit is REFUSED — never truncated, never summarized. This
+adapter refuses by design: a summarized region would break verbatim projection and would carry a source
+version it does not actually contain, making the drift check lie.
+
 ## Step 6 — Drift check (FR-010, SC-006)
 
 ```bash
@@ -103,11 +116,18 @@ the pre-projection reference with post-projection content, destroying the baseli
 test -f /tmp/claude-md-before.txt || echo "FAIL: T002 snapshot missing, cannot verify byte-identity"
 sh .specify/adapters/claude-code/project.sh
 # byte-identity BELOW the region
+# Assert the exit status - an earlier draft silenced diff with 2>/dev/null and checked
+# nothing, so a failure read as a pass.
 diff <(sed -n '/AI-JEDI:INSTRUCTIONS:END/,$p' ~/.claude/CLAUDE.md) \
-     <(sed -n '/AI-JEDI:INSTRUCTIONS:END/,$p' /tmp/claude-md-before.txt) 2>/dev/null
-# byte-identity ABOVE the region - presence greps alone are weaker than SC-002 demands
-diff <(sed -n '1,/AI-JEDI:INSTRUCTIONS:START/p' ~/.claude/CLAUDE.md | sed '$d') \
-     <(sed -n '1,4p' /tmp/claude-md-before.txt)
+     <(sed -n '/AI-JEDI:INSTRUCTIONS:END/,$p' /tmp/claude-md-before.txt) >/dev/null \
+  && echo "PASS below-region byte-identical" || echo "FAIL below-region differs"
+# byte-identity ABOVE the region - presence greps alone are weaker than SC-002 demands.
+# Derive the line count from the span T002 recorded; do NOT hardcode it. An earlier draft
+# assumed exactly 4 lines above the fork, which only held for one operator's file.
+ABOVE=$(grep -n 'AI-JEDI:INSTRUCTIONS:START' ~/.claude/CLAUDE.md | cut -d: -f1)
+ABOVE=$((ABOVE - 1))
+diff "<(head -n $ABOVE ~/.claude/CLAUDE.md)" "<(head -n $ABOVE /tmp/claude-md-before.txt)" >/dev/null \
+  && echo "PASS above-region byte-identical" || echo "FAIL above-region differs"
 grep -oE 'AI-JEDI:INSTRUCTIONS:START v[0-9.]+' ~/.claude/CLAUDE.md
 grep -c 'SYSTEM SPECIFICATION V4' ~/.claude/CLAUDE.md     # expected: 0 — fork gone
 grep -c '^@RTK.md' ~/.claude/CLAUDE.md                     # expected: 1 — operator import survived

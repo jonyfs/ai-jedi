@@ -141,12 +141,16 @@ without reading the projected content.
   uses, its harness's agent-definition location and format, and its capability-tier to concrete-model
   mapping. An adapter declaring only its path and format is incomplete.
 - **FR-001b**: The adapter MUST act on the declared size limit rather than merely recording it. Content
-  exceeding the target's limit MUST NOT be truncated arbitrarily; the adapter either summarizes or
-  refuses, and states which.
+  exceeding the target's limit MUST NOT be truncated arbitrarily. **This adapter REFUSES rather than
+  summarizes**, and the declaration records that choice. Summarizing is rejected for two concrete
+  reasons: it would break the verbatim span projection FR-004 and FR-005 require, and a summarized region
+  carrying the source version would make the drift check lie — two regions could report the same version
+  while holding different content.
 - **FR-015**: After writing, the adapter MUST verify its own output: both markers present and in order,
   the start marker's version matching the source, content outside the region byte-identical to before,
-  and the written path still user-level. A write that cannot be verified MUST be rolled back from the
-  backup.
+  and the written path still user-level. A write that fails verification MUST be rolled back from the
+  backup. **Boundary with FR-011**: FR-011 owns taking the backup and keeping the write atomic; FR-015
+  owns checking the result and triggering the restore. Neither duplicates the other.
 - **FR-016**: Fork migration MUST be gated on explicit operator confirmation for that specific span. The
   adapter MUST report the exact span and the signal it matched, and MUST refuse when the span is not
   bounded by exactly one heading matching the instruction title's shape extending to end-of-file.
@@ -195,7 +199,7 @@ without reading the projected content.
   start-marker version matching the source, and a fresh session of that tool applies a rule present only
   in the new content.
 - **SC-002**: Every byte of operator-authored content outside the region is identical before and after —
-  zero unintended changes across 3 of 3 runs.
+  zero unintended changes across 3 consecutive runs per fixture, measured rather than assumed.
 - **SC-003**: The pre-existing hand-maintained fork is gone from the global configuration, replaced by
   exactly one marked region, with zero duplicated instruction content.
 - **SC-004**: Running the adapter twice with unchanged source produces byte-identical output and exactly
