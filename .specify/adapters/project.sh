@@ -18,9 +18,17 @@
 set -u
 
 HERE=$(cd "$(dirname "$0")" && pwd)
-DECL="$HERE/adapter.yml"
-REPO=$(cd "$HERE/../../.." && pwd)
+REPO=$(cd "$HERE/../.." && pwd)
 SOURCE="$REPO/instructions.md"
+
+# T005: the declaration is chosen by --target, defaulting to claude-code so every
+# invocation that worked before this feature keeps working.
+TARGET_NAME=claude-code
+for a in "$@"; do
+  case ${prev:-} in --target) TARGET_NAME=$a ;; esac
+  prev=$a
+done
+DECL="$HERE/targets/${TARGET_NAME}.yml"
 
 OUTSIDE=""
 NEW=""
@@ -33,7 +41,7 @@ trap cleanup EXIT INT TERM
 die()  { printf 'REFUSED: %s\n' "$1" >&2; exit 1; }
 note() { printf '%s\n' "$1"; }
 
-[ -f "$DECL" ]   || die "missing declaration: $DECL"
+[ -f "$DECL" ]   || die "no declaration for target '$TARGET_NAME' at $DECL"
 [ -f "$SOURCE" ] || die "missing source: $SOURCE"
 
 # --- declaration ------------------------------------------------------------
@@ -56,6 +64,8 @@ FORK_GENERATION=$(sub generation_marker)
 BACKUP_SUFFIX=$(sub suffix)
 [ -n "$BACKUP_SUFFIX" ] || die "declaration has no backup.suffix"
 BACKUP_RETAIN=$(sub retain)
+SPECKIT_INTEGRATION=$(decl speckit_integration)
+MISSING_DIR_POLICY=$(decl missing_directory)
 
 MSTART_RE='^<!-- AI-JEDI:INSTRUCTIONS:START v[0-9][0-9.]* -->$'
 MEND_RE='^<!-- AI-JEDI:INSTRUCTIONS:END -->$'
@@ -67,8 +77,10 @@ for arg in "$@"; do
   case $arg in
     --check) MODE=check ;;
     --confirm-migration) CONFIRM_MIGRATION=yes ;;
+    --target) SKIP_NEXT=1 ;;
     --) : ;;
-    *) die "unknown argument: $arg" ;;
+    *) [ "${SKIP_NEXT:-0}" = "1" ] && { SKIP_NEXT=0; continue; }
+       die "unknown argument: $arg" ;;
   esac
 done
 
@@ -145,12 +157,18 @@ fi
 FORK_START=""
 if [ -f "$TARGET" ] && [ "$KIND" = absent ]; then
   OUTSIDE=$(mktemp)
-  awk '
+  # T006: foreign markers come from THIS target's declaration. The SPECKIT literals were
+  # hardcoded here while adapter.yml already declared them and was ignored — and a
+  # hardcoded pair cannot recognise OpenCode's caveman-begin/caveman-end syntax. Failing
+  # to recognise a foreign region means overwriting a working tool's configuration.
+  FSTART=$(sed -n '/^foreign_markers:/,/^[a-z_]/p' "$DECL" | sed -n 's/^  - "\(.*\)"$/\1/p' | sed -n 1p)
+  FEND=$(sed -n '/^foreign_markers:/,/^[a-z_]/p' "$DECL" | sed -n 's/^  - "\(.*\)"$/\1/p' | sed -n 2p)
+  awk -v fs="$FSTART" -v fe="$FEND" '
     /^<!-- AI-JEDI:INSTRUCTIONS:START/ { inr=1 }
-    /^<!-- SPECKIT START -->/          { inr=1 }
+    fs != "" && index($0, fs) == 1 { inr=1 }
     !inr { print NR": "$0 }
     /^<!-- AI-JEDI:INSTRUCTIONS:END -->/ { inr=0 }
-    /^<!-- SPECKIT END -->/              { inr=0 }
+    fe != "" && index($0, fe) == 1 { inr=0 }
   ' "$TARGET" > "$OUTSIDE"
 
   # OUTSIDE lines carry an "N: " prefix, so the declaration's ^-anchored patterns must be
@@ -251,7 +269,14 @@ if [ -f "$TARGET" ]; then
   cp "$TARGET" "$BACKUP" || { rm -f "$NEW"; die "could not back up $TARGET"; }
 fi
 
-mkdir -p "$(dirname "$TARGET")" 2>/dev/null
+# T006b: declared policy, not a silent choice.
+if [ ! -d "$(dirname "$TARGET")" ]; then
+  case "${MISSING_DIR_POLICY:-create}" in
+    create) mkdir -p "$(dirname "$TARGET")" 2>/dev/null || { rm -f "$NEW"; die "could not create $(dirname "$TARGET")"; } ;;
+    refuse) rm -f "$NEW"; die "target directory does not exist and this target's missing_directory policy is 'refuse': $(dirname "$TARGET")" ;;
+    *)      rm -f "$NEW"; die "unknown missing_directory policy: $MISSING_DIR_POLICY" ;;
+  esac
+fi
 if [ "${AIJEDI_CORRUPT_WRITE:-0}" = "1" ]; then
   printf 'deliberately corrupt\n' > "$TARGET"   # verification-failure injection
 else
@@ -324,6 +349,12 @@ prune_backups
 
 # --- report ------------------------------------------------------------------
 note "Projected instructions v$SRC_VERSION into $TARGET"
+case "${SPECKIT_INTEGRATION:-none}" in
+  none) note "  This target has no SpecKit integration: skill provisioning and command"
+        note "  invocation fall back to manual execution, per the constitution's"
+        note "  no-integration case. The absence is declared, not silently omitted." ;;
+  *)    note "  SpecKit integration: $SPECKIT_INTEGRATION" ;;
+esac
 if [ -n "$BACKUP" ]; then note "  backup: $BACKUP"; fi
 note "  This takes effect from the tool's NEXT session — the session that ran this"
 note "  script still holds the instructions it loaded at start."

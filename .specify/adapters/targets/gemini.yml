@@ -1,0 +1,64 @@
+# AI Jedi adapter declaration — Gemini
+#
+# Single source of truth for this target's vendor-specific values. project.sh and the
+# test harness both read this file; neither hardcodes any of it.
+#
+# Principle IX: path_pattern is home-relative and expanded at runtime. No absolute path
+# appears here — this file is committed to a public repository and would leak a username.
+
+target_tool: gemini
+
+path_pattern: .gemini/GEMINI.md
+
+format: markdown
+
+markers:
+  start: "<!-- AI-JEDI:INSTRUCTIONS:START v%VERSION% -->"
+  end: "<!-- AI-JEDI:INSTRUCTIONS:END -->"
+
+# Regions owned by other tooling. Never touched, never mistaken for ours. Recognised from
+# THIS declaration rather than a global constant, because marker syntax differs per tool.
+foreign_markers: []
+
+size_limit:
+  lines: 800
+  source: authoring-constraints
+  applies_to: resulting-file-total
+  over_limit: refuse
+
+fork_patterns:
+  versioned_title: '^# .* v[0-9]+\.[0-9]+\.[0-9]+:'
+  generation_marker: '^# .* V[0-9]+:'
+fork_bounding: exactly-one-to-eof
+
+backup:
+  pattern: "%TARGET%.aijedi-backup-%TIMESTAMP%-%PID%.bak"
+  suffix: ".aijedi-backup"
+  extension_is_loadable: false
+  retain: 3
+
+# What to do when the parent directory does not exist. Chosen and stated, not defaulted —
+# a policy left open would make the behavior invisible.
+missing_directory: create
+
+# This target has NO SpecKit integration: .specify/integration.json lists claude alone and
+# .specify/integrations/ holds one manifest. There is no install procedure to describe, no
+# manifest to verify against, and no invoke_separator to derive.
+#
+# Constitution v1.17.0 requires the absence be DECLARED. Fabricating an integration entry
+# to satisfy the letter of the rule would invent data; silently omitting these fields is
+# equally prohibited. Skill provisioning and command invocation fall back to Principle
+# VIII's manual execution.
+speckit_integration: none
+
+agent_definition:
+  location: .gemini/agents/
+  format: markdown-with-frontmatter
+  required_fields: [name, description]
+
+tier_map:
+  deep-reasoning: gemini-2.5-pro
+  balanced-coding: gemini-2.5-flash
+  fast-lightweight: gemini-2.5-flash-lite
+tier_map_verify_before_use: true
+tier_collapse: upward
